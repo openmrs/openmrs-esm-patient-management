@@ -42,41 +42,41 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid, presel
 
   const { mutate } = useSWRConfig();
 
-    const handleCreateNewList = useCallback(() => {
-      const reopenModal = (listIds: Array<string>) => {
-        const dispose = showModal('add-patient-to-patient-list-modal', {
-          closeModal: () => dispose(),
-          patientUuid,
-          preselectedListIds: listIds,
-          size: 'sm',
-        });
-      };
+  const handleCreateNewList = useCallback(() => {
+    const reopenModal = (listIds: Array<string>) => {
+      const dispose = showModal('add-patient-to-patient-list-modal', {
+        closeModal: () => dispose(),
+        patientUuid,
+        preselectedListIds: listIds,
+        size: 'sm',
+      });
+    };
 
-      closeModal();
+    closeModal();
 
-      // No window or group props are passed on purpose: the chart's workspace group is already open,
-      // and null props count as compatible with it, so open chart work (e.g. an unsaved vitals draft)
-      // is left alone and no discard prompt appears.
-      Promise.resolve(
-        launchWorkspace2('patient-list-form-chart-workspace', {
-          onSuccess: async (createdListUuid?: string) => {
-            // Refresh the addable lists so the new list is present when the modal reopens
-            await mutate(['addablePatientLists', patientUuid]);
-            reopenModal(createdListUuid ? [...selected, createdListUuid] : selected);
-          },
-        }),
-      )
-        .then((launched) => {
-          // The user declined a close prompt, so the form never opened: restore the selection modal
-          if (launched === false) {
-            reopenModal(selected);
-          }
-        })
-        .catch((error) => {
-          console.error('Unable to open the create patient list form', error);
+    // No window or group props are passed on purpose: the chart's workspace group is already open,
+    // and null props count as compatible with it, so open chart work (e.g. an unsaved vitals draft)
+    // is left alone and no discard prompt appears.
+    Promise.resolve(
+      launchWorkspace2('patient-list-form-chart-workspace', {
+        onSuccess: async (createdListUuid?: string) => {
+          // Refresh the addable lists so the new list is present when the modal reopens
+          await mutate(['addablePatientLists', patientUuid]);
+          reopenModal(createdListUuid ? [createdListUuid, ...selected] : selected);
+        },
+      }),
+    )
+      .then((launched) => {
+        // The user declined a close prompt, so the form never opened: restore the selection modal
+        if (launched === false) {
           reopenModal(selected);
-        });
-    }, [closeModal, mutate, patientUuid, selected]);
+        }
+      })
+      .catch((error) => {
+        console.error('Unable to open the create patient list form', error);
+        reopenModal(selected);
+      });
+  }, [closeModal, mutate, patientUuid, selected]);
 
   const handleSelectionChanged = useCallback((patientListId: string, listSelected: boolean) => {
     if (listSelected) {
@@ -98,7 +98,10 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid, presel
       showSnackbar({
         title: t('error', 'Error'),
         kind: 'error',
-        subtitle: t('errorSelectedListNotLoaded', 'The selected list could not be loaded. Close this window and try again.'),
+        subtitle: t(
+          'errorSelectedListNotLoaded',
+          'The selected list could not be loaded. Close this window and try again.',
+        ),
       });
       return;
     }
@@ -134,18 +137,32 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid, presel
     });
   }, [selected, closeModal, data, mutateCohortMembers, t]);
 
-  const searchResults = useMemo(() => {
+  // Preselected lists come first (the new list, then earlier selections) so they stay on the first page
+  const orderedLists = useMemo(() => {
     if (!data) {
       return [];
     }
 
-    if (searchValue?.trim().length > 0) {
-      const search = searchValue.toLowerCase();
-      return data.filter((patientList) => patientList.displayName.toLowerCase().includes(search));
+    if (!preselectedListIds?.length) {
+      return data;
     }
 
-    return data;
-  }, [searchValue, data]);
+    const preselectedLists = preselectedListIds
+      .map((listId) => data.find((list) => list.id === listId))
+      .filter((list): list is AddablePatientListViewModel => Boolean(list));
+    const otherLists = data.filter((list) => !preselectedListIds.includes(list.id));
+
+    return [...preselectedLists, ...otherLists];
+  }, [data, preselectedListIds]);
+
+  const searchResults = useMemo(() => {
+    if (searchValue?.trim().length > 0) {
+      const search = searchValue.toLowerCase();
+      return orderedLists.filter((patientList) => patientList.displayName.toLowerCase().includes(search));
+    }
+
+    return orderedLists;
+  }, [searchValue, orderedLists]);
 
   const { results, goTo, currentPage, paginated } = usePagination<AddablePatientListViewModel>(searchResults, 5);
 

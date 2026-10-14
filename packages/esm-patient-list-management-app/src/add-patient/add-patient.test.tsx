@@ -132,7 +132,7 @@ describe('AddPatientModal', () => {
     expect(mockCloseModal).toHaveBeenCalled();
   });
 
-    it('keeps previously checked lists when reopening after a list is created', async () => {
+  it('keeps previously checked lists when reopening after a list is created', async () => {
     const user = userEvent.setup();
     render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
 
@@ -147,7 +147,7 @@ describe('AddPatientModal', () => {
     await waitFor(() =>
       expect(mockShowModal).toHaveBeenCalledWith(
         'add-patient-to-patient-list-modal',
-        expect.objectContaining({ preselectedListIds: ['list1', 'list3'] }),
+        expect.objectContaining({ preselectedListIds: ['list3', 'list1'] }),
       ),
     );
   });
@@ -177,5 +177,31 @@ describe('AddPatientModal', () => {
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }));
     expect(mockCloseModal).not.toHaveBeenCalled();
+  });
+
+  it('shows the newly created list first, followed by the earlier selections', () => {
+    mockUseAddablePatientLists.mockReturnValue({
+      data: Array.from({ length: 8 }, (_, index) => ({
+        id: `list${index + 1}`,
+        displayName: `List ${index + 1}`,
+        addPatient: vi.fn(),
+      })),
+      isLoading: false,
+      error: null,
+      mutate: vi.fn(),
+      isValidating: false,
+    });
+
+    render(
+      <AddPatient
+        closeModal={mockCloseModal}
+        patientUuid={mockPatient.uuid}
+        preselectedListIds={['list8', 'list1', 'list2', 'list3', 'list4', 'list5']}
+      />,
+    );
+
+    const checkboxIds = screen.getAllByRole('checkbox').map((checkbox) => checkbox.id);
+    expect(checkboxIds.slice(0, 5)).toEqual(['list8', 'list1', 'list2', 'list3', 'list4']);
+    expect(screen.getByLabelText('List 8')).toBeChecked();
   });
 });
