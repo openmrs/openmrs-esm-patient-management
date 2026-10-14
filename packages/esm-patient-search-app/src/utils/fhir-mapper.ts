@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { formatPartialDate } from '@openmrs/esm-framework';
 import type { SearchedPatient } from '../types';
 
 const getGender = (gender: string) => {
@@ -35,7 +36,15 @@ export function mapToFhirPatient(patient: SearchedPatient) {
           },
         ]
       : [],
-    birthDate: patient.person.birthdateEstimated ? patient.person.birthdate.slice(0, 4) : patient.person.birthdate,
+    birthDate: patient.person.birthdateEstimated
+      ? formatPartialDate(patient.person.birthdate, {
+          time: false,
+          day: false,
+          month: patient.person.age === 0,
+          year: true,
+          noToday: true,
+        })
+      : patient.person.birthdate,
     deceasedBoolean: patient.person.dead,
     deceasedDateTime: patient.person.deathDate ?? undefined,
     gender: getGender(patient.person.gender),
