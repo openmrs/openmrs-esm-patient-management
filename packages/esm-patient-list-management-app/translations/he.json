@@ -34,6 +34,7 @@
   "errorCreatingList": "שגיאה ביצירת הרשימה",
   "errorDeletingList": "שגיאה במחיקת רשימת המטופלים",
   "errorRemovingPatientFromList": "נכשל להסיר מטופל מהרשימה",
+  "errorSelectedListNotLoaded": "The selected list could not be loaded. Close this window and try again.",
   "errorUpdatingList": "שגיאה בעדכון רשימה",
   "filterByLocation": "Filter by location",
   "identifier": "מזהה",

@@ -34,6 +34,7 @@
   "errorCreatingList": "Ndodhi një gabim gjatë krijimit të listës",
   "errorDeletingList": "Ndodhi një gabim gjatë fshirjes së listës",
   "errorRemovingPatientFromList": "Ndodhi një gabim gjatë heqjes së pacientit nga lista",
+  "errorSelectedListNotLoaded": "The selected list could not be loaded. Close this window and try again.",
   "errorUpdatingList": "Ndodhi një gabim gjatë përditësimit të listës",
   "filterByLocation": "Filter by location",
   "identifier": "Identifikuesi",
