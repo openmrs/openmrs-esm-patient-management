@@ -5,6 +5,8 @@ import {
   DataTable,
   DataTableSkeleton,
   Dropdown,
+  OverflowMenu,
+  OverflowMenuItem,
   InlineLoading,
   Pagination,
   Table,
@@ -17,11 +19,13 @@ import {
   Tag,
   Tile,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
+import { Add } from '@carbon/react/icons';
 import {
   ErrorState,
   isDesktop as desktopLayout,
+  getCoreTranslation,
   launchWorkspace2,
+  showModal,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
@@ -81,6 +85,17 @@ const BedAdministrationTable: React.FC = () => {
     [mutateBedsGroupedByLocation],
   );
 
+  const openDeleteBedModal = useCallback(
+    (uuid: string) => {
+      const dispose = showModal('delete-bed-confirmation-modal', {
+        uuid,
+        closeModal: () => dispose(),
+        mutateBeds: mutateBedsGroupedByLocation,
+      });
+    },
+    [mutateBedsGroupedByLocation],
+  );
+
   const handleBedStatusChange = ({ selectedItem }: { selectedItem: string }) =>
     setFilterOption(selectedItem.trim().toUpperCase());
 
@@ -123,18 +138,24 @@ const BedAdministrationTable: React.FC = () => {
       occupancyStatus: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
       allocationStatus: <CustomTag condition={Boolean(bed.location?.uuid)} />,
       actions: (
-        <Button
-          renderIcon={Edit}
-          onClick={() => handleLaunchBedWorkspace('edit', bed)}
-          kind={'ghost'}
-          iconDescription={t('editBed', 'Edit bed')}
-          hasIconOnly
-          size={responsiveSize}
-          tooltipPosition="right"
-        />
+        <OverflowMenu flipped size={responsiveSize} aria-label={t('actions', 'Actions')}>
+          <OverflowMenuItem
+            className={styles.menuitem}
+            data-testid={`edit-button-${bed.uuid}`}
+            itemText={getCoreTranslation('edit')}
+            onClick={() => handleLaunchBedWorkspace('edit', bed)}
+          />
+          <OverflowMenuItem
+            className={styles.menuitem}
+            isDelete
+            data-testid={`delete-button-${bed.uuid}`}
+            itemText={getCoreTranslation('delete')}
+            onClick={() => openDeleteBedModal(bed.uuid)}
+          />
+        </OverflowMenu>
       ),
     }));
-  }, [handleLaunchBedWorkspace, responsiveSize, paginatedData, t]);
+  }, [handleLaunchBedWorkspace, openDeleteBedModal, responsiveSize, paginatedData, t]);
 
   if (isLoadingBedsGroupedByLocation && !bedsGroupedByLocation.length) {
     return (
