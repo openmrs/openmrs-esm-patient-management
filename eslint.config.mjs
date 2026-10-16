@@ -22,6 +22,7 @@ export default [
       'packages/esm-active-visits-app/**',
       'packages/esm-appointments-app/**',
       'packages/esm-home-app/**',
+      'packages/esm-patient-list-management-app/**',
       'packages/esm-patient-search-app/**',
       'packages/esm-ward-app/**',
     ],

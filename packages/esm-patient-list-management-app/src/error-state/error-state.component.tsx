@@ -4,14 +4,22 @@ import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './error-state.scss';
 
+export interface FetchError extends Error {
+  response?: {
+    status?: number;
+    statusText?: string;
+  };
+}
+
 export interface ErrorStateProps {
-  error: any;
+  error: FetchError | Error | null | undefined;
   headerTitle: string;
 }
 
 export const ErrorState: React.FC<ErrorStateProps> = ({ error, headerTitle }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const response = error && 'response' in error ? (error as FetchError).response : undefined;
 
   return (
     <Layer>
@@ -20,8 +28,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, headerTitle }) =>
           <h2>{headerTitle}</h2>
         </div>
         <p className={styles.errorMessage}>
-          {t('error', 'Error')} {`${error?.response?.status}: `}
-          {error?.response?.statusText}
+          {t('error', 'Error')} {response?.status ? `${response.status}: ` : ''}
+          {response?.statusText ?? error?.message}
         </p>
         <p className={styles.errorCopy}>
           {t(
