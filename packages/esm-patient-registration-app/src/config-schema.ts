@@ -23,6 +23,10 @@ export interface FieldDefinition {
   locationTag?: string;
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<CustomConceptAnswer>;
+  showWhen?: {
+    field: string;
+    answers: Array<string>;
+  };
 }
 
 export interface CustomConceptAnswer {
@@ -238,6 +242,24 @@ export const esmPatientRegistrationSchema = {
           },
         },
       },
+      showWhen: {
+        _description:
+          'Shows this field only while another coded field (person attribute or obs) has one of the given answers. While hidden, the field is not validated, and a value entered before it was hidden is cleared.',
+        field: {
+          _type: Type.String,
+          _default: '',
+          _description:
+            'The id of the coded field definition that controls this field. By default, the field always shows.',
+        },
+        answers: {
+          _type: Type.Array,
+          _default: [],
+          _description: 'The answer concept UUIDs of the controlling field for which this field shows.',
+          _elements: {
+            _type: Type.UUID,
+          },
+        },
+      },
     },
     // Do not add fields here. If you want to add a field in code, add it to built-in fields above.
   },
@@ -437,6 +459,13 @@ export const esmPatientRegistrationSchema = {
       "If fieldDefinitions contains any fields of type 'obs', `registrationObs.encounterTypeUuid` must be set to a non-empty encounter type UUID.",
     ),
     validator(
+      (config: RegistrationConfig) => !config.fieldDefinitions.some((def) => hasInvalidShowWhen(def, config)),
+      (config: RegistrationConfig) => {
+        const badField = config.fieldDefinitions.find((def) => hasInvalidShowWhen(def, config));
+        return `The field definition '${badField.id}' has 'showWhen.field' '${badField.showWhen.field}', which must be the id of another field definition of type 'person attribute' or 'obs'.`;
+      },
+    ),
+    validator(
       (config: RegistrationConfig) =>
         config.sections.every((s) =>
           [...builtInSections, ...config.sectionDefinitions].map((sDef) => sDef.id).includes(s),
@@ -481,6 +510,15 @@ export const esmPatientRegistrationSchema = {
     ),
   ],
 };
+
+function hasInvalidShowWhen(def: FieldDefinition, config: RegistrationConfig) {
+  return (
+    Boolean(def.showWhen?.field) &&
+    !config.fieldDefinitions.some(
+      (other) => other !== def && other.id === def.showWhen.field && ['person attribute', 'obs'].includes(other.type),
+    )
+  );
+}
 
 function stringifyDefinitions(sectionDefinitions: Array<SectionDefinition | FieldDefinition>) {
   return `'${sectionDefinitions.map((s) => s.id).join("', '")}'`;

@@ -117,3 +117,42 @@ describe('esmPatientRegistrationSchema fieldDefinitions type validator', () => {
     expect(validateType('textarea')).toMatch(/one of/i);
   });
 });
+
+describe('esmPatientRegistrationSchema showWhen validator', () => {
+  function showWhenErrors(fieldDefinitions: Array<FieldDefinition>) {
+    return validationErrors(
+      buildConfig({
+        fieldDefinitions,
+        registrationObs: {
+          encounterTypeUuid: 'registration-encounter-type-uuid',
+          encounterProviderRoleUuid: 'provider-role-uuid',
+          registrationFormUuid: null,
+        },
+      }),
+    ).filter((message) => message.includes('showWhen.field'));
+  }
+
+  const guardianName: FieldDefinition = {
+    ...personAttributeFieldDefinition,
+    id: 'guardian-name',
+    uuid: 'guardian-name-uuid',
+    showWhen: { field: 'referred-by', answers: ['guardian-uuid'] },
+  };
+
+  it.each([
+    ['a person attribute field', personAttributeFieldDefinition],
+    ['an obs field', { ...obsFieldDefinition, id: 'referred-by' }],
+  ])('accepts a showWhen that names %s', (_label, controllingField) => {
+    expect(showWhenErrors([controllingField, guardianName])).toEqual([]);
+  });
+
+  it.each([
+    ['an unknown field', [guardianName]],
+    ['a text field', [{ ...personAttributeFieldDefinition, type: 'text' }, guardianName]],
+    ['the field itself', [{ ...guardianName, showWhen: { field: 'guardian-name', answers: [] } }]],
+  ])('reports an error when showWhen names %s', (_label, fieldDefinitions) => {
+    expect(showWhenErrors(fieldDefinitions)).toEqual([
+      expect.stringMatching(/^The field definition 'guardian-name' has 'showWhen.field'/),
+    ]);
+  });
+});
