@@ -53,6 +53,7 @@ const patient: SearchedPatient = {
     age: 35,
     addresses: [],
     birthdate: '1990-01-01T00:00:00.000+0000',
+    birthdateEstimated: false,
     dead: false,
     deathDate: null,
     gender: 'M',
@@ -180,8 +181,53 @@ describe('PatientBanner without the workspace v2 context', () => {
     expect(legacySlotCall[0].state).toEqual(
       expect.objectContaining({
         patientUuid: patient.uuid,
-        patient: expect.objectContaining({ id: patient.uuid }),
+        patient: expect.objectContaining({ id: patient.uuid, birthDate: patient.person.birthdate }),
       }),
     );
   });
+
+  it('maps an estimated birthdate with month precision to the year for patients aged one or older', () => {
+    expect(getMappedBirthDate({ birthdate: '1990-01', age: 35 })).toBe('1990');
+  });
+
+  it('maps an estimated birthdate with day precision to the year for patients aged one or older', () => {
+    expect(getMappedBirthDate({ birthdate: '1990-01-01T00:00:00.000+0000', age: 35 })).toBe('1990');
+  });
+
+  it('preserves month precision for a patient younger than 5 when the stored birthdate has month precision', () => {
+    expect(getMappedBirthDate({ birthdate: '2026-08', age: 4 })).toBe('2026-08');
+  });
+
+  it('removes day precision but preserves the month for a patient younger than 5 with a full stored birthdate', () => {
+    expect(getMappedBirthDate({ birthdate: '2026-08-14T00:00:00.000+0000', age: 4 })).toBe('2026-08');
+  });
+
+  it('preserves month precision for an estimated infant when the stored birthdate has month precision', () => {
+    expect(getMappedBirthDate({ birthdate: '2026-08', age: 0 })).toBe('2026-08');
+  });
+
+  it('removes day precision but preserves the month for an estimated infant with a full stored birthdate', () => {
+    expect(getMappedBirthDate({ birthdate: '2026-08-14T00:00:00.000+0000', age: 0 })).toBe('2026-08');
+  });
+
+  it('maps an estimated birthdate to the year for a 5-year-old', () => {
+    expect(getMappedBirthDate({ birthdate: '2021-08', age: 5 })).toBe('2021');
+  });
+
+  it('removes all precision for a 5-year-old with a full stored birthdate', () => {
+    expect(getMappedBirthDate({ birthdate: '2021-08-14T00:00:00.000+0000', age: 5 })).toBe('2021');
+  });
 });
+
+function getMappedBirthDate({ birthdate, age }: { birthdate: string; age: number }) {
+  render(
+    <PatientBanner
+      patient={{ ...patient, person: { ...patient.person, age, birthdate, birthdateEstimated: true } }}
+      patientUuid={patient.uuid}
+    />,
+  );
+
+  const legacySlotCall = mockExtensionSlot.mock.calls.find(([props]) => props?.name === 'start-visit-button-slot');
+  const mappedPatient = legacySlotCall?.[0].state.patient as { birthDate?: string } | undefined;
+  return mappedPatient?.birthDate;
+}
