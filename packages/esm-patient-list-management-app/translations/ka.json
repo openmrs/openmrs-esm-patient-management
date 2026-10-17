@@ -34,6 +34,7 @@
   "errorCreatingList": "სიის შექმნის შეცდომა",
   "errorDeletingList": "პაციენტების სიის წაშლის შეცდომა",
   "errorRemovingPatientFromList": "Failed to remove patient from list",
+  "errorSelectedListNotLoaded": "The selected list could not be loaded. Close this window and try again.",
   "errorUpdatingList": "სიის განახლების შეცდომა",
   "filterByLocation": "Filter by location",
   "identifier": "იდენტიფიკატორი",

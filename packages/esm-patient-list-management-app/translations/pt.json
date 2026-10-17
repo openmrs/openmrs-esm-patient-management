@@ -34,6 +34,7 @@
   "errorCreatingList": "Erro ao criar lista",
   "errorDeletingList": "Erro ao apagar a lista de utentes",
   "errorRemovingPatientFromList": "Falha ao remover utente da lista",
+  "errorSelectedListNotLoaded": "The selected list could not be loaded. Close this window and try again.",
   "errorUpdatingList": "Erro ao actualizar lista",
   "filterByLocation": "Filter by location",
   "identifier": "Identificador",
