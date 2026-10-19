@@ -32,7 +32,7 @@ export function useActiveVisits() {
     'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,stopDatetime,' +
     'encounters:(encounterDatetime,obs:(uuid,concept:(uuid,display),value)))';
 
-  const getUrl = (pageIndex, previousPageData: FetchResponse<VisitResponse>) => {
+  const getUrl = (pageIndex: number, previousPageData: FetchResponse<VisitResponse>) => {
     if (pageIndex && !previousPageData?.data?.links?.some((link) => link.rel === 'next')) {
       return null;
     }
@@ -177,18 +177,22 @@ export function useObsConcepts(uuids: Array<string>): {
   );
 }
 
-export function useActiveVisitsSorting(tableRows: Array<any>) {
+export function useActiveVisitsSorting(tableRows: Array<ActiveVisit>) {
   const [sortParams, setSortParams] = useState<{
     key: string;
     sortDirection: 'ASC' | 'DESC' | 'NONE';
   }>({ key: 'visitStartTime', sortDirection: 'DESC' });
 
-  const sortRow = (cellA, cellB, { key, sortDirection }) => {
+  const sortRow = (
+    cellA: ActiveVisit,
+    cellB: ActiveVisit,
+    { key, sortDirection }: { key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' },
+  ) => {
     setSortParams({ key, sortDirection });
     return 0; // Return value is not used, actual sorting happens in useMemo
   };
 
-  const getSortValue = (item: any, key: string) => {
+  const getSortValue = (item: ActiveVisit, key: string) => {
     // For observation columns
     if (key.startsWith('obs-')) {
       const conceptUuid = key.replace('obs-', '');
@@ -201,14 +205,14 @@ export function useActiveVisitsSorting(tableRows: Array<any>) {
       return obsValue;
     }
 
-    const value = item[key];
+    const value = item[key] as string | undefined;
     if (value == null) return null;
 
     if (key === 'visitStartTime') {
       return new Date(value).getTime();
     }
 
-    if (key === 'age' && !isNaN(value)) {
+    if (key === 'age' && !isNaN(Number(value))) {
       return Number(value);
     }
 

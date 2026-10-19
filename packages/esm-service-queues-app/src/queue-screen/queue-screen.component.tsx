@@ -1,13 +1,16 @@
 import React from 'react';
-import { DataTableSkeleton, Tile } from '@carbon/react';
+import { DataTableSkeleton, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { EmptyCardIllustration, ErrorState } from '@openmrs/esm-framework';
+import { ErrorState, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject } from '../config-schema';
 import { useActiveTickets } from './useActiveTickets';
+import EmptyState from '../empty-state/empty-state.component';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import styles from './queue-screen.scss';
 
 const QueueScreen: React.FC = () => {
   const { t } = useTranslation();
+  const { callingStatus } = useConfig<ConfigObject>();
   const { activeTickets, isLoading, error } = useActiveTickets();
 
   if (isLoading) {
@@ -23,22 +26,24 @@ const QueueScreen: React.FC = () => {
 
   return (
     <div>
-      <PatientQueueHeader title={t('queueScreen', 'Queue screen')} showFilters />
+      <PatientQueueHeader title={t('queueScreen', 'Queue screen')} />
       {error ? (
         <div className={styles.errorState}>
           <ErrorState error={error} headerTitle={t('queueScreen', 'Queue screen')} />
         </div>
       ) : rowData.length === 0 ? (
-        <Tile className={styles.emptyState}>
-          <EmptyCardIllustration />
-          <p className={styles.emptyStateContent}>{t('noActiveTickets', 'No active tickets to display')}</p>
-        </Tile>
+        <Layer role="status">
+          <EmptyState
+            className={styles.emptyState}
+            displayText={t('noActiveTickets', 'No active tickets to display')}
+          />
+        </Layer>
       ) : (
         <div className={styles.gridFlow}>
           {rowData.map((row) => (
             <div className={styles.card} key={row.id}>
               <p className={styles.subheader}>{t('ticketNumber', 'Ticket number')}</p>
-              <p className={row.status === 'calling' ? styles.headerBlinking : styles.header}>{row.ticketNumber}</p>
+              <p className={row.status === callingStatus ? styles.headerBlinking : styles.header}>{row.ticketNumber}</p>
               <p className={styles.subheader}>
                 {t('room', 'Room')} &nbsp; : &nbsp; {row.room}
               </p>

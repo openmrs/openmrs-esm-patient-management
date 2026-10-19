@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import DeleteIdentifierConfirmationModal from './delete-identifier-confirmation.modal';
@@ -7,8 +8,8 @@ import DeleteIdentifierConfirmationModal from './delete-identifier-confirmation.
  * Helper to render DeleteIdentifierConfirmationModal.
  */
 function renderDeleteIdentifierModal(
-  closeModal = jest.fn(),
-  deleteIdentifier = jest.fn(),
+  closeModal = vi.fn(),
+  deleteIdentifier = vi.fn(),
   identifierName = 'Identifier Name',
   identifierValue = 'Identifier Value',
 ) {
@@ -23,8 +24,8 @@ function renderDeleteIdentifierModal(
 }
 
 describe('DeleteIdentifierConfirmationModal', () => {
-  const mockDeleteIdentifier = jest.fn();
-  const mockCloseModal = jest.fn();
+  const mockDeleteIdentifier = vi.fn();
+  const mockCloseModal = vi.fn();
   const mockIdentifierName = 'OpenMRS ID';
   const mockIdentifierValue = '10001V';
 

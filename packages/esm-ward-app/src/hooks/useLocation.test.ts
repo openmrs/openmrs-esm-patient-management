@@ -1,18 +1,19 @@
 import useSWRImmutable from 'swr/immutable';
+import { vi, describe, it, expect, type Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { restBaseUrl } from '@openmrs/esm-framework';
 import useLocation from './useLocation';
 
-jest.mock('swr/immutable', () =>
-  jest.fn().mockReturnValue({
+vi.mock('swr/immutable', () => ({
+  default: vi.fn().mockReturnValue({
     data: {},
     error: null,
     isValidating: false,
-    mutate: jest.fn(),
+    mutate: vi.fn(),
   }),
-);
+}));
 
-const useSWRImmutableMock = useSWRImmutable as jest.Mock;
+const useSWRImmutableMock = useSWRImmutable as Mock;
 
 describe('useLocation hook', () => {
   it('should call useLocation', () => {

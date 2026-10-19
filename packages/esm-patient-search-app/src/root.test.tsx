@@ -1,10 +1,11 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach, afterAll } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type PatientSearchConfig, configSchema } from './config-schema';
 import PatientSearchRootComponent from './root.component';
 
-const mockUseConfig = jest.mocked(useConfig<PatientSearchConfig>);
+const mockUseConfig = vi.mocked(useConfig<PatientSearchConfig>);
 
 describe('PatientSearchRootComponent', () => {
   beforeEach(() => {

@@ -1,10 +1,11 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import NavGroupExtension from './nav-group.component';
 import { registerNavGroup } from './nav-group';
 
-jest.mock('./nav-group', () => ({
-  registerNavGroup: jest.fn(),
+vi.mock('./nav-group', () => ({
+  registerNavGroup: vi.fn(),
 }));
 
 describe('NavGroupExtension', () => {

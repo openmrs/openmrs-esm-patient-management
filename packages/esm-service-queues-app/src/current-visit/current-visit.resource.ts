@@ -1,23 +1,13 @@
+import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
-import { type ConceptMetadata } from './hooks/useVitalsConceptMetadata';
-import { type ObsMetaInfo } from '../types/index';
+import { type AppointmentStatus } from '../config-schema';
+import { omrsDateFormat, visitCustomRepresentation } from '../constants';
 
 export function useVisit(visitUuid?: string) {
-  const customRepresentation =
-    'custom:(uuid,encounters:(uuid,encounterDatetime,' +
-    // Use default representation for orders to safely include subclass-specific fields (e.g., DrugOrder)
-    // without requesting properties that are not present on other subclasses (e.g., TestOrder).
-    'orders,' +
-    'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
-    'display,groupMembers:(uuid,concept:(uuid,display),' +
-    'value:(uuid,display)),value),encounterType:(uuid,display),' +
-    'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
-    'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
+  const apiUrl = `${restBaseUrl}/visit/${visitUuid}?v=${visitCustomRepresentation}`;
 
-  const apiUrl = `${restBaseUrl}/visit/${visitUuid}?v=${customRepresentation}`;
-
-  const { data, error, isLoading, isValidating } = useSWR<{ data: Visit }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Visit }, Error>(
     visitUuid ? apiUrl : null,
     openmrsFetch,
   );
@@ -27,50 +17,46 @@ export function useVisit(visitUuid?: string) {
     error,
     isLoading,
     isValidating,
+    mutate,
   };
 }
 
-export function calculateBMI(weight: number, height: number): number {
-  if (!weight || !height) {
-    return;
-  }
+const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
 
-  if (weight > 0 && height > 0) {
-    return Number((weight / (height / 100) ** 2).toFixed(1));
-  }
+export interface TodaysAppointment {
+  uuid: string;
+  status: AppointmentStatus;
+  startDateTime: number;
+  service: { name: string };
+  // `name` is null for a provider that is not linked to a person, or whose person has no name.
+  providers: Array<{
+    uuid: string;
+    name: string | null;
+    response: 'AWAITING' | 'ACCEPTED' | 'REJECTED' | 'TENTATIVE' | 'CANCELLED';
+  }>;
 }
 
-export function assessValue(value: number | undefined, range?: ObsMetaInfo): ObservationInterpretation {
-  if (range && value) {
-    if (range.hiCritical && value >= range.hiCritical) {
-      return 'critically_high';
-    }
+export function useTodaysAppointments(patientUuid: string, statuses: Array<AppointmentStatus>) {
+  const startDate = dayjs().startOf('day').format(omrsDateFormat);
+  const endDate = dayjs().endOf('day').format(omrsDateFormat);
 
-    if (range.hiNormal && value > range.hiNormal) {
-      return 'high';
-    }
+  // The appointments module only exposes search via POST. No statuses to show means there is nothing to fetch.
+  const { data, error, isLoading } = useSWR<{ data: Array<TodaysAppointment> }, Error>(
+    patientUuid && statuses.length ? [appointmentsSearchUrl, patientUuid, startDate] : null,
+    () =>
+      openmrsFetch(appointmentsSearchUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: { patientUuid, startDate, endDate },
+      }),
+  );
 
-    if (range.lowCritical && value <= range.lowCritical) {
-      return 'critically_low';
-    }
-
-    if (range.lowNormal && value < range.lowNormal) {
-      return 'low';
-    }
-  }
-
-  return 'normal';
-}
-
-export type ObservationInterpretation = 'critically_low' | 'critically_high' | 'high' | 'low' | 'normal';
-
-export function getReferenceRangesForConcept(
-  conceptUuid: string,
-  conceptMetadata: Array<ConceptMetadata>,
-): ConceptMetadata {
-  if (!conceptUuid || !conceptMetadata?.length) {
-    return null;
-  }
-
-  return conceptMetadata?.find((metadata) => metadata.uuid === conceptUuid);
+  return {
+    // The backend returns these sorted by start time.
+    appointments: data?.data?.filter(({ status }) => statuses.includes(status)) ?? [],
+    // Whether the patient has any appointment today, including those with statuses not shown.
+    hasAppointmentsToday: data?.data?.length > 0,
+    error,
+    isLoading,
+  };
 }

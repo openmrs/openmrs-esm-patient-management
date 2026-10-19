@@ -4,8 +4,9 @@
 
 .visitContainer {
   background-color: $ui-background;
-  display: grid;
-  grid-template-columns: max-content auto;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
 }
 
 .bodyLong01 {
@@ -16,19 +17,28 @@
   @include type.type-style('heading-compact-02');
 }
 
+.headingRow {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+// Same space as between the sections below it in .visitContainer.
+.appointments {
+  margin: 0 layout.$spacing-05 layout.$spacing-05;
+}
+
 .subHeading {
-  @include type.type-style('label-01');
+  @include type.type-style('body-01');
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
   color: $text-02;
 }
 
-.structuredListRow {
-  border-bottom: none;
-}
-
-.structuredList {
-  margin-bottom: 0;
-}
-
 .headingContainer {
-  margin: 0 layout.$spacing-05;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: layout.$spacing-05;
 }

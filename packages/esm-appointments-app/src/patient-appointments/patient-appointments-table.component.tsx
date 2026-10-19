@@ -27,6 +27,7 @@ interface AppointmentTableProps {
   switchedView: boolean;
   setSwitchedView: (value: boolean) => void;
   patientUuid: string;
+  launchAppointmentForm?(patientUuid: string, appointment?: Appointment): void;
 }
 
 const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
@@ -34,6 +35,7 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
   patientUuid,
   switchedView,
   setSwitchedView,
+  launchAppointmentForm,
 }) => {
   const { t } = useTranslation();
   const { results: paginatedAppointments, currentPage, goTo } = usePagination(patientAppointments, pageSize);
@@ -62,7 +64,9 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
       paginatedAppointments?.map((appointment) => {
         return {
           id: appointment.uuid,
-          date: formatDatetime(parseDate(appointment.startDateTime), { mode: 'wide' }),
+          date: appointment.startDateTime
+            ? formatDatetime(new Date(appointment.startDateTime), { mode: 'wide' })
+            : '——',
           location: appointment?.location?.name ? appointment?.location?.name : '——',
           service: appointment.service.name,
           status: appointment.status,
@@ -100,7 +104,11 @@ const PatientAppointmentsTable: React.FC<AppointmentTableProps> = ({
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
                     <TableCell className="cds--table-column-menu">
-                      <PatientAppointmentsActionMenu appointment={paginatedAppointments[i]} patientUuid={patientUuid} />
+                      <PatientAppointmentsActionMenu
+                        appointment={paginatedAppointments[i]}
+                        patientUuid={patientUuid}
+                        launchAppointmentForm={launchAppointmentForm}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}

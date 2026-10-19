@@ -1,9 +1,9 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { forwardRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Layer, Loading, Tile } from '@carbon/react';
+import { Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import { type PatientSearchResponse } from '../types';
-import CompactPatientBanner from './compact-patient-banner.component';
+import CompactPatientBanner, { type CompactPatientBannerHandle } from './compact-patient-banner.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
 
@@ -11,45 +11,28 @@ interface PatientSearchProps extends PatientSearchResponse {
   query: string;
 }
 
-const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage, totalResults }, ref) => {
+const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>(
+  (
+    {
+      data: searchResults,
+      fetchError,
+      hasMore,
+      isLoading,
+      isLoadingMinSearchCharacters = false,
+      isValidating,
+      minSearchCharacters = 0,
+      query,
+      setPage,
+      totalResults,
+    },
+    ref,
+  ) => {
     const { t } = useTranslation();
-    const observer = useRef(null);
 
-    const loadingIconRef = useCallback(
-      (node: HTMLDivElement | null) => {
-        if (isValidating) {
-          return;
-        }
-        if (observer.current) {
-          observer.current.disconnect();
-        }
-        observer.current = new IntersectionObserver(
-          (entries) => {
-            if (entries[0].isIntersecting && hasMore) {
-              setPage((page) => page + 1);
-            }
-          },
-          {
-            threshold: 0.75,
-          },
-        );
-        if (node) {
-          observer.current.observe(node);
-        }
-      },
-      [isValidating, hasMore, setPage],
-    );
+    const fetchMore = useCallback(() => setPage((page) => page + 1), [setPage]);
 
-    useEffect(() => {
-      return () => {
-        if (observer.current) {
-          observer.current.disconnect();
-        }
-      };
-    }, []);
-
-    if (isLoading) {
+    // Only show the full skeleton when there is nothing to show
+    if ((isLoading || isLoadingMinSearchCharacters) && !searchResults?.length) {
       return (
         <div className={styles.searchResultsContainer} role="progressbar">
           {[...Array(5)].map((_, index) => (
@@ -80,6 +63,25 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
       );
     }
 
+    if (query.trim().length < minSearchCharacters) {
+      return (
+        <div className={styles.searchResultsContainer}>
+          <div className={styles.searchResults}>
+            <Layer>
+              <Tile className={styles.emptySearchResultsTile}>
+                <EmptyCardIllustration />
+                <p className={styles.emptyResultText}>
+                  {t('minCharactersRequired', 'Please enter at least {{count}} characters to search', {
+                    count: minSearchCharacters,
+                  })}
+                </p>
+              </Tile>
+            </Layer>
+          </div>
+        </div>
+      );
+    }
+
     if (searchResults?.length) {
       return (
         <div className={styles.searchResultsContainer}>
@@ -89,12 +91,13 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
                 count: totalResults,
               })}
             </p>
-            <CompactPatientBanner patients={searchResults} ref={ref} />
-            {hasMore && (
-              <div className={styles.loadingIcon} ref={loadingIconRef}>
-                <Loading withOverlay={false} small />
-              </div>
-            )}
+            <CompactPatientBanner
+              ref={ref}
+              patients={searchResults}
+              hasMore={hasMore}
+              isValidating={isValidating}
+              fetchMore={fetchMore}
+            />
           </div>
         </div>
       );

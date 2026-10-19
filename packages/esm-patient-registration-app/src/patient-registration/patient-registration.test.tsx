@@ -1,7 +1,14 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { useParams } from 'react-router-dom';
-import { fireEvent, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -14,21 +21,21 @@ import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient, renderWithContext } from 'tools';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../config-schema';
-import { FormManager } from './form-manager';
+import { FormManager, SavePatientTransactionManager, type SavePatientForm } from './form-manager';
 import { PatientRegistration } from './patient-registration.component';
 import { useInitialFormValues } from './patient-registration-hooks';
 import { ResourcesContextProvider } from '../resources-context';
 
-const mockSaveEncounter = jest.mocked(saveEncounter);
-const mockSavePatient = jest.mocked(savePatient);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-const mockUsePatient = jest.mocked(usePatient);
-const mockUseParams = jest.mocked(useParams);
-const mockUseInitialFormValues = jest.mocked(useInitialFormValues);
+const mockSaveEncounter = vi.mocked(saveEncounter);
+const mockSavePatient = vi.mocked(savePatient);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockUsePatient = vi.mocked(usePatient);
+const mockUseParams = vi.mocked(useParams);
+const mockUseInitialFormValues = vi.mocked(useInitialFormValues);
 
-jest.mock('./field/field.resource', () => ({
-  useConcept: jest.fn().mockImplementation((uuid: string) => {
+vi.mock('./field/field.resource', () => ({
+  useConcept: vi.fn().mockImplementation((uuid: string) => {
     let data;
     if (uuid === 'weight-uuid') {
       data = {
@@ -63,7 +70,7 @@ jest.mock('./field/field.resource', () => ({
       isLoading: !data,
     };
   }),
-  useConceptAnswers: jest.fn().mockImplementation((uuid: string) => {
+  useConceptAnswers: vi.fn().mockImplementation((uuid: string) => {
     if (uuid === 'nationality-uuid') {
       return {
         data: [
@@ -84,23 +91,23 @@ jest.mock('./field/field.resource', () => ({
   }),
 }));
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+vi.mock('react-router-dom', async () => ({
+  ...((await vi.importActual('react-router-dom')) as object),
   useLocation: () => ({
     pathname: 'openmrs/spa/patient-registration',
   }),
   useHistory: () => [],
-  useParams: jest.fn().mockReturnValue({ patientUuid: undefined }),
+  useParams: vi.fn().mockReturnValue({ patientUuid: undefined }),
 }));
 
-jest.mock('./patient-registration.resource', () => ({
-  ...jest.requireActual('./patient-registration.resource'),
-  saveEncounter: jest.fn(),
-  savePatient: jest.fn(),
+vi.mock('./patient-registration.resource', async () => ({
+  ...((await vi.importActual('./patient-registration.resource')) as object),
+  saveEncounter: vi.fn(),
+  savePatient: vi.fn(),
 }));
 
-jest.mock('./patient-registration-hooks', () => {
-  const actual = jest.requireActual('./patient-registration-hooks');
+vi.mock('./patient-registration-hooks', async () => {
+  const actual = (await vi.importActual('./patient-registration-hooks')) as object;
   const defaultInitialFormValues = {
     additionalFamilyName: '',
     additionalGivenName: '',
@@ -129,9 +136,8 @@ jest.mock('./patient-registration-hooks', () => {
 
   return {
     ...actual,
-    useInitialFormValues: jest.fn().mockReturnValue([defaultInitialFormValues, jest.fn()]),
-    useInitialAddressFieldValues: jest.fn().mockReturnValue([{}, jest.fn()]),
-    usePatientUuidMap: jest.fn().mockReturnValue([{}, jest.fn()]),
+    useInitialFormValues: vi.fn().mockReturnValue([defaultInitialFormValues, vi.fn()]),
+    usePatientUuidMap: vi.fn().mockReturnValue([{}, vi.fn()]),
   };
 });
 
@@ -277,6 +283,40 @@ const fillRequiredFields = async () => {
   await user.click(genderInput);
 };
 
+const renderWithOptionalPreferredSsn = (savePatientForm: SavePatientForm = vi.fn()) => {
+  const defaultConfig = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+  mockUseConfig.mockReturnValue({
+    ...defaultConfig,
+    ...mockOpenmrsConfig,
+    sectionDefinitions: [
+      { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob', 'id'] },
+      { id: 'contact', name: 'Contact Info', fields: ['address'] },
+    ],
+    defaultPatientIdentifierTypes: ['ssn-uuid'],
+    fieldConfigurations: {
+      ...defaultConfig.fieldConfigurations,
+      ...mockOpenmrsConfig.fieldConfigurations,
+      identifier: { allowPreferredSelection: true },
+    },
+  });
+  renderWithContext(<PatientRegistration savePatientForm={savePatientForm} />, ResourcesContextProvider, {
+    ...mockResourcesContextValue,
+    identifierTypes: [
+      {
+        uuid: 'ssn-uuid',
+        name: 'SSN',
+        fieldName: 'ssn',
+        format: null,
+        formatDescription: null,
+        isPrimary: false,
+        required: false,
+        uniquenessBehavior: null,
+        identifierSources: [],
+      },
+    ],
+  });
+};
+
 describe('Registering a new patient', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
@@ -288,7 +328,7 @@ describe('Registering a new patient', () => {
 
   it('should render all the required fields and sections', async () => {
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={jest.fn()} />,
+      <PatientRegistration savePatientForm={vi.fn()} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -320,7 +360,7 @@ describe('Registering a new patient', () => {
     const user = userEvent.setup();
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />,
+      <PatientRegistration savePatientForm={FormManager.savePatientFormOnline} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -339,6 +379,9 @@ describe('Registering a new patient', () => {
           gender: expect.stringMatching(/^M$/),
           names: [{ givenName: 'Paul', middleName: '', familyName: 'Gaihre', preferred: true, uuid: undefined }],
           dead: false,
+          deathDate: null,
+          causeOfDeath: null,
+          causeOfDeathNonCoded: null,
           uuid: expect.anything(),
         },
         uuid: expect.anything(),
@@ -349,10 +392,10 @@ describe('Registering a new patient', () => {
 
   it('should not save the patient if validation fails', async () => {
     const user = userEvent.setup();
-    const mockSavePatientForm = jest.fn();
+    const mockSavePatientForm = vi.fn();
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />,
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -363,6 +406,38 @@ describe('Registering a new patient', () => {
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 
+  it('shows the missing-value error as soon as an empty identifier is marked as preferred', async () => {
+    const user = userEvent.setup();
+    renderWithOptionalPreferredSsn();
+
+    await user.click(await screen.findByRole('radio', { name: /mark ssn as preferred/i }));
+
+    const ssnInput = screen.getByRole('textbox', { name: 'SSN' });
+    expect(await screen.findByText('Identifier value is required')).toBeInTheDocument();
+    expect(ssnInput).toHaveAttribute('aria-invalid', 'true');
+
+    await user.type(ssnInput, '123-45-6789');
+
+    await waitFor(() => expect(screen.queryByText('Identifier value is required')).not.toBeInTheDocument());
+    expect(ssnInput).not.toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('explains on the field why an empty preferred identifier blocks registration', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+    renderWithOptionalPreferredSsn(mockSavePatientForm);
+
+    await fillRequiredFields();
+    await user.click(await screen.findByRole('radio', { name: /mark ssn as preferred/i }));
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    const ssnInput = await screen.findByRole('textbox', { name: 'SSN' });
+    expect(screen.queryByRole('textbox', { name: /ssn \(optional\)/i })).not.toBeInTheDocument();
+    expect(await screen.findByText('Identifier value is required')).toBeInTheDocument();
+    expect(ssnInput).toHaveAttribute('aria-invalid', 'true');
+    expect(mockSavePatientForm).not.toHaveBeenCalled();
+  });
+
   it('renders and saves registration obs', async () => {
     const user = userEvent.setup();
 
@@ -370,7 +445,7 @@ describe('Registering a new patient', () => {
     mockUseConfig.mockReturnValue(configWithObs);
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />,
+      <PatientRegistration savePatientForm={FormManager.savePatientFormOnline} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -408,7 +483,7 @@ describe('Registering a new patient', () => {
     mockUseConfig.mockReturnValue(configWithObs);
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />,
+      <PatientRegistration savePatientForm={FormManager.savePatientFormOnline} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -454,11 +529,6 @@ describe('Updating an existing patient record', () => {
     });
     mockSavePatient.mockResolvedValue({ data: { uuid: 'new-pt-uuid' }, ok: true } as any);
     mockUseParams.mockReturnValue({ patientUuid: mockPatient.id });
-  });
-
-  it('edits patient demographics', async () => {
-    const user = userEvent.setup();
-    const mockSavePatientForm = jest.fn();
 
     mockUseInitialFormValues.mockReturnValue([
       {
@@ -509,11 +579,16 @@ describe('Updating an existing patient record', () => {
         telephoneNumber: '',
         yearsEstimated: 0,
       } as FormValues,
-      jest.fn(),
+      vi.fn(),
     ]);
+  });
+
+  it('edits patient demographics', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
 
     renderWithContext(
-      <PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />,
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
       ResourcesContextProvider,
       mockResourcesContextValue,
     );
@@ -594,14 +669,47 @@ describe('Updating an existing patient record', () => {
         yearsEstimated: 0,
       },
       expect.anything(),
-      expect.anything(),
       null,
       undefined,
       expect.anything(),
       expect.anything(),
       expect.anything(),
-      { patientSaved: false },
-      expect.anything(),
+      { patientSaved: false, generatedIdentifiers: {}, addedIdentifiers: {} },
     );
   });
+
+  it.each(['another-patient-uuid', undefined])(
+    'preserves retry state for the same patient and resets it when the route patient changes to %s',
+    async (nextPatientUuid) => {
+      const user = userEvent.setup();
+      const mockSavePatientForm = vi.fn<SavePatientForm>().mockRejectedValue(new Error('Save failed'));
+      const renderForm = () => (
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <PatientRegistration savePatientForm={mockSavePatientForm} />
+        </ResourcesContextProvider>
+      );
+      const { rerender } = render(renderForm());
+
+      await user.click(screen.getByRole('button', { name: /update patient/i }));
+      expect(mockSavePatientForm).toHaveBeenCalledOnce();
+      const firstManager = mockSavePatientForm.mock.calls[0][8];
+      firstManager.patientSaved = true;
+      firstManager.generatedIdentifiers.openMrsId = { sourceUuid: 'source-uuid', identifier: '10001V' };
+      firstManager.addedIdentifiers.openMrsId = '10001V';
+
+      rerender(renderForm());
+      await user.click(screen.getByRole('button', { name: /update patient/i }));
+      expect(mockSavePatientForm).toHaveBeenCalledTimes(2);
+      expect(mockSavePatientForm.mock.calls[1][8]).toBe(firstManager);
+      expect(firstManager.addedIdentifiers.openMrsId).toBe('10001V');
+
+      mockUseParams.mockReturnValue({ patientUuid: nextPatientUuid });
+      rerender(renderForm());
+      await user.click(screen.getByRole('button', { name: /update patient|register patient/i }));
+      expect(mockSavePatientForm).toHaveBeenCalledTimes(3);
+      const nextManager = mockSavePatientForm.mock.calls[2][8];
+      expect(nextManager).not.toBe(firstManager);
+      expect(nextManager).toEqual(new SavePatientTransactionManager());
+    },
+  );
 });

@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-bed-management-app",
-  "version": "10.0.2",
+  "version": "12.1.1",
   "description": "Bed management app for OpenMRS 3",
   "browser": "dist/openmrs-esm-bed-management-app.js",
   "main": "src/index.ts",
@@ -12,11 +12,12 @@
     "serve": "rspack serve --mode=development",
     "debug": "npm run serve",
     "build": "rspack --mode production",
+    "clean": "git clean -fdX -- dist",
     "analyze": "rspack --mode=production --env.analyze=true",
-    "lint": "cross-env eslint src --ext ts,tsx",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
-    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
-    "coverage": "yarn test --coverage",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest watch",
+    "coverage": "vitest run --coverage --passWithNoTests",
     "typescript": "tsc",
     "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.extension.tsx' 'src/**/*modal.tsx' 'src/**/*.workspace.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
@@ -34,10 +35,9 @@
     "url": "git+https://github.com/openmrs/openmrs-esm-patient-management.git"
   },
   "bugs": {
-    "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
+    "url": "https://openmrs.atlassian.net/jira/software/c/projects/O3/boards/37"
   },
   "dependencies": {
-    "@carbon/react": "^1.83.0",
     "@hookform/resolvers": "^3.9.1",
     "classnames": "^2.3.2",
     "lodash-es": "^4.17.15",
@@ -45,14 +45,18 @@
     "zod": "^3.24.1"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "9.x",
+    "@carbon/react": "1.x",
+    "@openmrs/esm-framework": "11.x",
     "dayjs": "1.x",
     "react": "18.x",
+    "react-dom": "18.x",
     "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
   "devDependencies": {
-    "openmrs": "next"
+    "@carbon/react": "^1.83.0",
+    "openmrs": "next",
+    "vitest": "^4.1.2"
   }
 }

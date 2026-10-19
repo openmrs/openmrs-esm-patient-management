@@ -1,6 +1,7 @@
+import { vi } from 'vitest';
 import { type ConceptResponse } from '../../patient-registration.types';
 
-export const useConcept = jest.fn(function mockUseConceptImplementation(uuid: string): {
+export const useConcept = vi.fn(function mockUseConceptImplementation(uuid: string): {
   data: ConceptResponse;
   isLoading: boolean;
 } {
@@ -39,7 +40,7 @@ export const useConcept = jest.fn(function mockUseConceptImplementation(uuid: st
   };
 });
 
-export const useConceptAnswers = jest.fn((uuid: string) => {
+export const useConceptAnswers = vi.fn((uuid: string) => {
   if (uuid === 'nationality-uuid') {
     return {
       data: [

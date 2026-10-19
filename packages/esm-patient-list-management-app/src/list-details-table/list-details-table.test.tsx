@@ -1,14 +1,15 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { isDesktop, launchWorkspace2, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { addPatientToList } from '../api/patient-list.resource';
 import ListDetailsTable from './list-details-table.component';
 
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockIsDesktop = jest.mocked(isDesktop);
-const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockIsDesktop = vi.mocked(isDesktop);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
 beforeEach(() => {
   mockUseLayoutType.mockReturnValue('small-desktop');
@@ -17,9 +18,9 @@ beforeEach(() => {
   mockLaunchWorkspace2.mockImplementation(() => {});
 });
 
-jest.mock('../api/patient-list.resource', () => ({
-  addPatientToList: jest.fn().mockResolvedValue({}),
-  removePatientFromList: jest.fn(),
+vi.mock('../api/patient-list.resource', () => ({
+  addPatientToList: vi.fn().mockResolvedValue({}),
+  removePatientFromList: vi.fn(),
 }));
 
 describe('ListDetailsTable', () => {
@@ -63,7 +64,7 @@ describe('ListDetailsTable', () => {
     },
   ];
 
-  const mockOnChange = jest.fn();
+  const mockOnChange = vi.fn();
 
   let pagination = {
     usePagination: true,
@@ -83,8 +84,8 @@ describe('ListDetailsTable', () => {
         isLoading={false}
         autoFocus={false}
         isFetching={true}
-        mutateListDetails={jest.fn()}
-        mutateListMembers={jest.fn()}
+        mutateListDetails={vi.fn()}
+        mutateListMembers={vi.fn()}
         cohortUuid="test-cohort"
       />,
     );
@@ -100,8 +101,8 @@ describe('ListDetailsTable', () => {
         isLoading={true}
         autoFocus={false}
         isFetching={false}
-        mutateListDetails={jest.fn()}
-        mutateListMembers={jest.fn()}
+        mutateListDetails={vi.fn()}
+        mutateListMembers={vi.fn()}
         cohortUuid="test-cohort"
       />,
     );
@@ -117,8 +118,8 @@ describe('ListDetailsTable', () => {
         columns={columns}
         isFetching={false}
         isLoading={false}
-        mutateListDetails={jest.fn()}
-        mutateListMembers={jest.fn()}
+        mutateListDetails={vi.fn()}
+        mutateListMembers={vi.fn()}
         pagination={pagination}
         patients={patients}
       />,
@@ -137,8 +138,8 @@ describe('ListDetailsTable', () => {
         isLoading={false}
         autoFocus={false}
         isFetching={false}
-        mutateListDetails={jest.fn()}
-        mutateListMembers={jest.fn()}
+        mutateListDetails={vi.fn()}
+        mutateListMembers={vi.fn()}
         cohortUuid="test-cohort"
       />,
     );
@@ -161,9 +162,9 @@ describe('ListDetailsTable', () => {
   });
 
   it('adds patient to list when onPatientSelected callback is invoked', async () => {
-    const mockMutateListDetails = jest.fn();
-    const mockMutateListMembers = jest.fn();
-    const mockCloseWorkspace = jest.fn();
+    const mockMutateListDetails = vi.fn();
+    const mockMutateListMembers = vi.fn();
+    const mockCloseWorkspace = vi.fn();
     const user = userEvent.setup();
 
     render(
@@ -187,7 +188,7 @@ describe('ListDetailsTable', () => {
     const workspaceProps = launchWorkspace2Call[1];
     const onPatientSelected = workspaceProps.onPatientSelected;
 
-    await onPatientSelected('new-patient-uuid', {} as fhir.Patient, jest.fn(), mockCloseWorkspace);
+    await onPatientSelected('new-patient-uuid', {} as fhir.Patient, vi.fn(), mockCloseWorkspace);
 
     await waitFor(() => {
       expect(addPatientToList).toHaveBeenCalledWith({

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Search } from '@carbon/react';
 import styles from './patient-search-bar.scss';
@@ -17,6 +17,11 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const responsiveSize = isCompact ? 'sm' : 'lg';
+
+    // Keep the field in step with a term supplied from outside, such as the query in the URL.
+    useEffect(() => {
+      setSearchTerm(initialSearchTerm);
+    }, [initialSearchTerm]);
 
     const handleChange = useCallback(
       (value: string) => {
@@ -38,7 +43,6 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
 
     return (
       <form onSubmit={handleSubmit} className={styles.searchArea}>
-        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
         <Search
           autoFocus
           className={styles.patientSearchInput}

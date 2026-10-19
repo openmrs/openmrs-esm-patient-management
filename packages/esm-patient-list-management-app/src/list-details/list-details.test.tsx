@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { OpenmrsCohortMember, OpenmrsCohort } from '../api/types';
@@ -8,20 +9,20 @@ import { deletePatientList } from '../api/patient-list.resource';
 import { getByTextWithMarkup } from 'tools';
 import ListDetails from './list-details.component';
 
-const mockUsePatientListDetails = jest.mocked(usePatientListDetails);
-const mockUsePatientListMembers = jest.mocked(usePatientListMembers);
-const mockDeletePatientList = jest.mocked(deletePatientList);
-const mockUseCohortTypes = jest.mocked(useCohortTypes);
-const mockShowModal = jest.mocked(showModal);
-const mockLaunchWorkspace2 = jest.mocked(launchWorkspace2);
+const mockUsePatientListDetails = vi.mocked(usePatientListDetails);
+const mockUsePatientListMembers = vi.mocked(usePatientListMembers);
+const mockDeletePatientList = vi.mocked(deletePatientList);
+const mockUseCohortTypes = vi.mocked(useCohortTypes);
+const mockShowModal = vi.mocked(showModal);
+const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
 
-jest.mock('../api/hooks', () => ({
-  usePatientListDetails: jest.fn(),
-  usePatientListMembers: jest.fn(),
-  useCohortTypes: jest.fn(),
+vi.mock('../api/hooks', () => ({
+  usePatientListDetails: vi.fn(),
+  usePatientListMembers: vi.fn(),
+  useCohortTypes: vi.fn(),
 }));
 
-jest.mock('../api/patient-list.resource');
+vi.mock('../api/patient-list.resource');
 
 const mockPatientListDetails = {
   name: 'Test Patient List',
@@ -68,14 +69,14 @@ describe('ListDetails', () => {
       listDetails: mockPatientListDetails,
       error: null,
       isLoading: false,
-      mutateListDetails: jest.fn().mockResolvedValue({}),
+      mutateListDetails: vi.fn().mockResolvedValue({}),
     });
 
     mockUsePatientListMembers.mockReturnValue({
       listMembers: mockPatientListMembers,
       isLoadingListMembers: false,
       error: null,
-      mutateListMembers: jest.fn().mockResolvedValue({}),
+      mutateListMembers: vi.fn().mockResolvedValue({}),
     });
 
     mockDeletePatientList.mockResolvedValue({});
@@ -84,7 +85,7 @@ describe('ListDetails', () => {
       listCohortTypes: mockCohortTypeList,
       isLoading: false,
       error: null,
-      mutate: jest.fn().mockReturnValue({}),
+      mutate: vi.fn().mockReturnValue({}),
     });
   });
 
@@ -106,7 +107,7 @@ describe('ListDetails', () => {
       listMembers: [],
       isLoadingListMembers: false,
       error: null,
-      mutateListMembers: jest.fn().mockResolvedValue({}),
+      mutateListMembers: vi.fn().mockResolvedValue({}),
     });
 
     render(<ListDetails />);

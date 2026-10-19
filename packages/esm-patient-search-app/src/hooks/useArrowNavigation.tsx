@@ -1,16 +1,34 @@
-import { useEffect, useState, useCallback } from 'react';
-import { type SearchedPatient } from '../types';
+import { useEffect, useState, useCallback, useRef, type RefObject } from 'react';
 
 const useArrowNavigation = (
   totalResults: number,
-  enterCallback: (evt: React.MouseEvent<HTMLAnchorElement>, index: number, patients?: Array<SearchedPatient>) => void,
+  enterCallback: (evt: KeyboardEvent, index: number) => void,
   resetFocusCallback: () => void,
   initalFocusedResult: number = -1,
+  containerRef?: RefObject<HTMLElement>,
+  navigationScope?: { key: string; patientUuids: Array<string> },
 ) => {
   const [focusedResult, setFocusedResult] = useState(initalFocusedResult);
 
+  const previousScope = useRef(navigationScope);
+
+  useEffect(() => {
+    const previous = previousScope.current;
+    if (
+      previous?.key !== navigationScope?.key ||
+      previous?.patientUuids[focusedResult] !== navigationScope?.patientUuids[focusedResult]
+    ) {
+      setFocusedResult(initalFocusedResult);
+    }
+    previousScope.current = navigationScope;
+  }, [navigationScope, focusedResult, initalFocusedResult]);
+
   const handleKeyPress = useCallback(
-    (e) => {
+    (e: KeyboardEvent) => {
+      if (containerRef?.current && !containerRef.current.contains(document.activeElement)) {
+        return;
+      }
+
       if (e.key === 'ArrowUp') {
         const newFocusedResult = Math.max(-1, focusedResult - 1);
         setFocusedResult(newFocusedResult);
@@ -30,7 +48,15 @@ const useArrowNavigation = (
         setFocusedResult(initalFocusedResult);
       }
     },
-    [setFocusedResult, totalResults, focusedResult, enterCallback, initalFocusedResult, resetFocusCallback],
+    [
+      setFocusedResult,
+      totalResults,
+      focusedResult,
+      enterCallback,
+      initalFocusedResult,
+      resetFocusCallback,
+      containerRef,
+    ],
   );
 
   useEffect(() => {

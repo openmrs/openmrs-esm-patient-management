@@ -1,30 +1,34 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import MetricsCard from './metrics-card.component';
-import { useScheduledAppointments } from '../../hooks/useClinicalMetrics';
-import { useAppointmentsStore } from '../../store';
-import { useAppointmentList } from '../../hooks/useAppointmentList';
+import { useAppointmentsAppContext } from '../../hooks/useAppointmentsAppContext';
 
+/**
+ * This extension shows the metrics of the number of scheduled appointments for the selected date and services,
+ * showing the total number of appointments (across all status), the number of checked in ones (status == CheckedIn),
+ * and number of not arrived (status == Scheduled).
+ *
+ */
 export default function ScheduledAppointmentsExtension() {
   const { t } = useTranslation();
-  const { appointmentServiceTypes } = useAppointmentsStore();
+  const { appointmentForSelectedDateFilteredByServiceTypes } = useAppointmentsAppContext();
 
-  const { appointmentList: arrivedAppointments } = useAppointmentList('CheckedIn');
-  const { appointmentList: pendingAppointments } = useAppointmentList('Scheduled');
+  const totalScheduledAppointments = appointmentForSelectedDateFilteredByServiceTypes.length;
 
-  const { totalScheduledAppointments } = useScheduledAppointments(appointmentServiceTypes);
+  const count = useMemo(() => {
+    const arrivedAppointments = appointmentForSelectedDateFilteredByServiceTypes.filter(
+      ({ status }) => status === 'CheckedIn',
+    );
+    const pendingAppointments = appointmentForSelectedDateFilteredByServiceTypes.filter(
+      ({ status }) => status === 'Scheduled',
+    );
 
-  const filteredArrivedAppointments = appointmentServiceTypes
-    ? arrivedAppointments.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
-    : arrivedAppointments;
-
-  const filteredPendingAppointments = appointmentServiceTypes
-    ? pendingAppointments.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
-    : pendingAppointments;
+    return { pendingAppointments, arrivedAppointments };
+  }, [appointmentForSelectedDateFilteredByServiceTypes]);
 
   return (
     <MetricsCard
-      count={{ pendingAppointments: filteredPendingAppointments, arrivedAppointments: filteredArrivedAppointments }}
+      count={count}
       headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
       label={t('appointments', 'Appointments')}
       value={totalScheduledAppointments}

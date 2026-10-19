@@ -1,11 +1,12 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
 import { mockPatient } from '__mocks__';
 import EditPatientDetailsButton from './edit-patient-details-button.component';
 
-const mockNavigate = jest.mocked(navigate);
+const mockNavigate = vi.mocked(navigate);
 
 describe('EditPatientDetailsButton', () => {
   const patientUuid = mockPatient.uuid;

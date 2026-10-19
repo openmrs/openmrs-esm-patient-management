@@ -76,7 +76,7 @@ export default function PatientBedSwapForm({
             } else {
               // get the bed that the patient is currently assigned to
               const bedAssignedToPatient = beds.find((bed) =>
-                bed.patients.some((bedPatient) => bedPatient.uuid == patientToSwap.uuid),
+                bed.patients.some((bedPatient) => bedPatient.uuid === patientToSwap.uuid),
               );
               if (bedAssignedToPatient) {
                 return removePatientFromBed(bedAssignedToPatient.bedId, patientToSwap.uuid);

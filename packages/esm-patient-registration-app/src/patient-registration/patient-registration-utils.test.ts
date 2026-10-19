@@ -1,4 +1,5 @@
 import { filterOutUndefinedPatientIdentifiers } from './patient-registration-utils';
+import { vi, describe, it, expect } from 'vitest';
 
 describe('filterOutUndefinedPatientIdentifiers', () => {
   const getIdentifiers = (autoGeneration = true, manualEntryEnabled = false) => ({

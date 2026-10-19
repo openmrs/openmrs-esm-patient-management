@@ -58,7 +58,7 @@ export function CodedPersonAttributeField({
         );
         setError(true);
       }
-      if (conceptAnswers?.length == 0) {
+      if (conceptAnswers?.length === 0) {
         reportError(
           t(
             'codedPersonAttributeAnswerSetEmpty',

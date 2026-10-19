@@ -1,9 +1,10 @@
 import React from 'react';
+import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor, fireEvent } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { renderWithContext } from 'tools';
-import { type Resources } from '../../../offline.resources';
+import { type Resources } from '../../../registration.resource';
 import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
@@ -14,14 +15,14 @@ import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
 import AddressSearchComponent from './address-search.component';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
-const mockUseAddressHierarchy = jest.mocked(useAddressHierarchy);
-const mockUseOrderedAddressHierarchyLevels = jest.mocked(useOrderedAddressHierarchyLevels);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockUseAddressHierarchy = vi.mocked(useAddressHierarchy);
+const mockUseOrderedAddressHierarchyLevels = vi.mocked(useOrderedAddressHierarchyLevels);
 
-jest.mock('./address-hierarchy.resource', () => ({
-  ...jest.requireActual('./address-hierarchy.resource'),
-  useAddressHierarchy: jest.fn(),
-  useOrderedAddressHierarchyLevels: jest.fn(),
+vi.mock('./address-hierarchy.resource', async () => ({
+  ...((await vi.importActual('./address-hierarchy.resource')) as object),
+  useAddressHierarchy: vi.fn(),
+  useOrderedAddressHierarchyLevels: vi.fn(),
 }));
 
 const allFields = mockedAddressTemplate.lines
@@ -63,10 +64,9 @@ async function renderAddressSearchWithFormik(
                 validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: jest.fn(),
-                setFieldTouched: jest.fn().mockResolvedValue(undefined),
+                setCapturePhotoProps: vi.fn(),
+                setFieldTouched: vi.fn().mockResolvedValue(undefined),
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <AddressSearchComponent addressLayout={allFields} />
@@ -288,7 +288,7 @@ describe('Testing address search bar', () => {
 
   it('does not submit the form when pressing Enter in the search field', async () => {
     const user = userEvent.setup();
-    const onSubmit = jest.fn();
+    const onSubmit = vi.fn();
 
     mockUseAddressHierarchy.mockReturnValue({
       addresses: [],
@@ -309,11 +309,10 @@ describe('Testing address search bar', () => {
               values: formValuesRef,
               validationSchema: null,
               inEditMode: false,
-              setFieldValue: jest.fn() as any,
-              setCapturePhotoProps: jest.fn(),
-              setFieldTouched: jest.fn().mockResolvedValue(undefined),
+              setFieldValue: vi.fn() as any,
+              setCapturePhotoProps: vi.fn(),
+              setFieldTouched: vi.fn().mockResolvedValue(undefined),
               currentPhoto: '',
-              isOffline: false,
               initialFormValues: formValuesRef,
             }}>
             <AddressSearchComponent addressLayout={allFields} />

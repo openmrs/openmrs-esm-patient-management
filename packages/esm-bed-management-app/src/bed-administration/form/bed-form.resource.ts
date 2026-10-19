@@ -83,26 +83,31 @@ async function updateBedTagMappings(bedUuid: string, bedTags: BedTag[]): Promise
     const allBeds = existingMappingsResponse.data?.results?.flatMap((location) => location.bedLayouts || []) || [];
     const targetBed = allBeds.find((bed) => bed.bedUuid === bedUuid);
     const existingMappings = targetBed?.bedTagMaps || [];
-
-    if (existingMappings.length > 0) {
-      const deletePromises = existingMappings.map((mapping) =>
-        openmrsFetch(`${restBaseUrl}/bedTagMap/${mapping.uuid}`, {
-          method: 'DELETE',
+    const existingTagIds = existingMappings.map((m) => m.bedTag?.uuid).filter(Boolean);
+    const newTagIds = bedTags.map((t) => t.uuid).filter(Boolean);
+    const tagsToAdd = bedTags.filter((t) => t.uuid && !existingTagIds.includes(t.uuid));
+    const tagsToRemove = existingMappings.filter((m) => m.bedTag?.uuid && !newTagIds.includes(m.bedTag.uuid));
+    const deletePromises = tagsToRemove.map((mapping) =>
+      openmrsFetch(`${restBaseUrl}/bedTagMap/${mapping.uuid}`, {
+        method: 'DELETE',
+      }),
+    );
+    const addPromises = tagsToAdd
+      .filter((tag) => Boolean(tag.uuid))
+      .map((tag) =>
+        openmrsFetch(`${restBaseUrl}/bedTagMap`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: {
+            bed: bedUuid,
+            bedTag: tag.uuid,
+          },
         }),
       );
-      await Promise.all(deletePromises);
-    }
-
-    if (bedTags.length > 0) {
-      await createBedTagMappings(bedUuid, bedTags);
-    }
+    await Promise.all([...deletePromises, ...addPromises]);
   } catch (error) {
-    if (error?.message?.includes?.('Tag Already Present')) {
-      throw error;
-    }
-    if (bedTags.length > 0) {
-      await createBedTagMappings(bedUuid, bedTags);
-    }
+    console.error('Failed to update bed tag mappings:', error);
+    throw error;
   }
 }
 

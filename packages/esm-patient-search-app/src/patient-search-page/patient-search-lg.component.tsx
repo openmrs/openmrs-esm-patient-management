@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { usePagination } from '@openmrs/esm-framework';
@@ -12,8 +12,11 @@ interface PatientSearchComponentProps {
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
   searchResults: Array<SearchedPatient>;
+  /** True when the refine filters, not the query, left the results empty. */
+  emptiedByFilters?: boolean;
   isLoading: boolean;
   fetchError: Error | null;
+  minSearchCharacters: number;
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
@@ -21,8 +24,10 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   stickyPagination,
   inTabletOrOverlay,
   searchResults,
+  emptiedByFilters = false,
   isLoading,
   fetchError,
+  minSearchCharacters,
 }) => {
   const { t } = useTranslation();
   const resultsToShow = inTabletOrOverlay ? 15 : 20;
@@ -33,12 +38,27 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     resultsToShow,
   );
 
+  // `goTo` from `usePagination` is rebuilt whenever `totalPages` changes, and `totalPages` grows
+  // as the infinite search appends server pages. Depending on `goTo` alone would therefore snap the
+  // user back to page 1 every time another page of results lands.
+  //
+  // Reset on a new query, and whenever the selected page falls outside the result set: `usePagination`
+  // holds its page in state and only clamps inside `goTo`, so a refine filter — which narrows the rows
+  // on the client under an unchanged query — can leave the page pointing past the end, rendering the
+  // empty state under a non-zero result count.
+  const previousQueryRef = useRef(query);
   useEffect(() => {
-    goTo(1);
-  }, [query, goTo]);
+    const queryChanged = previousQueryRef.current !== query;
+    previousQueryRef.current = query;
+
+    if (queryChanged || currentPage > totalPages) {
+      goTo(1);
+    }
+  }, [query, currentPage, totalPages, goTo]);
 
   const searchResultsView = useMemo(() => {
-    if (isLoading) {
+    // Only show the full skeleton when there is nothing to show
+    if (isLoading && !results?.length) {
       return <LoadingState />;
     }
 
@@ -47,11 +67,31 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     }
 
     if (!isLoading && (!results || results.length === 0)) {
-      return <EmptyState />;
+      const tooFewCharacters = query.trim().length < minSearchCharacters;
+
+      if (tooFewCharacters) {
+        return (
+          <EmptyState
+            title={t('minCharactersRequired', 'Please enter at least {{count}} characters to search', {
+              count: minSearchCharacters,
+            })}
+            hint={null}
+          />
+        );
+      }
+
+      return emptiedByFilters ? (
+        <EmptyState
+          title={t('noPatientsMatchFilters', 'No patients match these filters')}
+          hint={t('adjustFiltersHint', 'Remove or change a filter to see more patients')}
+        />
+      ) : (
+        <EmptyState />
+      );
     }
 
     return <PatientSearchResults searchResults={results} />;
-  }, [fetchError, isLoading, results]);
+  }, [emptiedByFilters, fetchError, isLoading, results, query, minSearchCharacters, t]);
 
   return (
     <div

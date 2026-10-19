@@ -1,4 +1,11 @@
+/**
+ * @vitest-environment jsdom
+ *
+ * The form-submit flow under test does not fire its callback under happy-dom
+ * (likely a DOM-event-dispatch divergence). Run this file under jsdom.
+ */
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -6,18 +13,18 @@ import { type PatientSearchConfig } from '../../config-schema';
 import { usePersonAttributeType } from './person-attributes.resource';
 import RefineSearch from './refine-search.component';
 
-const mockUseConfig = jest.mocked(useConfig);
-const mockUseLayoutType = jest.mocked(useLayoutType);
-const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
+const mockUseConfig = vi.mocked(useConfig);
+const mockUseLayoutType = vi.mocked(useLayoutType);
+const mockUsePersonAttributeType = vi.mocked(usePersonAttributeType);
 
-jest.mock('./person-attributes.resource', () => ({
-  usePersonAttributeType: jest.fn(),
+vi.mock('./person-attributes.resource', () => ({
+  usePersonAttributeType: vi.fn(),
 }));
 
 describe('RefineSearch', () => {
   const user = userEvent.setup();
 
-  const mockSetFilters = jest.fn();
+  const mockSetFilters = vi.fn();
   const mockConfig = {
     search: {
       searchFilterFields: {
@@ -117,11 +124,55 @@ describe('RefineSearch', () => {
     );
   });
 
+  describe('Age field bounds', () => {
+    const withAgeConfig = (age: { enabled: boolean; min?: number; max?: number }) =>
+      mockUseConfig.mockReturnValue({
+        ...mockConfig,
+        search: {
+          ...mockConfig.search,
+          searchFilterFields: { ...mockConfig.search.searchFilterFields, age },
+        },
+      } as PatientSearchConfig);
+
+    it('applies the configured minimum and maximum to the age field', async () => {
+      withAgeConfig({ enabled: true, min: 18, max: 65 });
+      renderComponent();
+
+      const ageInput = screen.getByRole('spinbutton', { name: /age/i });
+      expect(ageInput).toHaveAttribute('min', '18');
+      expect(ageInput).toHaveAttribute('max', '65');
+
+      await user.type(ageInput, '70');
+      expect(screen.getByText('Enter an age between 18 and 65')).toBeInTheDocument();
+    });
+
+    it('leaves the age field unbounded above when the maximum is 0', () => {
+      withAgeConfig({ enabled: true, min: 0, max: 0 });
+      renderComponent();
+
+      const ageInput = screen.getByRole('spinbutton', { name: /age/i });
+      expect(ageInput).toHaveAttribute('min', '0');
+      expect(ageInput).not.toHaveAttribute('max');
+    });
+
+    it('applies the configured bounds in the tablet dialog too', async () => {
+      withAgeConfig({ enabled: true, min: 18, max: 65 });
+      mockUseLayoutType.mockReturnValue('tablet');
+      renderComponent({ inTabletOrOverlay: true });
+
+      await user.click(screen.getByRole('button', { name: /refine search/i }));
+
+      const ageInput = screen.getByRole('spinbutton', { name: /age/i });
+      expect(ageInput).toHaveAttribute('min', '18');
+      expect(ageInput).toHaveAttribute('max', '65');
+    });
+  });
+
   describe('Layout rendering', () => {
     it('renders desktop layout by default', () => {
       renderComponent();
 
-      expect(screen.getByRole('refine-search')).toHaveClass('refineSearchContainer');
+      expect(screen.getByRole('form', { name: /refine search/i })).toHaveClass('refineSearchContainer');
       expect(screen.queryByRole('button', { name: /refine search/i })).not.toBeInTheDocument();
     });
 

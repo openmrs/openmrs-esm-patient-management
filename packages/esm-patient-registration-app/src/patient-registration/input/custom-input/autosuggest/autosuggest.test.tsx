@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithRouter } from 'tools';
@@ -45,7 +46,7 @@ function renderAutosuggest(
     id: 'person',
     labelText: '',
     placeholder: 'Find Person',
-    onSuggestionSelected: jest.fn(),
+    onSuggestionSelected: vi.fn(),
     getSearchResults: mockGetSearchResults,
     getDisplayValue: (item: { display: string }) => item.display,
     getFieldValue: (item: { uuid: string }) => item.uuid,
@@ -141,7 +142,7 @@ describe('Autosuggest component', () => {
   describe('Suggestion selection', () => {
     it('calls onSuggestionSelected when user clicks a suggestion', async () => {
       const user = userEvent.setup();
-      const mockOnSuggestionSelected = jest.fn();
+      const mockOnSuggestionSelected = vi.fn();
       renderAutosuggest({ onSuggestionSelected: mockOnSuggestionSelected });
 
       const searchbox = screen.getByRole('searchbox');
