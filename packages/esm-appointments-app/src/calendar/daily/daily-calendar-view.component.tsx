@@ -5,7 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { formatAMPM } from '../../helpers/functions';
 import { type Appointment } from '../../types';
 import { useAppointmentsByDate } from '../../hooks/useAppointmentsByDate';
-import { STATUS_TAG_TYPES, DEFAULT_STATUS_TAG_TYPE, CALENDAR_HOURS, formatHourLabel } from '../utils/calendar-colors';
+import {
+  STATUS_TAG_TYPES,
+  DEFAULT_STATUS_TAG_TYPE,
+  CALENDAR_HOURS,
+  formatHourLabel,
+} from '../utils/calendar-colors';
 import styles from './daily-calendar-view.scss';
 
 interface DailyCalendarViewProps {
@@ -61,10 +66,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
   );
 };
 
-const DailyCard: React.FC<{ appointment: Appointment; serviceColorMap?: Map<string, string> }> = ({
-  appointment,
-  serviceColorMap,
-}) => {
+const DailyCard: React.FC<{ appointment: Appointment; serviceColorMap?: Map<string, string> }> = ({ appointment, serviceColorMap }) => {
   const color = serviceColorMap?.get(appointment.service?.uuid ?? '');
   const tagType = STATUS_TAG_TYPES[appointment.status] ?? DEFAULT_STATUS_TAG_TYPE;
   const time = useMemo(() => {
