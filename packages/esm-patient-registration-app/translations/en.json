@@ -55,6 +55,7 @@
   "familyNameLabelText": "Family Name",
   "familyNameRequired": "Family name is required",
   "female": "Female",
+  "fieldRequired": "Required",
   "fieldsWithErrors": "The following fields have errors: ",
   "fullNameLabelText": "Full Name",
   "genderLabelText": "Sex",
