@@ -16,12 +16,7 @@ interface MonthlyCalendarViewProps {
   serviceColorMap?: Map<string, string>;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
-  events,
-  calendarSelectedDate,
-  onSelectDate,
-  serviceColorMap,
-}) => {
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calendarSelectedDate, onSelectDate, serviceColorMap }) => {
   const gridDayCells = useMemo(() => monthDays(calendarSelectedDate), [calendarSelectedDate]);
 
   const eventsMap = useMemo(() => {
