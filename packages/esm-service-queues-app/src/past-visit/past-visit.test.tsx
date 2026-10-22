@@ -1,45 +1,82 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 import { mockPastVisit } from '__mocks__';
 import { mockPatient, renderWithSwr } from 'tools';
-import { configSchema, type ConfigObject } from '../config-schema';
 import { usePastVisits } from './past-visit.resource';
-import PastVisitSummary from './past-visit-details/past-visit-summary.component';
+import PastVisit from './past-visit.component';
 
-const mockUsePastVisits = jest.mocked(usePastVisits);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+const mockUsePastVisits = vi.mocked(usePastVisits);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
+const mockUsePatient = vi.mocked(usePatient);
 
-jest.mock('./past-visit.resource', () => ({
-  usePastVisits: jest.fn(),
+vi.mock('./past-visit.resource', () => ({
+  usePastVisits: vi.fn(),
 }));
 
 describe('PastVisit', () => {
   beforeEach(() => {
-    mockUseConfig.mockReturnValue({
-      ...getDefaultsFromConfigSchema(configSchema),
+    mockUsePatient.mockReturnValue({
+      patient: mockPatient,
+      patientUuid: mockPatient.id,
+      isLoading: false,
+      error: null,
     });
   });
 
-  it('renders an empty state when notes, encounters, medications, and vitals data is not available', async () => {
-    const user = userEvent.setup();
-
+  it('renders the most recent past visit header and the shared visit summary', () => {
+    const pastVisit = mockPastVisit.data.results[0];
     mockUsePastVisits.mockReturnValueOnce({
-      visits: mockPastVisit.data.results[0],
+      visits: pastVisit,
       error: null,
       isLoading: false,
       isValidating: false,
+      mutate: vi.fn(),
     });
 
-    renderWithSwr(<PastVisitSummary patientUuid={mockPatient.id} encounters={[]} />);
+    renderWithSwr(<PastVisit patientUuid={mockPatient.id} />);
 
-    expect(screen.queryAllByText(/vitals/i));
-    const vitalsTab = screen.getByRole('tab', { name: /vitals/i });
-    expect(vitalsTab).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
-    await user.click(vitalsTab);
-    expect(vitalsTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText(pastVisit.visitType.display)).toBeInTheDocument();
+    expect(mockExtensionSlot.mock.calls.map(([props]) => props)).toContainEqual(
+      expect.objectContaining({
+        name: 'service-queues-past-visit-summary-slot',
+        state: expect.objectContaining({
+          visit: pastVisit,
+          patientUuid: mockPatient.id,
+          patient: mockPatient,
+          onEditEncounter: expect.any(Function),
+          mutateVisitContext: expect.any(Function),
+        }),
+      }),
+    );
+  });
+
+  it('renders a loading skeleton while fetching', () => {
+    mockUsePastVisits.mockReturnValueOnce({
+      visits: null,
+      error: null,
+      isLoading: true,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderWithSwr(<PastVisit patientUuid={mockPatient.id} />);
+
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  });
+
+  it('renders a fallback when there is no previous visit', () => {
+    mockUsePastVisits.mockReturnValueOnce({
+      visits: null,
+      error: null,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+
+    renderWithSwr(<PastVisit patientUuid={mockPatient.id} />);
+
+    expect(screen.getByText('No previous visit found')).toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { type Visit, type OpenmrsResource, type Location, type Obs, type Patient } from '@openmrs/esm-framework';
+import { type Visit, type OpenmrsResource, type Location, type Patient } from '@openmrs/esm-framework';
 import { type ColumnConfig } from '../config-schema';
 
 export interface Attribute {
@@ -9,239 +9,6 @@ export interface Attribute {
   value: string | number;
 }
 
-export interface AppointmentsFetchResponse {
-  data: Array<Appointment>;
-}
-
-export interface Appointment {
-  appointmentKind: string;
-  appointmentNumber: string;
-  comments: string;
-  endDateTime: Date | number;
-  location: OpenmrsResource;
-  patient: {
-    uuid: string;
-    name: string;
-    identifier: string;
-    gender: string;
-    age: string;
-    phoneNumber: string;
-  };
-  provider: OpenmrsResource;
-  providers: Array<OpenmrsResource>;
-  // recurring: boolean;
-  service: AppointmentService;
-  startDateTime: number | any;
-  status: string;
-  uuid: string;
-}
-
-export interface ServiceTypes {
-  duration: number;
-  name: string;
-  uuid: string;
-}
-
-export interface AppointmentService {
-  appointmentServiceId: number;
-  color: string;
-  creatorName: string;
-  description: string;
-  durationMins: string;
-  endTime: string;
-  initialAppointmentStatus: string;
-  location: OpenmrsResource;
-  maxAppointmentsLimit: number | null;
-  name: string;
-  speciality: OpenmrsResource;
-  startTime: string;
-  uuid: string;
-  serviceTypes: Array<ServiceTypes>;
-}
-
-export interface Note {
-  concept: OpenmrsResource;
-  note: string;
-  provider: {
-    name: string;
-    role: string;
-  };
-  time: string;
-}
-
-export interface Order {
-  uuid: string;
-  dateActivated: string;
-  dateStopped?: Date | null;
-  action?: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW' | string;
-  previousOrder?: {
-    uuid: string;
-  } | null;
-  dose: number;
-  dosingInstructions: string | null;
-  dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
-  doseUnits: {
-    uuid: string;
-    display: string;
-  };
-  drug: {
-    uuid: string;
-    name: string;
-    display: string;
-    strength: string;
-  };
-  duration: number;
-  durationUnits: {
-    uuid: string;
-    display: string;
-  };
-  frequency: {
-    uuid: string;
-    display: string;
-  };
-  numRefills: number;
-  orderNumber: string;
-  orderReason: string | null;
-  orderReasonNonCoded: string | null;
-  orderer: {
-    uuid: string;
-    person: {
-      uuid: string;
-      display: string;
-    };
-  };
-  orderType: {
-    uuid: string;
-    display: string;
-  };
-  route: {
-    uuid: string;
-    display: string;
-  };
-  quantity: number;
-  quantityUnits: OpenmrsResource;
-}
-
-export interface OrderItem {
-  order: Order;
-  provider: {
-    name: string;
-    role: string;
-  };
-  time: string;
-}
-
-export interface DiagnosisItem {
-  diagnosis: string;
-}
-
-export interface Encounter {
-  uuid: string;
-  encounterDatetime: string;
-  encounterProviders: Array<{
-    uuid: string;
-    display: string;
-    encounterRole: {
-      uuid: string;
-      display: string;
-    };
-    provider: {
-      uuid: string;
-      person: {
-        uuid: string;
-        display: string;
-      };
-    };
-  }>;
-  encounterType: {
-    uuid: string;
-    display: string;
-  };
-  obs: Array<Observation>;
-  form: OpenmrsResource;
-  patient: OpenmrsResource;
-  orders: Array<Order>;
-}
-
-export interface Observation {
-  uuid: string;
-  concept: {
-    uuid: string;
-    display: string;
-    conceptClass: {
-      uuid: string;
-      display: string;
-    };
-  };
-  display: string;
-  groupMembers: null | Array<{
-    uuid: string;
-    concept: {
-      uuid: string;
-      display: string;
-    };
-    value: {
-      uuid: string;
-      display: string;
-    };
-  }>;
-  value: any;
-  obsDatetime: string;
-}
-
-export interface PatientVitals {
-  systolic?: number;
-  diastolic?: number;
-  pulse?: number;
-  temperature?: number;
-  oxygenSaturation?: number;
-  height?: number;
-  weight?: number;
-  bmi?: number | null;
-  respiratoryRate?: number;
-  muac?: number;
-  provider?: {
-    name: string;
-    role: string;
-  };
-  time?: string;
-}
-
-export interface MappedEncounter {
-  id: string;
-  datetime: string;
-  encounterType: string;
-  form: OpenmrsResource;
-  obs: Array<Observation>;
-  provider: string;
-  visitUuid?: string;
-}
-
-export interface FormattedEncounter {
-  id: string;
-  datetime: string;
-  encounterType: string;
-  form: OpenmrsResource;
-  obs: Array<Obs>;
-  provider: string;
-}
-
-export interface ObsMetaInfo {
-  [_: string]: any;
-
-  assessValue?: (value: number) => OBSERVATION_INTERPRETATION;
-}
-
-export type OBSERVATION_INTERPRETATION =
-  | 'NORMAL'
-  | 'HIGH'
-  | 'CRITICALLY_HIGH'
-  | 'OFF_SCALE_HIGH'
-  | 'LOW'
-  | 'CRITICALLY_LOW'
-  | 'OFF_SCALE_LOW'
-  | '--';
-
 export interface PatientProgram {
   uuid: string;
   display: string;
@@ -250,18 +17,6 @@ export interface PatientProgram {
   dateEnrolled: string;
   dateCompleted: string;
   location: OpenmrsResource;
-}
-
-export interface AppointmentCountMap {
-  allAppointmentsCount: number;
-  missedAppointmentsCount: number;
-  appointmentDate: number;
-  appointmentServiceUuid: string;
-}
-
-export interface AppointmentSummary {
-  appointmentService: { name: string };
-  appointmentCountMap: Record<string, AppointmentCountMap>;
 }
 
 export interface QueueEntryPayload {
@@ -278,21 +33,6 @@ export interface QueueEntryPayload {
 
 export type AllowedPriority = OpenmrsResource;
 export type AllowedStatus = OpenmrsResource;
-
-export interface MappedServiceQueueEntry {
-  id: string;
-  name: string;
-  age: string;
-  gender: string;
-  visitType: string;
-  returnDate: string;
-  patientUuid: string;
-}
-
-export enum FilterTypes {
-  SHOW,
-  HIDE,
-}
 
 export interface Provider {
   uuid: string;
@@ -365,7 +105,7 @@ export interface Resource {
 
 export interface Identifer {
   identifier: string;
-  display: string;
+  display?: string;
   uuid: string;
   identifierType: {
     uuid: string;
@@ -411,8 +151,8 @@ export interface ProvidersQueueRoom {
 }
 
 export interface WaitTime {
-  metric: string;
-  averageWaitTime: string;
+  // Older queue-module versions serialize an unavailable average as the string "NaN"; newer ones send null.
+  averageWaitTime: number | string | null;
 }
 
 export interface QueueTableCellComponentProps {
@@ -435,14 +175,10 @@ export type QueueTableColumnFunction = (
   config?: ColumnConfig,
 ) => QueueTableColumn;
 
-export interface QueueTableTabConfig {
-  columns: QueueTableColumn[];
-  tabNameI18nKey?: string;
-}
-
 export interface Queue {
   uuid: string;
   display: string;
+  retired?: boolean;
   name: string;
   description: string;
   location: Location;

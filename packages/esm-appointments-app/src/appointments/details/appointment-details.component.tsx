@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, formatDatetime, usePatient } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, parseDate, usePatient } from '@openmrs/esm-framework';
 import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
 import { getGender } from '../../helpers';
 import { type Appointment } from '../../types';
@@ -45,7 +45,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
           {patient && patient?.birthDate ? (
             <div className={styles.labelContainer}>
               <p className={styles.labelBold}>{t('dateOfBirth', 'Date of birth')}: </p>
-              <p className={styles.label}>{formatDate(new Date(patient.birthDate))}</p>
+              <p className={styles.label}>{formatDate(parseDate(patient.birthDate))}</p>
             </div>
           ) : (
             ''

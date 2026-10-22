@@ -59,12 +59,12 @@ export function getValidationSchema(
       })
       .max(new Date(), t('deathDateInFuture', 'Death date cannot be in future'))
       .test(
-        'deathDate-after-birthdate',
+        'deathDate-not-before-birthdate',
         t('deathdayBeforeBirthday', 'Death date and time cannot be before the birthday'),
         function (value) {
           const { birthdate } = this.parent;
           if (birthdate && value) {
-            return dayjs(value).isAfter(birthdate);
+            return !dayjs(value).isBefore(birthdate, 'day');
           }
           return true;
         },
@@ -110,8 +110,12 @@ export function getValidationSchema(
         mapValues(obj, () =>
           Yup.object({
             required: Yup.bool(),
-            identifierValue: Yup.string().when('required', {
-              is: true,
+            preferred: Yup.bool(),
+            autoGeneration: Yup.bool(),
+            identifierValue: Yup.string().when(['required', 'preferred', 'autoGeneration'], {
+              is: (required: boolean, preferred: boolean, autoGeneration: boolean) =>
+                required ||
+                (config.fieldConfigurations?.identifier?.allowPreferredSelection && preferred && !autoGeneration),
               then: Yup.string().required(t('identifierValueRequired', 'Identifier value is required')),
               otherwise: Yup.string().notRequired(),
             }),

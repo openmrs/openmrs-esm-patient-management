@@ -1,7 +1,6 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema } from './config-schema';
-import { moduleName, patientRegistration } from './constants';
-import { setupOffline } from './offline';
+import { moduleName } from './constants';
 import addPatientLinkComponent from './add-patient-link.extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -13,23 +12,6 @@ const options = {
 
 export function startupApp() {
   defineConfigSchema(moduleName, esmPatientRegistrationSchema);
-
-  registerBreadcrumbs([
-    {
-      path: `${window.spaBase}/${patientRegistration}`,
-      // t('patientRegistrationBreadcrumb', 'Patient Registration')
-      title: () => Promise.resolve(window.i18next.t('patientRegistrationBreadcrumb', 'Patient Registration')),
-      parent: `${window.spaBase}/home`,
-    },
-    {
-      path: `${window.spaBase}/patient/:patientUuid/edit`,
-      // t('editPatientDetailsBreadcrumb', 'Edit patient details')
-      title: () => Promise.resolve(window.i18next.t('editPatientDetailsBreadcrumb', 'Edit patient details')),
-      parent: `${window.spaBase}/patient/:patientUuid/chart`,
-    },
-  ]);
-
-  setupOffline();
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);

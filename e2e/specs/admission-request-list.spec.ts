@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
-import { test } from '../core';
+import { wardTest as test } from '../core';
 import { PatientChartPage } from '../pages';
-import { endVisit, startVisit, changeToWardLocation, generateRandomPatient, deletePatient } from '../commands';
+import { endVisit, startVisit, generateRandomPatient, deletePatient } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Patient } from '../commands/types';
 
@@ -9,9 +9,13 @@ let visit: Visit;
 let wardPatient: Patient;
 
 test.beforeEach(async ({ api }) => {
-  await changeToWardLocation(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
+});
+
+test.afterEach(async ({ api }) => {
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
 });
 
 test('Add a patient to the admission request list', async ({ page }) => {
@@ -70,9 +74,4 @@ test('Add a patient to the admission request list', async ({ page }) => {
     await page.getByRole('button', { name: 'Manage' }).click();
     await expect(page.getByText(fullName)).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
 });

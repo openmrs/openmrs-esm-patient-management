@@ -45,7 +45,7 @@ const WardPatientCodedObsTags: React.FC<WardPatientCodedObsTagsProps> = ({ id, p
     );
   } else {
     const obsToDisplay = data?.filter((o) => {
-      const matchVisit = o.encounter.visit?.uuid == visit?.uuid;
+      const matchVisit = o.encounter.visit?.uuid === visit?.uuid;
       return matchVisit;
     });
 

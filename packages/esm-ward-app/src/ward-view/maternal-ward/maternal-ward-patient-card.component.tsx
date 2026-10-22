@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { Tag } from '@carbon/react';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type WardPatient } from '../../types';
 import CodedObsTagsRow from '../../ward-patient-card/card-rows/coded-obs-tags-row.component';
@@ -45,6 +46,9 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
     <>
       <WardPatientCard wardPatient={wardPatient} relatedTransferPatients={childrenOfWardPatientInSameBed}>
         <MaternalWardPatientCardHeader {...{ wardPatient }} />
+        <div className={styles.wardPatientCardHeaderBadge}>
+          <ExtensionSlot name="maternal-ward-patient-card-header-slot" state={{ visit }} />
+        </div>
         <div className={classNames(styles.wardPatientCardRow, styles.dotSeparatedChildren)}>
           <WardPatientTimeOnWard
             encounterAssigningToCurrentInpatientLocation={encounterAssigningToCurrentInpatientLocation}
@@ -67,6 +71,12 @@ const MaternalWardPatientCard: React.FC<MaternalWardPatientCardProps> = (props) 
             <MotherChildBedShareDivider />
             <WardPatientCard wardPatient={childWardPatient} relatedTransferPatients={relatedTransferPatients}>
               <MaternalWardPatientCardHeader wardPatient={childWardPatient} />
+              <div className={styles.wardPatientCardHeaderBadge}>
+                <ExtensionSlot
+                  name="maternal-ward-patient-card-header-slot"
+                  state={{ visit: childWardPatient.visit }}
+                />
+              </div>
               <PendingItemsRow id={'pending-items'} wardPatient={childWardPatient} />
             </WardPatientCard>
           </React.Fragment>

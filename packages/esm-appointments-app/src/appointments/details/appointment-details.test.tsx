@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { usePatient } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
@@ -50,9 +51,9 @@ const appointment: Appointment = {
   extensions: [],
 };
 
-const mockUsePatient = jest.mocked(usePatient);
+const mockUsePatient = vi.mocked(usePatient);
 
-jest.mock('../../hooks/usePatientAppointmentHistory', () => ({
+vi.mock('../../hooks/usePatientAppointmentHistory', () => ({
   usePatientAppointmentHistory: () => ({
     appointmentsCount: {
       completedAppointments: 1,
@@ -101,4 +102,26 @@ test('renders appointment details correctly', async () => {
   expect(screen.getByText('3', { exact: true })).toBeInTheDocument();
   expect(screen.getByText(/Upcoming/i)).toBeInTheDocument();
   expect(screen.getByText('4', { exact: true })).toBeInTheDocument();
+});
+
+test('shows the birth date on the right day in timezones behind UTC', () => {
+  // FHIR birth dates are date-only strings like "2020-03-22", which `new Date()` reads as UTC midnight. That's the
+  // previous day anywhere behind UTC. The suite runs in UTC, so switch zones to exercise that case.
+  const originalTz = process.env.TZ;
+  process.env.TZ = 'America/New_York';
+
+  try {
+    mockUsePatient.mockReturnValue({
+      error: null,
+      isLoading: false,
+      patientUuid: mockPatient.id,
+      patient: { birthDate: '2020-03-22' },
+    });
+
+    render(<AppointmentDetails appointment={appointment} />);
+
+    expect(screen.getByText(/22-Mar-2020/i)).toBeInTheDocument();
+  } finally {
+    process.env.TZ = originalTz;
+  }
 });

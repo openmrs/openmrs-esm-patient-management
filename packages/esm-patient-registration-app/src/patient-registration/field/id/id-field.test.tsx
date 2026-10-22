@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { Form, Formik } from 'formik';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -7,7 +8,7 @@ import { type AddressTemplate, type IdentifierSource } from '../../patient-regis
 import { mockIdentifierTypes, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
 import { renderWithContext } from 'tools';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../config-schema';
-import { type Resources } from '../../../offline.resources';
+import { type Resources } from '../../../registration.resource';
 import {
   PatientRegistrationContextProvider,
   type PatientRegistrationContextProps,
@@ -15,7 +16,7 @@ import {
 import { Identifiers, setIdentifierSource } from './id-field.component';
 import { ResourcesContextProvider } from '../../../resources-context';
 
-const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 const mockResourcesContextValue = {
   addressTemplate: null as unknown as AddressTemplate,
@@ -52,10 +53,9 @@ const mockContextValues: PatientRegistrationContextProps = {
   inEditMode: false,
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
-  isOffline: false,
-  setCapturePhotoProps: jest.fn(),
-  setFieldValue: jest.fn(),
-  setInitialFormValues: jest.fn(),
+  setCapturePhotoProps: vi.fn(),
+  setFieldValue: vi.fn(),
+  setInitialFormValues: vi.fn(),
   validationSchema: null,
   values: mockInitialFormValues,
 } as unknown as PatientRegistrationContextProps;

@@ -4,11 +4,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .defaultQueueTable {
-  margin: layout.$spacing-05;
-}
-
-.container {
-  border: 1px solid colors.$gray-20;
+  margin: layout.$spacing-05 0 0;
 }
 
 .tableSection {
@@ -24,51 +20,25 @@
   background-color: colors.$gray-10;
 }
 
-.headerButtons {
-  display: flex;
-
-  .filterSearch {
-    margin-left: layout.$spacing-05;
-  }
-}
-
 .loaderContainer {
   display: flex;
   flex: 0.25;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: $ui-02;
 
   :global(.cds--inline-loading) {
     justify-content: end;
   }
 }
 
-.filterContainer {
-  :global(.cds--dropdown__wrapper--inline) {
-    gap: 0;
-  }
-
-  :global(.cds--list-box__menu-icon) {
-    height: layout.$spacing-05;
-  }
-}
-
 .search {
   max-width: 16rem;
   display: inline;
+
   input {
     background-color: $ui-02 !important;
   }
-}
-
-.statusTableContainer {
-  padding: layout.$spacing-05;
-  background-color: colors.$gray-10;
-}
-
-.statusTableHeader {
-  padding: layout.$spacing-03 0;
 }
 
 .tableHeader {
@@ -99,6 +69,7 @@
 
   .toolbarContent {
     display: flex;
+    align-items: center;
     z-index: 1; // prevent dropdown from getting covered by table elements
     column-gap: layout.$spacing-03;
   }
@@ -140,17 +111,13 @@
 }
 
 .expandedActiveVisitRow {
-  td {
+  > td {
     padding: layout.$spacing-03;
 
     > div {
       max-height: max-content !important;
       background-color: $ui-02;
     }
-  }
-
-  th[colspan] td[colspan] > div:first-child {
-    padding: 0 layout.$spacing-05;
   }
 }
 
@@ -161,20 +128,25 @@ html[dir='rtl'] {
       margin-left: 0;
       margin-right: layout.$spacing-03;
     }
+
     h2 {
       text-align: right;
     }
   }
+
   .tableContainer {
     th > div {
       text-align: right;
     }
+
     td {
       text-align: right;
+
       .serviceColor {
         margin-right: 0;
         margin-left: layout.$spacing-03;
       }
+
       button {
         padding: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
         text-align: right;
@@ -183,14 +155,10 @@ html[dir='rtl'] {
   }
 }
 
-.tabList {
-  padding-left: layout.$spacing-05;
-}
-
 .tileContainer {
   border-top: 1px solid $ui-03;
   padding: layout.$spacing-07 layout.$spacing-05;
-  background: white;
+  background: $ui-02;
   margin: 0 layout.$spacing-05;
 }
 

@@ -267,8 +267,8 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   );
 
   const handleAddPatientToList = useCallback(
-    async (patientUuid) => {
-      const alreadyInList = patients.some((p) => patientUuid == p.uuid);
+    async (patient) => {
+      const alreadyInList = patients.some((p) => patient === p.uuid);
 
       if (alreadyInList) {
         showSnackbar({
@@ -281,7 +281,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
       }
 
       if (config.enforcePatientListLocationMatch) {
-        const patientLocation = await getPatientLocationFromIdentifiers(patientUuid);
+        const patientLocation = await getPatientLocationFromIdentifiers(patient);
 
         if (config.enforcePatientListLocationMatch && listLocation) {
           if (patientLocation && patientLocation.uuid !== listLocation.uuid) {
@@ -301,7 +301,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
       try {
         await addPatientToList({
           cohort: cohortUuid,
-          patient: patientUuid,
+          patient: patient,
           startDate: toOmrsIsoString(new Date()),
         });
 

@@ -1,34 +1,36 @@
 import { expect } from '@playwright/test';
-import { test } from '../core';
+import { wardTest as test } from '../core';
 import {
-  changeToWardLocation,
   deletePatient,
   endVisit,
   generateRandomPatient,
   generateWardAdmissionRequest,
-  getProvider,
   startVisit,
   waitForAdmissionRequestToBeProcessed,
 } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
-import { type Bed, type BedType, type Patient, type Provider } from '../commands/types';
+import { type Bed, type BedType, type Patient } from '../commands/types';
 import { dischargePatientFromBed, generateBedType, generateRandomBed, retireBedType } from '../commands/bed-operations';
 import { WardPage } from '../pages';
 
 let bed: Bed;
 let bedtype: BedType;
-let provider: Provider;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api }) => {
-  await changeToWardLocation(api);
+test.beforeEach(async ({ api, emrConfiguration }) => {
   bedtype = await generateBedType(api);
   bed = await generateRandomBed(api, bedtype);
-  provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, emrConfiguration, wardPatient.uuid);
+});
+
+test.afterEach(async ({ api }) => {
+  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
+  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
 });
 
 test('Admit a patient to a ward from the admission requests list', async ({ page, api }) => {
@@ -61,7 +63,7 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
   });
 
   await test.step('And I select the bed for admission', async () => {
-    await page.getByText(`${bed.bedNumber} · Empty`).click();
+    await wardPage.selectBedForAdmission(bed.bedNumber);
   });
 
   await test.step('And I confirm admission by clicking "Admit"', async () => {
@@ -73,11 +75,4 @@ test('Admit a patient to a ward from the admission requests list', async ({ page
       page.getByText(new RegExp(`${fullName}\\s+has been successfully admitted and assigned to bed ${bed.bedNumber}`)),
     ).toBeVisible();
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await dischargePatientFromBed(api, bed.id, wardPatient.uuid);
-  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
 });

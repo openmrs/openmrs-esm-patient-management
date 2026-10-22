@@ -23,6 +23,7 @@ function WardPatientOrderBasketActionButton({ groupProps: { wardPatient } }: War
           drugOrderWorkspaceName: 'ward-patient-order-basket-add-drug-order-workspace',
           labOrderWorkspaceName: 'ward-patient-order-basket-add-lab-order-workspace',
           generalOrderWorkspaceName: 'ward-patient-order-basket-add-general-order-workspace',
+          allergyFormWorkspaceName: 'ward-patient-order-basket-add-allergy-workspace',
         },
       }}
     />

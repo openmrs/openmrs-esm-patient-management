@@ -35,6 +35,7 @@ export interface PatientAdmitOrTransferFormProps {
 
   onSuccess(): void;
   onCancel(): void;
+  preSelectRelatedPatients?: boolean;
 }
 
 /**
@@ -48,6 +49,7 @@ export default function PatientAdmitOrTransferForm({
   relatedTransferPatients = [],
   onSuccess,
   onCancel,
+  preSelectRelatedPatients,
 }: PatientAdmitOrTransferFormProps) {
   const { t } = useTranslation();
   const { patient, inpatientRequest, visit } = wardPatient ?? {};
@@ -55,40 +57,52 @@ export default function PatientAdmitOrTransferForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
     useCreateEncounter();
-  const dispositionsWithTypeTransfer = useMemo(
-    () => emrConfiguration?.dispositions.filter(({ type }) => type === 'TRANSFER'),
-    [emrConfiguration],
+
+  const dispositionType = wardPatient.inpatientRequest?.dispositionType ?? 'TRANSFER';
+  const isTransfer = dispositionType === 'TRANSFER';
+  // dispositions of either type TRANSFER or ADMIT, depending on the disposition type of the wardPatient
+  const dispositionsOfRequestedType = useMemo(
+    () => emrConfiguration?.dispositions.filter(({ type }) => type === dispositionType),
+    [emrConfiguration, dispositionType],
   );
   const { wardPatientGroupDetails } = useAppContext<WardViewContext>('ward-view-context') ?? {};
   const currentAdmission = wardPatientGroupDetails?.inpatientAdmissionsByPatientUuid?.get(patient?.uuid);
-  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>([]);
+  const [selectedRelatedPatient, setCheckedRelatedPatient] = useState<string[]>(() =>
+    preSelectRelatedPatients ? relatedTransferPatients.map((rp) => rp.patient.uuid) : [],
+  );
 
   const zodSchema = useMemo(
     () =>
       z.object({
         location: z.string({
-          required_error: t('pleaseSelectTransferLocation', 'Please select transfer location'),
+          required_error: isTransfer
+            ? t('pleaseSelectTransferLocation', 'Please select transfer location')
+            : t('pleaseSelectAdmitLocation', 'Please select admit location'),
         }),
         note: z.string().optional(),
         transferType:
-          dispositionsWithTypeTransfer?.length > 1
+          dispositionsOfRequestedType?.length > 1
             ? z.string({
-                required_error: t('pleaseSelectTransferType', 'Please select transfer type'),
+                required_error: isTransfer
+                  ? t('pleaseSelectTransferType', 'Please select transfer type')
+                  : t('pleaseSelectAdmitType', 'Please select admit type'),
               })
             : z.string().optional(),
       }),
-    [t, dispositionsWithTypeTransfer],
+    [t, dispositionsOfRequestedType, isTransfer],
   );
 
   type FormValues = z.infer<typeof zodSchema>;
 
   const formDefaultValues: Partial<FormValues> = useMemo(() => {
     const defaultValues: FormValues = {};
-    if (dispositionsWithTypeTransfer?.length === 1) {
-      defaultValues.transferType = dispositionsWithTypeTransfer[0].uuid;
+    if (wardPatient.inpatientRequest?.dispositionType) {
+      defaultValues.transferType = wardPatient.inpatientRequest.disposition.uuid;
+    } else if (dispositionsOfRequestedType?.length === 1) {
+      defaultValues.transferType = dispositionsOfRequestedType[0].conceptCode;
     }
     return defaultValues;
-  }, [dispositionsWithTypeTransfer]);
+  }, [dispositionsOfRequestedType, wardPatient.inpatientRequest]);
 
   const {
     formState: { errors, isDirty },
@@ -98,13 +112,13 @@ export default function PatientAdmitOrTransferForm({
   } = useForm<FormValues>({ resolver: zodResolver(zodSchema), defaultValues: formDefaultValues });
 
   useEffect(() => {
-    if (dispositionsWithTypeTransfer?.length === 1) {
-      setValue('transferType', dispositionsWithTypeTransfer[0].uuid);
+    if (dispositionsOfRequestedType?.length === 1) {
+      setValue('transferType', dispositionsOfRequestedType[0].conceptCode);
     }
-  }, [dispositionsWithTypeTransfer, setValue]);
+  }, [dispositionsOfRequestedType, setValue]);
 
   const onSubmit = useCallback(
-    (values: FormValues) => {
+    async (values: FormValues) => {
       setIsSubmitting(true);
       setShowErrorNotifications(false);
       const obs: Array<ObsPayload> = [
@@ -114,7 +128,7 @@ export default function PatientAdmitOrTransferForm({
         },
         {
           concept: emrConfiguration.dispositionDescriptor.dispositionConcept.uuid,
-          value: dispositionsWithTypeTransfer.find(({ uuid }) => uuid === values.transferType)?.conceptCode,
+          value: values.transferType,
         },
       ];
 
@@ -125,57 +139,76 @@ export default function PatientAdmitOrTransferForm({
         });
       }
 
-      const wardPatientsToTransfer = [
+      const wardPatientsToAdmitOrTransfer = [
         wardPatient,
         ...relatedTransferPatients.filter((rp) => selectedRelatedPatient.includes(rp.patient.uuid)),
       ];
 
-      Promise.all(
-        wardPatientsToTransfer.map(async (wardPatientToTransfer) => {
-          const { patient: patientToTransfer, visit: patientToTransferVisit } = wardPatientToTransfer;
+      try {
+        const results = await Promise.allSettled(
+          wardPatientsToAdmitOrTransfer.map(async (wardPatientToAdmitOrTransfer) => {
+            const { patient: patientToTransfer, visit: patientToTransferVisit } = wardPatientToAdmitOrTransfer;
 
-          return createEncounter(
-            patientToTransfer,
-            emrConfiguration.transferRequestEncounterType,
-            patientToTransferVisit?.uuid,
-            [
-              {
-                concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
-                groupMembers: obs,
-              },
-            ],
-          );
-        }),
-      )
-        .then(() => {
-          showSnackbar({
-            title: t('patientTransferRequestCreated', 'Patient transfer request created'),
-            kind: 'success',
-          });
-          onSuccess();
-        })
-        .catch((err: Error) => {
-          showSnackbar({
-            title: t('errorCreatingTransferRequest', 'Error creating transfer request'),
-            subtitle: err.message,
-            kind: 'error',
-          });
-        })
-        .finally(() => {
-          setIsSubmitting(false);
-          wardPatientGroupDetails.mutate();
+            return createEncounter(
+              patientToTransfer,
+              emrConfiguration.transferRequestEncounterType,
+              patientToTransferVisit?.uuid,
+              [
+                {
+                  concept: emrConfiguration.dispositionDescriptor.dispositionSetConcept.uuid,
+                  groupMembers: obs,
+                },
+              ],
+            );
+          }),
+        );
+
+        results.forEach((result, i) => {
+          const patientName = wardPatientsToAdmitOrTransfer[i].patient.person.preferredName.display;
+          if (result.status === 'fulfilled') {
+            showSnackbar({
+              title: isTransfer
+                ? t('patientTransferRequestCreatedForPatient', 'Transfer request created for {{patientName}}', {
+                    patientName,
+                  })
+                : t('patientAdmitRequestCreatedForPatient', 'Admit request created for {{patientName}}', {
+                    patientName,
+                  }),
+              kind: 'success',
+            });
+          } else {
+            showSnackbar({
+              title: isTransfer
+                ? t('errorCreatingTransferRequest', 'Error creating transfer request for {{patientName}}', {
+                    patientName,
+                  })
+                : t('errorCreatingAdmitRequest', 'Error creating admit request for {{patientName}}', {
+                    patientName,
+                  }),
+              subtitle: (result.reason as Error)?.message,
+              kind: 'error',
+            });
+          }
         });
+
+        if (results.some((r) => r.status === 'fulfilled')) {
+          onSuccess();
+        }
+      } finally {
+        await wardPatientGroupDetails?.mutate?.();
+        setIsSubmitting(false);
+      }
     },
     [
       onSuccess,
       createEncounter,
-      dispositionsWithTypeTransfer,
       emrConfiguration,
       t,
       wardPatientGroupDetails,
       selectedRelatedPatient,
       relatedTransferPatients,
       wardPatient,
+      isTransfer,
     ],
   );
 
@@ -268,9 +301,11 @@ export default function PatientAdmitOrTransferForm({
             )}
           />
         </div>
-        {dispositionsWithTypeTransfer?.length > 1 && (
+        {!formDefaultValues.transferType && dispositionsOfRequestedType?.length > 1 && (
           <div className={styles.field}>
-            <h2 className={styles.productiveHeading02}>{t('transferType', 'Transfer type')}</h2>
+            <h2 className={styles.productiveHeading02}>
+              {isTransfer ? t('transferType', 'Transfer type') : t('admitType', 'Admit type')}
+            </h2>
             <Controller
               name="transferType"
               control={control}
@@ -281,8 +316,8 @@ export default function PatientAdmitOrTransferForm({
                     {...field}
                     invalid={!!error?.message}
                     invalidText={error?.message}>
-                    {dispositionsWithTypeTransfer.map((disposition) => (
-                      <RadioButton id={disposition.uuid} labelText={disposition.name} value={disposition.uuid} />
+                    {dispositionsOfRequestedType.map((disposition) => (
+                      <RadioButton id={disposition.uuid} labelText={disposition.name} value={disposition.conceptCode} />
                     ))}
                   </RadioButtonGroup>
                 </ResponsiveWrapper>

@@ -8,14 +8,29 @@ import styles from './patient-appointments-action-menu.scss';
 interface appointmentsActionMenuProps {
   appointment: Appointment;
   patientUuid: string;
+
+  /**
+   * Optional callback to launch the appropriate appointments form workspace, depending
+   * on which app is using this component. If not provided, defaults to launching the
+   * standalone appointments form workspace.
+   */
+  launchAppointmentForm?(patientUuid: string, appointment?: Appointment): void;
 }
 
-export const PatientAppointmentsActionMenu = ({ appointment, patientUuid }: appointmentsActionMenuProps) => {
+export const PatientAppointmentsActionMenu = ({
+  appointment,
+  patientUuid,
+  launchAppointmentForm,
+}: appointmentsActionMenuProps) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
   const handleLaunchEditAppointmentForm = () => {
-    launchWorkspace2('appointments-form-workspace', { appointment, patientUuid });
+    if (launchAppointmentForm) {
+      launchAppointmentForm(patientUuid, appointment);
+    } else {
+      launchWorkspace2('appointments-form-workspace', { appointment, patientUuid });
+    }
   };
 
   const handleLaunchCancelAppointmentModal = () => {

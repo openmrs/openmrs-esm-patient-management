@@ -1,23 +1,24 @@
 {
   "name": "@openmrs/esm-home-app",
-  "version": "10.0.2",
+  "version": "12.1.1",
   "description": "Homepage microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-home-app.js",
   "main": "src/index.ts",
   "license": "MPL-2.0",
-  "homepage": "https://github.com/openmrs/openmrs-esm-home#readme",
+  "homepage": "https://github.com/openmrs/openmrs-esm-patient-management#readme",
   "scripts": {
     "start": "openmrs develop",
     "serve": "rspack serve --mode=development",
     "debug": "npm run serve",
     "build": "rspack --mode production",
+    "clean": "git clean -fdX -- dist",
     "analyze": "rspack --mode=production --env.analyze=true",
-    "lint": "cross-env eslint src --ext ts,tsx --fix --max-warnings=0 --color",
+    "lint": "eslint src --fix --max-warnings=0 --color",
     "typescript": "tsc",
     "verify": "turbo lint typescript test --color",
     "extract-translations": "i18next 'src/**/*.{component.tsx,tsx}' 'src/index.ts' --config ../../tools/i18next-parser.config.js",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
-    "coverage": "yarn test --coverage"
+    "test": "vitest run --passWithNoTests",
+    "coverage": "vitest run --coverage --passWithNoTests"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -30,19 +31,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openmrs/openmrs-esm-home.git"
+    "url": "git+https://github.com/openmrs/openmrs-esm-patient-management.git"
   },
   "bugs": {
-    "url": "https://github.com/openmrs/openmrs-esm-home/issues"
+    "url": "https://openmrs.atlassian.net/jira/software/c/projects/O3/boards/37"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "9.x",
+    "@carbon/react": "1.x",
+    "@openmrs/esm-framework": "11.x",
     "react": "18.x",
+    "react-dom": "18.x",
     "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
   "devDependencies": {
-    "openmrs": "next"
+    "@carbon/react": "^1.83.0",
+    "openmrs": "next",
+    "vitest": "^4.1.2"
   }
 }

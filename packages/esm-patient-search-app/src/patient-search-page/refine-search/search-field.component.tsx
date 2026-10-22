@@ -32,7 +32,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
             render={({ field: { onChange, value } }) => (
               <>
                 <ContentSwitcher
-                  id="gender"
+                  id="gender-common"
                   size={isTablet ? 'lg' : 'md'}
                   onChange={({ name }) => onChange(name)}
                   selectedIndex={['any', 'male', 'female'].indexOf(value)}>
@@ -41,7 +41,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                   <Switch name="female">{t('female', 'Female')}</Switch>
                 </ContentSwitcher>
                 <ContentSwitcher
-                  id="gender"
+                  id="gender-other"
                   size={isTablet ? 'lg' : 'md'}
                   onChange={({ name }) => onChange(name)}
                   selectedIndex={['other', 'unknown'].indexOf(value)}>
@@ -135,6 +135,14 @@ export const SearchField: React.FC<SearchFieldProps> = ({ field, control, inTabl
                 label={t('age', 'Age')}
                 min={field.min}
                 max={field.max}
+                invalidText={
+                  field.max
+                    ? t('ageOutOfRange', 'Enter an age between {{min}} and {{max}}', {
+                        min: field.min ?? 0,
+                        max: field.max,
+                      })
+                    : t('ageBelowMinimum', 'Enter an age of at least {{min}}', { min: field.min ?? 0 })
+                }
                 allowEmpty
                 hideSteppers
                 size={isTablet ? 'lg' : 'md'}

@@ -1,12 +1,11 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { HomePage } from '../pages';
-import { getPatientIdentifierStr } from '../commands';
+import { getPatientIdentifierStr, getPatientNames } from '../commands';
 
 test('Search patient by patient identifier', async ({ page, patient }) => {
   const openmrsIdentifier = getPatientIdentifierStr(patient);
-  const firstName = patient.person.display.split(' ')[0];
-  const lastName = patient.person.display.split(' ')[1];
+  const { firstName, lastName } = getPatientNames(patient);
   const homePage = new HomePage(page);
 
   await test.step('When I visit the home page', async () => {
@@ -30,15 +29,14 @@ test('Search patient by patient identifier', async ({ page, patient }) => {
 
   await test.step("Then I should be redirected to the patient's chart page", async () => {
     await expect(homePage.page).toHaveURL(
-      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
+      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/patient-summary`,
     );
   });
 });
 
 test('Search patient by full name', async ({ page, patient }) => {
   const openmrsIdentifier = getPatientIdentifierStr(patient);
-  const firstName = patient.person.display.split(' ')[0];
-  const lastName = patient.person.display.split(' ')[1];
+  const { firstName, lastName, fullName } = getPatientNames(patient);
 
   const homePage = new HomePage(page);
 
@@ -47,7 +45,7 @@ test('Search patient by full name', async ({ page, patient }) => {
   });
 
   await test.step('And I enter a valid patient name into the search field', async () => {
-    await homePage.searchPatient(`${firstName} ${lastName}`);
+    await homePage.searchPatient(fullName);
   });
 
   await test.step('Then I should see only the patient with the entered name', async () => {
@@ -63,7 +61,7 @@ test('Search patient by full name', async ({ page, patient }) => {
 
   await test.step("Then I should be in the patient's chart page", async () => {
     await expect(homePage.page).toHaveURL(
-      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
+      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/patient-summary`,
     );
   });
 

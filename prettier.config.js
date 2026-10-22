@@ -1,8 +1,4 @@
 module.exports = {
-  printWidth: 120,
-  singleQuote: true,
-  trailingComma: 'all',
-  bracketSpacing: true,
-  semi: true,
+  ...require('@openmrs/prettier-config'),
   bracketSameLine: true,
 };

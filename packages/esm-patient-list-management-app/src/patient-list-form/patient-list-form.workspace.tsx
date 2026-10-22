@@ -42,8 +42,11 @@ type CohortFormData = z.infer<ReturnType<typeof createCohortSchema>>;
 export interface PatientListFormWorkspaceProps {
   /** Existing patient list to edit. If not provided, creates a new list. */
   patientListDetails?: OpenmrsCohort;
-  /** Callback triggered after successful create/edit operation */
-  onSuccess?: () => void;
+  /**
+   * Callback triggered after successful create/edit operation.
+   * When a new list is created, it receives the UUID of the created list.
+   */
+  onSuccess?: (createdListUuid?: string) => void;
 }
 
 const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFormWorkspaceProps>> = ({
@@ -160,14 +163,14 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
         ...cohortDetails,
         location: cohortDetails.location || session?.sessionLocation?.uuid || '',
       } as NewCohortDataPayload)
-        .then(() => {
+        .then((response) => {
           showSnackbar({
             title: t('created', 'Created'),
             subtitle: `${t('listCreated', 'List created successfully')}`,
             kind: 'success',
             isLowContrast: true,
           });
-          onSuccess();
+          onSuccess(response?.uuid);
           setIsSubmitting(false);
           closeWorkspace({ discardUnsavedChanges: true });
         })
@@ -193,7 +196,6 @@ const PatientListFormWorkspace: React.FC<Workspace2DefinitionProps<PatientListFo
   return (
     <Workspace2 title={workspaceTitle} hasUnsavedChanges={isDirty}>
       <div data-tutorial-target="patient-list-form" className={styles.container}>
-        {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
         <div className={styles.content}>
           <h4 className={styles.header}>{t('configureList', 'Configure your patient list using the fields below')}</h4>
           <div>

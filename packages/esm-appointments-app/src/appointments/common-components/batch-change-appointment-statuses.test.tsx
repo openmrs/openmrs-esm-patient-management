@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -8,23 +9,23 @@ import { type Appointment, AppointmentKind, AppointmentStatus } from '../../type
 import { type ConfigObject, configSchema } from '../../config-schema';
 import BatchChangeAppointmentStatusesModal from './batch-change-appointment-statuses.modal';
 
-const mockCloseModal = jest.fn();
-const mockMutateAppointments = jest.fn();
-const mockChangeAppointmentStatus = jest.mocked(changeAppointmentStatus);
-const mockShowSnackbar = jest.mocked(showSnackbar);
-const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
-const mockUseMutateAppointments = jest.mocked(useMutateAppointments);
+const mockCloseModal = vi.fn();
+const mockMutateAppointments = vi.fn();
+const mockChangeAppointmentStatus = vi.mocked(changeAppointmentStatus);
+const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseMutateAppointments = vi.mocked(useMutateAppointments);
 
-jest.mock('../../patient-appointments/patient-appointments.resource', () => ({
-  changeAppointmentStatus: jest.fn(),
+vi.mock('../../patient-appointments/patient-appointments.resource', () => ({
+  changeAppointmentStatus: vi.fn(),
 }));
 
-jest.mock('./batch-change-appointment-statuses.resources', () => ({
-  getActiveVisitsForPatient: jest.fn(),
+vi.mock('./batch-change-appointment-statuses.resources', () => ({
+  getActiveVisitsForPatient: vi.fn(),
 }));
 
-jest.mock('../../hooks/useMutateAppointments', () => ({
-  useMutateAppointments: jest.fn(),
+vi.mock('../../hooks/useMutateAppointments', () => ({
+  useMutateAppointments: vi.fn(),
 }));
 
 const mockAppointment1: Appointment = {
@@ -57,7 +58,7 @@ const mockAppointment1: Appointment = {
     person: { uuid: 'person-1', display: 'Dr James Cook' },
   },
   location: { name: 'HIV Clinic', uuid: 'location-1' },
-  startDateTime: new Date().toISOString(),
+  startDateTime: new Date().getTime(),
   appointmentKind: AppointmentKind.SCHEDULED,
   status: AppointmentStatus.SCHEDULED,
   comments: 'Some comments',
@@ -85,7 +86,7 @@ const mockAppointment2: Appointment = {
 
 describe('BatchChangeAppointmentStatusesModal', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(configSchema),
       checkOutButton: { enabled: true, customUrl: '' },
@@ -118,7 +119,7 @@ describe('BatchChangeAppointmentStatusesModal', () => {
 
   it('successfully changes status of multiple appointments', async () => {
     const user = userEvent.setup();
-    mockChangeAppointmentStatus.mockResolvedValue({} as any);
+    mockChangeAppointmentStatus.mockResolvedValue(undefined);
 
     render(
       <BatchChangeAppointmentStatusesModal

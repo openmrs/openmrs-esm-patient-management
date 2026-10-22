@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -7,11 +8,11 @@ import { CodedPersonAttributeField } from './coded-person-attribute-field.compon
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
 
-const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
+const mockUseConceptAnswers = vi.mocked(useConceptAnswers);
 
-jest.mock('../field.resource', () => ({
-  ...jest.requireActual('../field.resource'),
-  useConceptAnswers: jest.fn(),
+vi.mock('../field.resource', async () => ({
+  ...((await vi.importActual('../field.resource')) as object),
+  useConceptAnswers: vi.fn(),
 }));
 
 const personAttributeType = {

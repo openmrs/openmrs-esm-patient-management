@@ -1,49 +1,17 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { forwardRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading, Layer, Loading, Tile } from '@carbon/react';
+import { InlineLoading, Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
-import type { PatientSearchResponse } from '../types';
-import CompactPatientBanner from './compact-patient-banner.component';
+import CompactPatientBanner, { type CompactPatientBannerHandle } from './compact-patient-banner.component';
 import Loader from './loader.component';
+import type { PatientSearchResponse } from '../types';
 import styles from './patient-search.scss';
 
-const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchResponse>(
+const RecentlySearchedPatients = forwardRef<CompactPatientBannerHandle, PatientSearchResponse>(
   ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
     const { t } = useTranslation();
-    const observer = useRef(null);
 
-    const loadingIconRef = useCallback(
-      (node: HTMLDivElement | null) => {
-        if (isValidating) {
-          return;
-        }
-        if (observer.current) {
-          observer.current.disconnect();
-        }
-        observer.current = new IntersectionObserver(
-          (entries) => {
-            if (entries[0].isIntersecting && hasMore) {
-              setPage((page) => page + 1);
-            }
-          },
-          {
-            threshold: 0.75,
-          },
-        );
-        if (node) {
-          observer.current.observe(node);
-        }
-      },
-      [isValidating, hasMore, setPage],
-    );
-
-    useEffect(() => {
-      return () => {
-        if (observer.current) {
-          observer.current.disconnect();
-        }
-      };
-    }, []);
+    const fetchMore = useCallback(() => setPage((page) => page + 1), [setPage]);
 
     if (!searchResults && isLoading) {
       return (
@@ -92,12 +60,14 @@ const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, PatientSearchR
                 </span>
               )}
             </div>
-            <CompactPatientBanner patients={searchResults} ref={ref} />
-            {hasMore && (
-              <div className={styles.loadingIcon} ref={loadingIconRef}>
-                <Loading withOverlay={false} small />
-              </div>
-            )}
+            <CompactPatientBanner
+              ref={ref}
+              patients={searchResults}
+              hasMore={hasMore}
+              isValidating={isValidating}
+              fetchMore={fetchMore}
+              virtualize={false}
+            />
           </div>
         </div>
       );

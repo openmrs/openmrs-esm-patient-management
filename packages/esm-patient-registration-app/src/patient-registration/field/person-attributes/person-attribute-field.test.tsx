@@ -1,7 +1,9 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { Form, Formik } from 'formik';
-import { render, screen, waitFor } from '@testing-library/react';
+import { Form, Formik, type FormikTouched } from 'formik';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { useConceptAnswers } from '../field.resource';
@@ -9,18 +11,18 @@ import { PersonAttributeField } from './person-attribute-field.component';
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
 
-jest.mock('./person-attributes.resource', () => ({
-  ...jest.requireActual('./person-attributes.resource'),
-  usePersonAttributeType: jest.fn(),
+vi.mock('./person-attributes.resource', async () => ({
+  ...((await vi.importActual('./person-attributes.resource')) as object),
+  usePersonAttributeType: vi.fn(),
 }));
 
-jest.mock('../field.resource', () => ({
-  ...jest.requireActual('../field.resource'),
-  useConceptAnswers: jest.fn(),
+vi.mock('../field.resource', async () => ({
+  ...((await vi.importActual('../field.resource')) as object),
+  useConceptAnswers: vi.fn(),
 }));
 
-const mockUsePersonAttributeType = jest.mocked(usePersonAttributeType);
-const mockUseConceptAnswers = jest.mocked(useConceptAnswers);
+const mockUsePersonAttributeType = vi.mocked(usePersonAttributeType);
+const mockUseConceptAnswers = vi.mocked(useConceptAnswers);
 
 const mockPersonAttributeType = {
   format: 'java.lang.String',
@@ -44,11 +46,13 @@ const renderPersonAttributeFieldWithFormik = (
   };
 
   let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
+  let formTouchedRef: FormikTouched<FormValues> = {};
 
   const utils = render(
     <Formik initialValues={defaultValues} onSubmit={() => {}} enableReinitialize={options?.enableReinitialize}>
-      {({ setFieldValue, values, setFieldTouched }) => {
+      {({ setFieldValue, values, setFieldTouched, touched }) => {
         formValuesRef = { ...initialFormValues, ...values } as FormValues;
+        formTouchedRef = touched;
         return (
           <Form>
             <PersonAttributeField fieldDefinition={fieldDefinition} />
@@ -61,6 +65,7 @@ const renderPersonAttributeFieldWithFormik = (
   return {
     ...utils,
     getFormValues: () => formValuesRef,
+    getFormTouched: () => formTouchedRef,
   };
 };
 
@@ -305,6 +310,55 @@ describe('PersonAttributeField', () => {
 
       const select = screen.getByRole('combobox', { name: /referred by/i });
       expect(select).not.toBeRequired();
+    });
+  });
+  describe.each(['org.openmrs.util.AttributableDate', 'java.util.Date'])('Date format (%s)', (format) => {
+    const uuid = 'd2a4f9a1-3c5e-4a7b-9b1d-6f8e2c4a1b3d';
+    const dateFieldDefinition: FieldDefinition = {
+      id: 'dateOfFirstVisit',
+      label: 'Date of first visit',
+      type: 'person attribute',
+      uuid,
+      showHeading: false,
+    };
+
+    beforeEach(() => {
+      mockUsePersonAttributeType.mockReturnValue({
+        data: { ...mockPersonAttributeType, uuid, format, display: 'Date of first visit', name: 'Date of first visit' },
+        isLoading: false,
+        error: null,
+      });
+    });
+
+    it('saves the selected date in the YYYY-MM-DD format', async () => {
+      const { getFormValues } = renderPersonAttributeFieldWithFormik(dateFieldDefinition);
+
+      fireEvent.change(screen.getByLabelText('Date of first visit'), { target: { value: '2026-09-20' } });
+
+      await waitFor(() => expect(getFormValues().attributes[uuid]).toBe('2026-09-20'));
+    });
+
+    it('marks the field as touched when a date is selected', async () => {
+      const { getFormTouched } = renderPersonAttributeFieldWithFormik(dateFieldDefinition);
+
+      fireEvent.change(screen.getByLabelText('Date of first visit'), { target: { value: '2026-09-20' } });
+
+      await waitFor(() => expect(getFormTouched().attributes?.[uuid]).toBe(true));
+    });
+
+    it('renders a saved date', () => {
+      renderPersonAttributeFieldWithFormik(dateFieldDefinition, { attributes: { [uuid]: '2026-09-20' } });
+
+      expect(screen.getByLabelText('Date of first visit')).toHaveValue('20/09/2026');
+    });
+
+    it('does not allow future dates when allowFutureDates is false', () => {
+      vi.mocked(OpenmrsDatePicker).mockClear();
+      renderPersonAttributeFieldWithFormik({ ...dateFieldDefinition, allowFutureDates: false });
+
+      const props = vi.mocked(OpenmrsDatePicker).mock.calls.at(-1)[0];
+      expect(props.maxDate).toBeInstanceOf(Date);
+      expect(props.minDate).toBeUndefined();
     });
   });
 });

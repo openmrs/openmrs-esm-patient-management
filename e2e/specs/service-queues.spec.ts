@@ -9,12 +9,21 @@ test('Add patient with visit to queue', async ({ api, page, patient }) => {
   const firstName = patient.person.display.split(' ')[0];
   const lastName = patient.person.display.split(' ')[1];
 
-  await test.step('When I go to the Appointments page in the patient chart', async () => {
+  await test.step('When I go to the Service queues page', async () => {
     await serviceQueuesPage.goto();
   });
 
-  await test.step('And I click on the “Add patient to queue” button', async () => {
-    await page.getByRole('button', { name: 'Add patient to queue', exact: true }).click();
+  await test.step('Then I should see the clinic overview tab selected with the queues table', async () => {
+    await expect(page.getByRole('tab', { name: /clinic overview/i })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('table', { name: /queues/i })).toBeVisible();
+  });
+
+  await test.step('When I open the waiting list tab', async () => {
+    await page.getByRole('tab', { name: /waiting list/i }).click();
+  });
+
+  await test.step('And I click on the “Add a patient to this list” button', async () => {
+    await page.getByRole('button', { name: 'Add a patient to this list', exact: true }).click();
   });
 
   await test.step('And I search for the patient', async () => {
@@ -61,5 +70,21 @@ test('Add patient with visit to queue', async ({ api, page, patient }) => {
   await test.step('Then I should see a success message and see the patient in the queue table', async () => {
     await expect(page.getByText(/Queue entry added successfully/i)).toBeVisible();
     await expect(page.getByRole('link', { name: `${firstName} ${lastName}` })).toBeVisible();
+  });
+
+  await test.step('Then the row with the patient name should contain "Not Urgent"', async () => {
+    const patientRow = page
+      .getByRole('row')
+      .filter({ has: page.getByRole('link', { name: `${firstName} ${lastName}` }) });
+    await expect(patientRow).toContainText('Not Urgent');
+  });
+
+  await test.step("When I click on the patient's chart", async () => {
+    await page.getByRole('link', { name: `${firstName} ${lastName}` }).click();
+  });
+
+  await test.step('Then "Outpatient Consultation" and "Not Urgent" should be present on the page', async () => {
+    await expect(page.getByText('Outpatient Consultation')).toBeVisible();
+    await expect(page.getByText('Not Urgent')).toBeVisible();
   });
 });

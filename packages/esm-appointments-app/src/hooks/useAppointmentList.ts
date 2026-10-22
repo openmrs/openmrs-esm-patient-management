@@ -1,13 +1,11 @@
-import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
 import { useSelectedDate } from './useSelectedDate';
+import { buildAppointmentsUrl } from '../helpers';
 
 export const useAppointmentList = (date: string) => {
-  const startOfDay = dayjs(date).startOf('day').toISOString();
-  const searchUrl = `${restBaseUrl}/appointments?forDate=${startOfDay}`;
-
+  const searchUrl = buildAppointmentsUrl(date);
   const { data, ...rest } = useSWR<AppointmentsFetchResponse, Error>(searchUrl, openmrsFetch);
   return { appointmentList: data?.data ?? [], ...rest };
 };

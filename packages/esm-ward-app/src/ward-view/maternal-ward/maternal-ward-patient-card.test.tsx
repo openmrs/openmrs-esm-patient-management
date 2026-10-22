@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { getDefaultsFromConfigSchema, useAppContext, useConfig } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import { configSchema, type WardConfigObject } from '../../config-schema';
@@ -11,20 +12,21 @@ import { useObs } from '../../hooks/useObs';
 import { type WardPatient, type WardViewContext } from '../../types';
 import MaternalWardPatientCard from './maternal-ward-patient-card.component';
 
-const mockUseConfig = jest.mocked(useConfig<WardConfigObject>);
+const mockUseConfig = vi.mocked(useConfig<WardConfigObject>);
 
-jest.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
+vi.mocked(useAppContext<WardViewContext>).mockReturnValue(mockWardViewContext);
 
-jest.mock('../../hooks/useObs', () => ({
-  useObs: jest.fn(),
+vi.mock('../../hooks/useObs', () => ({
+  useObs: vi.fn(),
 }));
 
-jest.mock('../../ward-patient-card/row-elements/ward-patient-obs.resource', () => ({
-  useConceptToTagColorMap: jest.fn(),
+vi.mock('../../ward-patient-card/row-elements/ward-patient-obs.resource', async (importOriginal) => ({
+  ...((await importOriginal()) as object),
+  useConceptToTagColorMap: vi.fn(),
 }));
 
 //@ts-ignore
-jest.mocked(useObs).mockReturnValue({
+vi.mocked(useObs).mockReturnValue({
   data: [],
 });
 

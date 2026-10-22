@@ -1,4 +1,5 @@
 import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import CancelPatientEdit from './cancel-patient-edit.modal';
@@ -6,13 +7,13 @@ import CancelPatientEdit from './cancel-patient-edit.modal';
 /**
  * Helper to render CancelPatientEdit modal.
  */
-function renderCancelPatientEditModal(close = jest.fn(), onConfirm = jest.fn()) {
+function renderCancelPatientEditModal(close = vi.fn(), onConfirm = vi.fn()) {
   return render(<CancelPatientEdit close={close} onConfirm={onConfirm} />);
 }
 
 describe('CancelPatientEdit modal', () => {
-  const mockClose = jest.fn();
-  const mockOnConfirm = jest.fn();
+  const mockClose = vi.fn();
+  const mockOnConfirm = vi.fn();
 
   describe('Rendering', () => {
     it('renders modal with title and message', () => {

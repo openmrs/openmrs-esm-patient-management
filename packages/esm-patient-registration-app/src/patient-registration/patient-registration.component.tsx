@@ -22,7 +22,7 @@ import { useResourcesContext } from '../resources-context';
 import { SectionWrapper } from './section/section-wrapper.component';
 import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
-import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
+import { useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import BeforeSavePrompt from './before-save-prompt.component';
 import styles from './patient-registration.scss';
 
@@ -30,10 +30,15 @@ let exportedInitialFormValuesForTesting = {} as FormValues;
 
 export interface PatientRegistrationProps {
   savePatientForm: SavePatientForm;
-  isOffline: boolean;
 }
 
-export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
+export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm }) => {
+  const { patientUuid } = useParams();
+
+  return <PatientRegistrationForm key={patientUuid ?? 'new-patient'} savePatientForm={savePatientForm} />;
+};
+
+const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatientForm }) => {
   const { t } = useTranslation();
   const { currentSession, identifierTypes } = useResourcesContext();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
@@ -41,19 +46,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const config = useConfig<RegistrationConfig>();
 
-  const [initialFormValues, setInitialFormValues] = useInitialFormValues(
-    isLoadingPatientToEdit,
-    patientToEdit,
-    uuidOfPatientToEdit,
-  );
-  const [initialAddressFieldValues] = useInitialAddressFieldValues(
-    {},
-    isLoadingPatientToEdit,
-    patientToEdit,
-    uuidOfPatientToEdit,
-  );
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientToEdit, uuidOfPatientToEdit);
 
-  const [patientUuidMap] = usePatientUuidMap({}, isLoadingPatientToEdit, patientToEdit, uuidOfPatientToEdit);
+  const [patientUuidMap] = usePatientUuidMap({}, patientToEdit, uuidOfPatientToEdit);
 
   const [target, setTarget] = useState<undefined | string>();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
@@ -83,7 +78,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [config.sections, config.sectionDefinitions]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
-    const abortController = new AbortController();
     helpers.setSubmitting(true);
 
     const updatedFormValues = { ...values, identifiers: filterOutUndefinedPatientIdentifiers(values.identifiers) };
@@ -92,14 +86,12 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         !inEditMode,
         updatedFormValues,
         patientUuidMap,
-        initialAddressFieldValues,
         capturePhotoProps,
         location,
         initialFormValues['identifiers'],
         currentSession,
         config,
         savePatientTransactionManager.current,
-        abortController,
       );
 
       showSnackbar({
@@ -147,7 +139,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   };
 
-  const getDescription = (errors: FormikErrors<FormValues>): JSX.Element => {
+  const getDescription = (errors: FormikErrors<FormValues>): React.JSX.Element => {
     return (
       <ul style={{ listStyle: 'inside' }}>
         {Object.keys(errors).map((error, index) => {
@@ -178,19 +170,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setFieldTouched: formikProps.setFieldTouched,
       setCapturePhotoProps,
       currentPhoto: photo?.imageSrc,
-      isOffline,
       initialFormValues: formikProps.initialValues,
       setInitialFormValues,
     }),
-    [
-      identifierTypes,
-      validationSchema,
-      inEditMode,
-      setCapturePhotoProps,
-      photo?.imageSrc,
-      isOffline,
-      setInitialFormValues,
-    ],
+    [identifierTypes, validationSchema, inEditMode, setCapturePhotoProps, photo?.imageSrc, setInitialFormValues],
   );
 
   return (
@@ -203,47 +186,48 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         <Form className={styles.form}>
           <BeforeSavePrompt when={Object.keys(props.touched).length > 0} redirect={target} />
           <div className={styles.formContainer}>
-            <div>
-              <div className={styles.stickyColumn}>
-                <h4>
-                  {inEditMode
-                    ? t('editPatientDetails', 'Edit patient details')
-                    : t('createNewPatient', 'Create new patient')}
-                </h4>
-                {showDummyDataInput && <DummyDataInput setValues={props.setValues} />}
-                <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
-                {sections.map((section) => (
-                  <div className={classNames(styles.space05, styles.touchTarget)} key={section.name}>
-                    <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
-                      <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
-                    </Link>
-                  </div>
-                ))}
-                <Button
-                  className={styles.submitButton}
-                  type="submit"
-                  onClick={() => props.validateForm().then((errors) => displayErrors(errors))}
-                  // Current session and identifiers are required for patient registration.
-                  // If currentSession or identifierTypes are not available, then the
-                  // user should be blocked to register the patient.
-                  disabled={!currentSession || !identifierTypes || props.isSubmitting}>
-                  {props.isSubmitting ? (
-                    <InlineLoading
-                      className={styles.spinner}
-                      description={`${t('submitting', 'Submitting')} ...`}
-                      iconDescription="submitting"
-                    />
-                  ) : inEditMode ? (
-                    t('updatePatient', 'Update patient')
-                  ) : (
-                    t('registerPatient', 'Register patient')
-                  )}
-                </Button>
-                <Button className={styles.cancelButton} kind="secondary" onClick={cancelRegistration}>
-                  {t('cancel', 'Cancel')}
-                </Button>
-              </div>
+            {/* Navigation Sidebar */}
+            <div className={styles.stickyColumn}>
+              <h4>
+                {inEditMode
+                  ? t('editPatientDetails', 'Edit patient details')
+                  : t('createNewPatient', 'Create new patient')}
+              </h4>
+              {showDummyDataInput && <DummyDataInput setValues={props.setValues} />}
+              <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
+              {sections.map((section) => (
+                <div className={classNames(styles.space05, styles.touchTarget)} key={section.name}>
+                  <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
+                    <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
+                  </Link>
+                </div>
+              ))}
+              <hr className={styles.divider} />
+              <Button
+                className={styles.submitButton}
+                type="submit"
+                onClick={() => props.validateForm().then((errors) => displayErrors(errors))}
+                // Current session and identifiers are required for patient registration.
+                // If currentSession or identifierTypes are not available, then the
+                // user should be blocked to register the patient.
+                disabled={!currentSession || !identifierTypes || props.isSubmitting}>
+                {props.isSubmitting ? (
+                  <InlineLoading
+                    className={styles.spinner}
+                    description={`${t('submitting', 'Submitting')} ...`}
+                    iconDescription="submitting"
+                  />
+                ) : inEditMode ? (
+                  t('updatePatient', 'Update patient')
+                ) : (
+                  t('registerPatient', 'Register patient')
+                )}
+              </Button>
+              <Button className={styles.cancelButton} kind="secondary" onClick={cancelRegistration}>
+                {t('cancel', 'Cancel')}
+              </Button>
             </div>
+            {/* Registration Form */}
             <div className={styles.infoGrid}>
               <PatientRegistrationContextProvider value={createContextValue(props)}>
                 {sections.map((section, index) => (

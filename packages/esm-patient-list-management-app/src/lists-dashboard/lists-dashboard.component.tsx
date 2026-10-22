@@ -60,7 +60,6 @@ const ListsDashboard: React.FC = () => {
                 <Tab className={styles.tab}>{t('starredLists', 'Starred lists')}</Tab>
                 <Tab className={styles.tab}>{t('systemLists', 'System lists')}</Tab>
                 <Tab className={styles.tab}>{t('myLists', 'My lists')}</Tab>
-                {/* data-tutorial-target attribute is essential for joyride in onboarding app ! */}
                 <Tab data-tutorial-target="all-patient-lists-tab" className={styles.tab}>
                   {t('allLists', 'All lists')}
                 </Tab>

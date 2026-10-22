@@ -2,7 +2,6 @@ import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import type { Visit } from '@openmrs/esm-framework';
 import {
-  changeToWardLocation,
   deletePatient,
   dischargePatientFromBed,
   endVisit,
@@ -10,14 +9,13 @@ import {
   generateRandomBed,
   generateRandomPatient,
   generateWardAdmissionRequest,
-  getProvider,
   retireBedType,
   startVisit,
   waitForAdmissionRequestToBeProcessed,
   waitForAdmissionToBeProcessed,
 } from '../commands';
-import type { Bed, BedType, Patient, Provider } from '../commands/types';
-import { test } from '../core';
+import type { Bed, BedType, Patient } from '../commands/types';
+import { wardTest as test } from '../core';
 import { WardPage } from '../pages';
 
 async function selectBedByLabel(page: Page, label: string) {
@@ -35,21 +33,25 @@ async function selectBedByLabel(page: Page, label: string) {
 
 let bed: Bed;
 let bedtype: BedType;
-let provider: Provider;
 let swapBed: Bed;
 let visit: Visit;
 let wardPatient: Patient;
 
-test.beforeEach(async ({ api, page }) => {
-  await changeToWardLocation(api);
+test.beforeEach(async ({ api, page, emrConfiguration }) => {
   bedtype = await generateBedType(api);
   bed = await generateRandomBed(api, bedtype);
   swapBed = await generateRandomBed(api, bedtype); // Generate the bed we'll swap to
-  provider = await getProvider(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
-  await generateWardAdmissionRequest(api, provider.uuid, wardPatient.uuid);
+  await generateWardAdmissionRequest(api, emrConfiguration, wardPatient.uuid);
   await waitForAdmissionRequestToBeProcessed(api, page, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID as string);
+});
+
+test.afterEach(async ({ api }) => {
+  await dischargePatientFromBed(api, swapBed.id, wardPatient.uuid);
+  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
+  await deletePatient(api, wardPatient.uuid);
+  await endVisit(api, visit.uuid, true);
 });
 
 test('Swap a patient from one bed to another', async ({ page, api }) => {
@@ -134,11 +136,4 @@ test('Swap a patient from one bed to another', async ({ page, api }) => {
     });
     await expect(originalBedLocator.getByText(/empty bed/i)).toBeVisible({ timeout: 60000 });
   });
-});
-
-test.afterEach(async ({ api }) => {
-  await dischargePatientFromBed(api, swapBed.id, wardPatient.uuid);
-  await retireBedType(api, bedtype.uuid, 'Retired during automated testing');
-  await deletePatient(api, wardPatient.uuid);
-  await endVisit(api, visit.uuid, true);
 });

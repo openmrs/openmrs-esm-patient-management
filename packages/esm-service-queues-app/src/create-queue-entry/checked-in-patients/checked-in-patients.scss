@@ -1,0 +1,85 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.heading {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  padding: layout.$spacing-05 layout.$spacing-05 layout.$spacing-03;
+}
+
+.patientList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.patientRow {
+  border-top: 1px solid $ui-03;
+  border-bottom: 1px solid $ui-03;
+  background-color: $ui-02;
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+}
+
+.patientBanner {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  align-items: center;
+}
+
+.patientBannerButton {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background-color: $ui-01;
+  }
+}
+
+.patientAvatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: layout.$spacing-05;
+  overflow: hidden;
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  margin-right: layout.$spacing-05;
+}
+
+.toggleContactDetailsButton {
+  > svg {
+    fill: $color-blue-60-2 !important;
+  }
+}
+
+.contactDetails {
+  padding: 0 layout.$spacing-05 layout.$spacing-05;
+}
+
+.emptyState {
+  margin: 0 layout.$spacing-05;
+}
+
+.emptyStateText {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.loading {
+  margin: layout.$spacing-05;
+}

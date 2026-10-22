@@ -29,6 +29,9 @@
 
 .dashboardContainerTablet {
   flex-grow: 1;
+
+  // Prevent the dashboard from expanding to fit the width of its children
+  min-width: 0;
 }
 
 .logoSection {
