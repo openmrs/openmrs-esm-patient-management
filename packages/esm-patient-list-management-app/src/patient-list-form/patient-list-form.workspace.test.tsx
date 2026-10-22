@@ -122,6 +122,8 @@ describe('PatientListFormWorkspace', () => {
   });
 
   it('creates a new patient list successfully', async () => {
+    mockCreatePatientList.mockResolvedValueOnce({ uuid: 'new-list-uuid' });
+
     const user = userEvent.setup();
     const props = createMockWorkspace2Props({ onSuccess: mockOnSuccess });
 
@@ -145,7 +147,7 @@ describe('PatientListFormWorkspace', () => {
       }),
     );
 
-    expect(mockOnSuccess).toHaveBeenCalled();
+    expect(mockOnSuccess).toHaveBeenCalledWith('new-list-uuid');
     expect(mockCloseWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true });
   });
 
@@ -177,7 +179,7 @@ describe('PatientListFormWorkspace', () => {
       }),
     );
 
-    expect(mockOnSuccess).toHaveBeenCalled();
+    expect(mockOnSuccess).toHaveBeenCalledWith();
     expect(mockCloseWorkspace).toHaveBeenCalledWith({ discardUnsavedChanges: true });
   });
 

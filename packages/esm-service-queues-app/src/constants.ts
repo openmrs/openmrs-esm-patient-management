@@ -16,12 +16,12 @@ export const queueEntryCustomRepresentation =
 
 /**
  * Feeds the shared `visit-summary` extension, which reads many of these fields unguarded — omitting
- * `obs.groupMembers.display`, for example, throws while rendering any obs group. Kept identical to the
- * visits-widget representation in openmrs-esm-patient-chart (`visit/visits-widget/visit.resource.tsx`), apart
- * from `diagnoses.certainty` which its encounters table reads.
+ * `obs.groupMembers.display`, for example, throws while rendering any obs group. Based on the visits-widget
+ * representation in openmrs-esm-patient-chart (`visit/visits-widget/visit.resource.tsx`). This one also requests
+ * `attributes.attributeType.datatypeClassname`, which the current visit summary reads to format visit attribute tags.
  */
 export const visitCustomRepresentation =
-  'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,certainty,voided),form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
+  'custom:(uuid,location,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis,certainty,voided),form:(uuid,display,name,description,encounterType,version,resources:(uuid,display,name,valueReference)),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:(uuid,display,datatypeClassname),display,uuid,value)';
 
 // Error codes
 export const DUPLICATE_QUEUE_ENTRY_ERROR_CODE = 'queue.entry.error.duplicate';

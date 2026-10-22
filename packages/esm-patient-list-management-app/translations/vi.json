@@ -34,6 +34,7 @@
   "errorCreatingList": "Lỗi khi tạo danh sách",
   "errorDeletingList": "Lỗi khi xóa danh sách bệnh nhân",
   "errorRemovingPatientFromList": "Không xóa được bệnh nhân khỏi danh sách",
+  "errorSelectedListNotLoaded": "The selected list could not be loaded. Close this window and try again.",
   "errorUpdatingList": "Lỗi cập nhật danh sách",
   "filterByLocation": "Filter by location",
   "identifier": "Mã định danh",

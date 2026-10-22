@@ -34,6 +34,7 @@
   "errorCreatingList": "Kesalahan membuat daftar",
   "errorDeletingList": "Kesalahan menghapus daftar pasien",
   "errorRemovingPatientFromList": "Gagal menghapus pasien dari daftar",
+  "errorSelectedListNotLoaded": "The selected list could not be loaded. Close this window and try again.",
   "errorUpdatingList": "Kesalahan memperbarui daftar",
   "filterByLocation": "Filter by location",
   "identifier": "Identifikasi",
