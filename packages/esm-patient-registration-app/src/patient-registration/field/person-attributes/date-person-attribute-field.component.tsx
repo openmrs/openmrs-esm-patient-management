@@ -34,7 +34,7 @@ export function DatePersonAttributeField({
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Layer>
         <Field name={fieldName}>
-          {({ field, form: { touched, errors, setFieldValue, setFieldTouched }, meta }) => {
+          {({ field, form: { setFieldValue, setFieldTouched }, meta }) => {
             return (
               <OpenmrsDatePicker
                 id={id}
@@ -46,7 +46,7 @@ export function DatePersonAttributeField({
                   setFieldValue(fieldName, date ? dayjs(date).format('YYYY-MM-DD') : '');
                   setFieldTouched(fieldName, true, false);
                 }}
-                isInvalid={errors[fieldName] && touched[fieldName]}
+                isInvalid={!!(meta.touched && meta.error)}
                 invalidText={t(meta.error)}
                 minDate={!pastDatesAllowed ? new Date() : undefined}
                 maxDate={!futureDatesAllowed ? new Date() : undefined}

@@ -266,4 +266,53 @@ describe('Patient registration validation', () => {
     const validationError = await validateFormValues(formValues);
     expect(validationError).toBeFalsy();
   });
+
+  describe('required person attributes', () => {
+    const clinicUuid = 'fe261119-2911-5b36-be40-8f9827826987';
+    const consentUuid = 'e15bf9b7-249e-5d75-907d-937b8d9b0c46';
+
+    const validateWithAttributes = async (attributes: Record<string, unknown>, shownFields = ['clinic', 'consent']) => {
+      const config = (await getConfig('@openmrs/esm-patient-registration-app')) as unknown as RegistrationConfig;
+      const validationSchema = getValidationSchema(
+        {
+          ...config,
+          sections: ['demographics', 'rhd'],
+          sectionDefinitions: [{ id: 'rhd', fields: shownFields }],
+          fieldDefinitions: [
+            {
+              id: 'clinic',
+              type: 'person attribute',
+              uuid: clinicUuid,
+              label: 'Clinic',
+              validation: { required: true },
+            },
+            { id: 'consent', type: 'person attribute', uuid: consentUuid, validation: { required: false } },
+          ],
+        } as unknown as RegistrationConfig,
+        (key: string, defaultValue: string) => defaultValue,
+      );
+      try {
+        await validationSchema.validate({ ...validFormValues, attributes }, { abortEarly: false });
+      } catch (err) {
+        return err;
+      }
+    };
+
+    it('requires a person attribute marked required', async () => {
+      const validationError = await validateWithAttributes({ [consentUuid]: '' });
+      expect(validationError.inner.map((e) => e.path)).toEqual([`attributes.${clinicUuid}`]);
+      expect(validationError.errors).toEqual(['Required']);
+    });
+
+    it('accepts a required person attribute with a value, or a saved location reference', async () => {
+      expect(await validateWithAttributes({ [clinicUuid]: 'some-location-uuid' })).toBeFalsy();
+      expect(
+        await validateWithAttributes({ [clinicUuid]: { uuid: 'some-location-uuid', display: 'Gulu' } }),
+      ).toBeFalsy();
+    });
+
+    it('does not require a person attribute that is in no section shown', async () => {
+      expect(await validateWithAttributes({}, ['consent'])).toBeFalsy();
+    });
+  });
 });

@@ -123,6 +123,7 @@ export function getValidationSchema(
         ),
       ),
     ),
+    attributes: Yup.object(getRequiredAttributeSchema(config, t)),
     relationships: Yup.array().of(
       Yup.object().shape({
         relatedPersonUuid: Yup.string().required(),
@@ -130,4 +131,32 @@ export function getValidationSchema(
       }),
     ),
   });
+}
+
+/**
+ * The person attributes marked `validation.required` in `fieldDefinitions` and shown in a section. Their fields also
+ * carry the native `required` attribute, which blocks the submit without a message; this gives them one.
+ */
+function getRequiredAttributeSchema(
+  config: RegistrationConfig,
+  t: (key: string, defaultValue: string) => string,
+): Record<string, Yup.AnySchema> {
+  const shownFields = new Set(
+    (config.sectionDefinitions ?? [])
+      .filter((section) => config.sections?.includes(section.id))
+      .flatMap((section) => section.fields),
+  );
+  return Object.fromEntries(
+    (config.fieldDefinitions ?? [])
+      .filter((field) => field.type === 'person attribute' && field.validation?.required && shownFields.has(field.id))
+      .map((field) => [
+        field.uuid,
+        Yup.mixed().test(
+          'required',
+          t('fieldRequired', 'Required'),
+          // Saved location attributes load as `{ uuid, display }` references
+          (value) => (typeof value === 'object' ? Boolean(value?.uuid) : Boolean(value)),
+        ),
+      ]),
+  );
 }
