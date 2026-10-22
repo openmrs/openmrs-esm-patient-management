@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   InlineLoading,
@@ -9,7 +10,6 @@ import {
   TextInput,
 } from '@carbon/react';
 import { getCoreTranslation, showSnackbar } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import { type Bed } from '../types';
 import { deleteBed } from './form/bed-form.resource';
 
@@ -84,7 +84,7 @@ const DeleteBedModal: React.FC<DeleteBedModalProps> = ({ bed, closeModal, mutate
         )}
         <TextInput
           id="delete-bed-reason"
-          labelText={t('reasonForDeletingBed', 'Reason for deleting the bed')}
+          labelText={t('reasonForDeletingBed', 'Enter a reason for deleting this bed')}
           value={reason}
           onChange={(event) => setReason(event.target.value)}
           maxLength={255}
