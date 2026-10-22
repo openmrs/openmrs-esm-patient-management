@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import isEmpty from 'lodash-es/isEmpty';
 import useSWR from 'swr';
-import { type Concept, type Identifer, type Queue, type QueueEntry } from './types';
+import { type Concept, type Identifier, type Queue, type QueueEntry } from './types';
 
 dayjs.extend(isToday);
 
@@ -43,7 +43,7 @@ export interface MappedVisitQueueEntry {
   queueLocation: string;
   sortWeight: number;
   visitQueueNumber: string;
-  identifiers: Array<Identifer>;
+  identifiers: Array<Identifier>;
   queueComingFrom: string;
 }
 
@@ -100,7 +100,7 @@ export const mapVisitQueueEntryProperties = (
   sortWeight: queueEntry.sortWeight,
   visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)
     ?.value,
-  identifiers: queueEntry.patient?.identifiers as Identifer[],
+  identifiers: queueEntry.patient?.identifiers as Identifier[],
   queueComingFrom: queueEntry?.queueComingFrom?.name,
 });
 
