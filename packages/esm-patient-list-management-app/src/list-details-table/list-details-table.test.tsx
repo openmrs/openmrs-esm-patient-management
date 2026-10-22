@@ -211,4 +211,62 @@ describe('ListDetailsTable', () => {
 
     expect(mockCloseWorkspace).not.toHaveBeenCalled();
   });
+
+  it('renders patients with missing identifiers and null fields safely', () => {
+    const mockMutateListDetails = vi.fn();
+    const mockMutateListMembers = vi.fn();
+
+    const patientsWithMissingFields = [
+      {
+        uuid: 'patient-uuid-1',
+        membershipUuid: 'member-uuid-1',
+        name: 'Patient One',
+        firstName: 'Patient One',
+        lastName: 'Doe',
+        identifier: null,
+        sex: 'Male',
+        startDate: null,
+        mobile: null,
+      },
+      {
+        uuid: 'patient-uuid-2',
+        membershipUuid: 'member-uuid-2',
+        name: 'Patient Two',
+        firstName: 'Patient Two',
+        lastName: 'Smith',
+        identifier: null,
+        sex: undefined,
+        startDate: null,
+        mobile: null,
+      },
+    ];
+
+    const testColumns = [
+      {
+        key: 'name',
+        header: 'Name',
+      },
+      {
+        key: 'identifier',
+        header: 'Identifier',
+      },
+    ];
+
+    render(
+      <ListDetailsTable
+        patients={patientsWithMissingFields}
+        columns={testColumns}
+        pagination={pagination}
+        isLoading={false}
+        autoFocus={false}
+        isFetching={false}
+        mutateListDetails={mockMutateListDetails}
+        mutateListMembers={mockMutateListMembers}
+        cohortUuid="test-cohort"
+      />,
+    );
+
+    expect(screen.getByText('Patient One')).toBeInTheDocument();
+    expect(screen.getByText('Patient Two')).toBeInTheDocument();
+  });
 });
