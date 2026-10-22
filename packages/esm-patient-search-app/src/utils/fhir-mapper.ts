@@ -8,7 +8,7 @@ function getEstimatedBirthDate(birthdate: string, age: number) {
   }
 
   const [, year, month] = dateParts;
-  return age < 5 && month ? `${year}-${month}` : year;
+  return age <= 5 && month ? `${year}-${month}` : year;
 }
 
 const getGender = (gender: string) => {
