@@ -2,8 +2,8 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
-import { launchWorkspace2, showModal, showSnackbar } from '@openmrs/esm-framework';
-import { useAddablePatientLists } from '../api/patient-list.resource';
+import { launchWorkspace2, showModal, showSnackbar, useConfig, navigate } from '@openmrs/esm-framework';
+import { useAddablePatientLists, getPatientLocationFromIdentifiers } from '../api/patient-list.resource';
 import { mockPatient } from '__mocks__';
 import AddPatient from './add-patient.modal';
 
@@ -12,9 +12,29 @@ const mockShowModal = vi.mocked(showModal);
 const mockUseAddablePatientLists = vi.mocked(useAddablePatientLists);
 const mockCloseModal = vi.fn();
 const mockShowSnackbar = vi.mocked(showSnackbar);
+const mockUseConfig = vi.mocked(useConfig);
+const mockNavigate = vi.mocked(navigate);
+const mockGetPatientLocationFromIdentifiers = vi.mocked(getPatientLocationFromIdentifiers);
+
+vi.mock('@openmrs/esm-framework', () => ({
+  navigate: vi.fn(),
+  useConfig: vi.fn(),
+  showSnackbar: vi.fn(),
+  launchWorkspace2: vi.fn(),
+  showModal: vi.fn(),
+  usePagination: vi.fn((items, pageSize) => ({
+    results: items,
+    goTo: vi.fn(),
+    currentPage: 1,
+    paginated: false,
+  })),
+  getCoreTranslation: vi.fn((key) => key),
+  restBaseUrl: '/openmrs/ws/rest/v1',
+}));
 
 vi.mock('../api/patient-list.resource', () => ({
   useAddablePatientLists: vi.fn(),
+  getPatientLocationFromIdentifiers: vi.fn(),
 }));
 
 describe('AddPatientModal', () => {
@@ -23,14 +43,31 @@ describe('AddPatientModal', () => {
     mockShowModal.mockClear();
     mockUseAddablePatientLists.mockReturnValue({
       data: [
-        { id: 'list1', displayName: 'List 1', addPatient: vi.fn() },
-        { id: 'list2', displayName: 'List 2', addPatient: vi.fn() },
+        {
+          id: 'list1',
+          displayName: 'List 1',
+          addPatient: vi.fn(),
+          location: { uuid: 'loc-1', display: 'Location 1' },
+        },
+        {
+          id: 'list2',
+          displayName: 'List 2',
+          addPatient: vi.fn(),
+          location: { uuid: 'loc-2', display: 'Location 2' },
+        },
+        { id: 'list3', displayName: 'List 3', addPatient: vi.fn(), location: null },
       ],
       isLoading: false,
       error: null,
       mutate: vi.fn(),
       isValidating: false,
     });
+    mockUseConfig.mockReturnValue({
+      enforcePatientListLocationMatch: false,
+    });
+    mockGetPatientLocationFromIdentifiers.mockResolvedValue(null);
+    mockShowSnackbar.mockImplementation(() => {});
+    vi.clearAllMocks();
   });
 
   it('renders the Add Patient to List modal', () => {
@@ -92,7 +129,6 @@ describe('AddPatientModal', () => {
       'patient-list-form-chart-workspace',
       expect.objectContaining({ onSuccess: expect.any(Function) }),
     );
-    // No window/group props: keeps the chart's open workspace group (and any unsaved drafts) untouched
     expect(mockLaunchWorkspace2.mock.calls[0]).toHaveLength(2);
   });
 
@@ -203,5 +239,249 @@ describe('AddPatientModal', () => {
     const checkboxIds = screen.getAllByRole('checkbox').map((checkbox) => checkbox.id);
     expect(checkboxIds.slice(0, 5)).toEqual(['list8', 'list1', 'list2', 'list3', 'list4']);
     expect(screen.getByLabelText('List 8')).toBeChecked();
+  });
+
+  describe('Location match enforcement', () => {
+    it('fetches patient location when enforcePatientListLocationMatch is enabled', async () => {
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'loc-1', display: 'Location 1' });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalledWith(mockPatient.uuid);
+      });
+    });
+
+    it('blocks adding patient when location mismatch is detected', async () => {
+      const user = userEvent.setup();
+      const addPatientMock = vi.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'patient-loc', display: 'Patient Location' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock,
+            location: { uuid: 'different-loc', display: 'Different Location' },
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: vi.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalled();
+      });
+
+      const checkbox = screen.getByRole('checkbox', { name: /list 1/i });
+      await user.click(checkbox);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(mockShowSnackbar).toHaveBeenCalledWith(
+          expect.objectContaining({
+            title: 'Error',
+            kind: 'error',
+            subtitle: expect.stringContaining('Patient location does not match list location'),
+          }),
+        );
+      });
+      expect(addPatientMock).not.toHaveBeenCalled();
+    });
+
+    it('allows adding patient when location matches', async () => {
+      const user = userEvent.setup();
+      const addPatientMock = vi.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'loc-1', display: 'Location 1' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock,
+            location: { uuid: 'loc-1', display: 'Location 1' },
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: vi.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalled();
+      });
+
+      const checkbox = screen.getByRole('checkbox', { name: /list 1/i });
+      await user.click(checkbox);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(mockShowSnackbar).toHaveBeenCalledWith(
+          expect.objectContaining({
+            title: 'Successfully added',
+            kind: 'success',
+          }),
+        );
+      });
+      expect(addPatientMock).toHaveBeenCalled();
+    });
+
+    it('allows adding patient when enforcePatientListLocationMatch is disabled even with location mismatch', async () => {
+      const user = userEvent.setup();
+      const addPatientMock = vi.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: false,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'loc-A', display: 'Location A' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock,
+            location: { uuid: 'loc-B', display: 'Location B' },
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: vi.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      const checkbox = screen.getByRole('checkbox', { name: /list 1/i });
+      await user.click(checkbox);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(mockShowSnackbar).toHaveBeenCalledWith(
+          expect.objectContaining({
+            kind: 'success',
+          }),
+        );
+      });
+      expect(addPatientMock).toHaveBeenCalled();
+    });
+
+    it('allows adding patient when list has no location even with enforcePatientListLocationMatch enabled', async () => {
+      const user = userEvent.setup();
+      const addPatientMock = vi.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'patient-loc', display: 'Patient Location' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock,
+            location: null,
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: vi.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalled();
+      });
+
+      const checkbox = screen.getByRole('checkbox', { name: /list 1/i });
+      await user.click(checkbox);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(mockShowSnackbar).toHaveBeenCalledWith(
+          expect.objectContaining({
+            kind: 'success',
+          }),
+        );
+      });
+      expect(addPatientMock).toHaveBeenCalled();
+    });
+
+    it('allows adding to multiple lists with correct location matches', async () => {
+      const user = userEvent.setup();
+      const addPatientMock1 = vi.fn().mockResolvedValue({});
+      const addPatientMock2 = vi.fn().mockResolvedValue({});
+
+      mockUseConfig.mockReturnValue({
+        enforcePatientListLocationMatch: true,
+      });
+      mockGetPatientLocationFromIdentifiers.mockResolvedValue({ uuid: 'loc-1', display: 'Location 1' });
+      mockUseAddablePatientLists.mockReturnValue({
+        data: [
+          {
+            id: 'list1',
+            displayName: 'List 1',
+            addPatient: addPatientMock1,
+            location: { uuid: 'loc-1', display: 'Location 1' },
+          },
+          {
+            id: 'list2',
+            displayName: 'List 2',
+            addPatient: addPatientMock2,
+            location: { uuid: 'loc-1', display: 'Location 1' },
+          },
+        ],
+        isLoading: false,
+        error: null,
+        mutate: vi.fn(),
+        isValidating: false,
+      });
+
+      render(<AddPatient closeModal={mockCloseModal} patientUuid={mockPatient.uuid} />);
+
+      await waitFor(() => {
+        expect(mockGetPatientLocationFromIdentifiers).toHaveBeenCalled();
+      });
+
+      const checkbox1 = screen.getByRole('checkbox', { name: /list 1/i });
+      const checkbox2 = screen.getByRole('checkbox', { name: /list 2/i });
+      await user.click(checkbox1);
+      await user.click(checkbox2);
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(addPatientMock1).toHaveBeenCalled();
+      });
+      expect(addPatientMock2).toHaveBeenCalled();
+    });
   });
 });
