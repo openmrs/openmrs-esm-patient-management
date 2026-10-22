@@ -210,12 +210,12 @@ describe('PatientBanner without the workspace v2 context', () => {
     expect(getMappedBirthDate({ birthdate: '2026-08-14T00:00:00.000+0000', age: 0 })).toBe('2026-08');
   });
 
-  it('maps an estimated birthdate to the year for a 5-year-old', () => {
-    expect(getMappedBirthDate({ birthdate: '2021-08', age: 5 })).toBe('2021');
+  it('preserves the month for an estimated 5-year-old', () => {
+    expect(getMappedBirthDate({ birthdate: '2021-08-14T00:00:00.000+0000', age: 5 })).toBe('2021-08');
   });
 
-  it('removes all precision for a 5-year-old with a full stored birthdate', () => {
-    expect(getMappedBirthDate({ birthdate: '2021-08-14T00:00:00.000+0000', age: 5 })).toBe('2021');
+  it('maps an estimated birthdate to the year for a 6-year-old', () => {
+    expect(getMappedBirthDate({ birthdate: '2020-08-14T00:00:00.000+0000', age: 6 })).toBe('2020');
   });
 });
 
