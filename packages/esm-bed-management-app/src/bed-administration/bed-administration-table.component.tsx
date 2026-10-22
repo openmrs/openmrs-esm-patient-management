@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -22,6 +22,7 @@ import {
   ErrorState,
   isDesktop as desktopLayout,
   launchWorkspace2,
+  showSnackbar,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
@@ -47,6 +48,7 @@ const BedAdministrationTable: React.FC = () => {
     errorFetchingBedsGroupedByLocation,
   } = useBedsGroupedByLocation();
   const [filterOption, setFilterOption] = useState('ALL');
+  const hasShownBackgroundFetchWarning = useRef(false);
 
   function CustomTag({ condition }: { condition: boolean }) {
     const { t } = useTranslation();
@@ -91,6 +93,25 @@ const BedAdministrationTable: React.FC = () => {
 
   const [pageSize, setPageSize] = useState(10);
   const { results: paginatedData, currentPage, goTo } = usePagination(filteredData, pageSize);
+
+  const flattened = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
+  const hasLoadedRows = flattened.length > 0;
+
+  useEffect(() => {
+    if (errorFetchingBedsGroupedByLocation && hasLoadedRows) {
+      if (!hasShownBackgroundFetchWarning.current) {
+        showSnackbar({
+          kind: 'warning',
+          isLowContrast: true,
+          title: t('backgroundFetchFailed', 'Background fetch failed'),
+        });
+        hasShownBackgroundFetchWarning.current = true;
+      }
+      return;
+    }
+
+    hasShownBackgroundFetchWarning.current = false;
+  }, [errorFetchingBedsGroupedByLocation, hasLoadedRows, t]);
 
   const tableHeaders = [
     {
@@ -147,7 +168,7 @@ const BedAdministrationTable: React.FC = () => {
     );
   }
 
-  if (errorFetchingBedsGroupedByLocation) {
+  if (errorFetchingBedsGroupedByLocation && !hasLoadedRows) {
     return (
       <>
         <Header title={t('bedAllocation', 'Bed allocation')} />
