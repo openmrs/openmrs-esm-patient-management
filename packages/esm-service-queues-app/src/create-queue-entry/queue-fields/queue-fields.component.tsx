@@ -51,7 +51,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   const { t } = useTranslation();
   const schema = useMemo(() => createQueueServiceSchema(t), [t]);
   const { sessionLocation } = useSession();
-  const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
+  const { queueLocations, isLoading: isLoadingQueueLocations, error: queueLocationsError } = useQueueLocations();
 
   // A patient cannot be added to a queue they are already in, so those queues are left out below
   const {
@@ -89,8 +89,11 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   const queueLocation = watch('queueLocation');
   const queueService = watch('queueService');
   const priority = watch('priority');
-  // The default can be the session location, which may not be a queue location, so treat it as unset until it is one
-  const isKnownQueueLocation = queueLocations.some((location) => location.id === queueLocation);
+  // The default can be the session location, which may not be a queue location, so treat it as unset until it is
+  // one. If the queue locations failed to load there is nothing to check it against, so keep the default.
+  const isKnownQueueLocation = queueLocationsError
+    ? Boolean(queueLocation)
+    : queueLocations.some((location) => location.id === queueLocation);
 
   const { queues, isLoading: isLoadingQueues } = useQueues(queueLocation);
   const memoizedQueues = useMemo(
