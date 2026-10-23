@@ -230,6 +230,17 @@ describe('QueueFields', () => {
     expect(screen.getByTitle(/select a queue location/i)).toHaveValue('1');
   });
 
+  it('waits for a queue location instead of using a session location that has no queues', () => {
+    // The session location from mockSession is not one of the queue locations
+    mockUseQueues.mockImplementation((location) => ({ queues: location === '1' ? mockQueues : [] }) as any);
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
+
+    expect(screen.getByTitle(/select a queue location/i)).toHaveValue('');
+    expect(screen.queryByRole('group', { name: /service/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/no services configured/i)).not.toBeInTheDocument();
+  });
+
   it('falls back to the session location if the store has no selected location', () => {
     mockUseServiceQueuesStore.mockReturnValue({ selectedQueueLocationUuid: undefined } as any);
     mockUseSession.mockReturnValue({ sessionLocation: { uuid: '1' } } as any);
