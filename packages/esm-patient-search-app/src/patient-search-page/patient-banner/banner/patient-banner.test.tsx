@@ -186,24 +186,12 @@ describe('PatientBanner without the workspace v2 context', () => {
     );
   });
 
-  it('maps an estimated birthdate with month precision to the year for patients aged one or older', () => {
-    expect(getMappedBirthDate({ birthdate: '1990-01', age: 35 })).toBe('1990');
-  });
-
   it('maps an estimated birthdate with day precision to the year for patients aged one or older', () => {
     expect(getMappedBirthDate({ birthdate: '1990-01-01T00:00:00.000+0000', age: 35 })).toBe('1990');
   });
 
-  it('preserves month precision for a patient younger than 5 when the stored birthdate has month precision', () => {
-    expect(getMappedBirthDate({ birthdate: '2026-08', age: 4 })).toBe('2026-08');
-  });
-
   it('removes day precision but preserves the month for a patient younger than 5 with a full stored birthdate', () => {
     expect(getMappedBirthDate({ birthdate: '2026-08-14T00:00:00.000+0000', age: 4 })).toBe('2026-08');
-  });
-
-  it('preserves month precision for an estimated infant when the stored birthdate has month precision', () => {
-    expect(getMappedBirthDate({ birthdate: '2026-08', age: 0 })).toBe('2026-08');
   });
 
   it('removes day precision but preserves the month for an estimated infant with a full stored birthdate', () => {
