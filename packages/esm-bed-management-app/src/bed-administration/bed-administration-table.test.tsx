@@ -215,7 +215,7 @@ describe('BedAdministrationTable', () => {
   it('renders the page header with correct title', () => {
     renderWithSwr(<BedAdministrationTable />);
 
-    expect(screen.getByText('Bed allocation', { selector: 'p' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Bed allocation', level: 1 })).toBeInTheDocument();
   });
 
   //though only 3 beds are there in mock data and Carbon's Pagination will be disabled,but it will still be present in the DOM and the test checks toBeInTheDocument() so test passes
