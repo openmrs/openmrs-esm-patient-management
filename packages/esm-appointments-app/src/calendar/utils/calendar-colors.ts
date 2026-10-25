@@ -109,14 +109,16 @@ function hslToHex(h: number, s: number, l: number): string {
  * @param services - Ordered list of service objects containing at least a uuid.
  * @returns A Map mapping service UUID to hex color string.
  */
-export function buildServiceColorMap(services: ReadonlyArray<{ uuid: string }>): Map<string, string> {
+export function buildServiceColorMap(services: ReadonlyArray<{ uuid: string; color?: string }>): Map<string, string> {
   const map = new Map<string, string>();
   let paletteIndex = 0;
-  for (const { uuid } of services) {
+  for (const { uuid, color } of services) {
     if (!uuid || map.has(uuid)) {
       continue;
     }
-    if (paletteIndex < SERVICE_COLOR_PALETTE.length) {
+    if (color) {
+      map.set(uuid, color);
+    } else if (paletteIndex < SERVICE_COLOR_PALETTE.length) {
       map.set(uuid, SERVICE_COLOR_PALETTE[paletteIndex++]);
     } else {
       map.set(uuid, getFallbackServiceColor(uuid));
