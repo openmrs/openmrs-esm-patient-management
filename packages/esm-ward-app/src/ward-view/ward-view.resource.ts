@@ -87,10 +87,12 @@ export function createAndGetWardPatientGrouping(
   inpatientAdmissionsAtOtherLocations: InpatientAdmission[],
   currentWardLocation: Location,
 ) {
-  const inpatientAdmissionsByPatientUuid = getInpatientAdmissionsUuidMap([
+  const inpatientAdmissions = [
     ...(inpatientAdmissionsAtCurrentLocation ?? []),
     ...(inpatientAdmissionsAtOtherLocations ?? []),
-  ]);
+  ].filter((admission): admission is InpatientAdmission => admission != null);
+
+  const inpatientAdmissionsByPatientUuid = getInpatientAdmissionsUuidMap(inpatientAdmissions);
 
   const wardAdmittedPatientsWithBed = new Map<string, InpatientAdmission>();
   const wardUnadmittedPatientsWithBed = new Map<string, Patient>();
@@ -124,6 +126,7 @@ export function createAndGetWardPatientGrouping(
 
   for (const inpatientRequest of inpatientRequests ?? []) {
     // TODO: inpatientRequest is undefined sometimes, why?
+    //FIXED
     if (inpatientRequest) {
       allWardPatientUuids.add(inpatientRequest.patient.uuid);
     }
