@@ -11,7 +11,7 @@ export function useQueues(locationUuid?: string) {
   const { data, ...rest } = useSWRImmutable<{ data: { results: Array<Queue> } }, Error>(apiUrl, openmrsFetch);
 
   const queues = useMemo(
-    () => data?.data?.results.sort((a, b) => a.display.localeCompare(b.display, getLocale())) ?? [],
+    () => data?.data?.results.slice().sort((a, b) => a.display.localeCompare(b.display, getLocale())) ?? [],
     [data?.data?.results],
   );
 
