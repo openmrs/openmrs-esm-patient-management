@@ -47,9 +47,14 @@ export const Autosuggest = <Suggestion = unknown,>({
     onSuggestionSelected(name, undefined);
 
     if (query) {
-      getSearchResults(query).then((suggestions) => {
-        setSuggestions(suggestions);
-      });
+      getSearchResults(query)
+        .then((suggestions) => {
+          setSuggestions(suggestions);
+        })
+        .catch((error) => {
+          console.error('Autosuggest error:', error);
+          setSuggestions([]);
+        });
     } else {
       setSuggestions([]);
     }
