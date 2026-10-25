@@ -24,10 +24,6 @@ export interface PatientList {
   options?: Array<PatientListOption>;
 }
 
-export interface PatientListUpdate {
-  isStarred: boolean;
-}
-
 export interface PatientListFilter {
   isStarred?: boolean;
   name?: string;
