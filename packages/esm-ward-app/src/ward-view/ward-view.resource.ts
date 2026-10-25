@@ -50,9 +50,9 @@ export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): B
 export function getWardMetrics(wardPatientGroup: WardPatientGroupDetails): WardMetrics {
   // pull all the patients out of the three constructs they are stored in: unadmitted but in a bed, admitted and in a bed, and admitted but not in a bed
   const allPatients = [
-    ...wardPatientGroup.wardUnadmittedPatientsWithBed?.values(),
-    ...[...wardPatientGroup.wardAdmittedPatientsWithBed?.values()].map((admission) => admission.patient),
-    ...wardPatientGroup.wardUnassignedPatientsList?.map((admission) => admission.patient),
+    ...(wardPatientGroup.wardUnadmittedPatientsWithBed?.values() ?? []),
+    ...[...(wardPatientGroup.wardAdmittedPatientsWithBed?.values() ?? [])].map((admission) => admission.patient),
+    ...(wardPatientGroup.wardUnassignedPatientsList?.map((admission) => admission.patient) ?? []),
   ];
 
   const patientCount = allPatients?.length ?? 0;
@@ -99,7 +99,7 @@ export function createAndGetWardPatientGrouping(
   let wardPatientPendingCount = 0;
   bedLayouts?.map((bedLayout) => {
     const { patients } = bedLayout;
-    patients.map((patient) => {
+    (patients ?? []).map((patient) => {
       const admission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
       allWardPatientUuids.add(patient.uuid);
       if (admission?.currentInpatientLocation?.uuid === currentWardLocation.uuid) {
