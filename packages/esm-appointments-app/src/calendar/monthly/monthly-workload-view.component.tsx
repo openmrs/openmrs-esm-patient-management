@@ -143,7 +143,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
                   key={`${serviceUuid}-${i}`}
                   className={styles.serviceArea}
                   data-testid={`service-area-${serviceUuid}`}
-                  style={color ? { backgroundColor: `color-mix(in srgb, ${color} 13%, transparent)` } : undefined}>
+                  style={color ? { backgroundColor: color } : undefined}>
                   <span
                     className={styles.swatch}
                     style={{ backgroundColor: color }}
