@@ -5,44 +5,42 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, within } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import AppointmentsCalendarView from '../calendar/appointments-calendar-view.component';
-import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
+import { type Appointment } from '../types';
+import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
 
-const generalMedicine = {
-  appointmentServiceId: 1,
-  name: 'General Medicine service',
-  uuid: '7ba3aa21-cc56-47ca-bb4d-a60549f666c0',
-  color: '#feecae',
-};
+const generalMedicine = { name: 'General Medicine service', uuid: '7ba3aa21-cc56-47ca-bb4d-a60549f666c0' };
+const hivClinic = { name: 'HIV Clinic', uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1' };
 
-const hivClinic = {
-  appointmentServiceId: 2,
-  name: 'HIV Clinic',
-  uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1',
-  color: '#73a947',
-};
+const today = dayjs().format('YYYY-MM-DD');
+const nineAm = dayjs().hour(9).minute(0).second(0).valueOf();
+
+function makeAppointment(uuid: string, service: { name: string; uuid: string }, patientName: string): Appointment {
+  return {
+    uuid,
+    service: { name: service.name, uuid: service.uuid },
+    patient: { name: patientName },
+    status: 'Scheduled',
+    startDateTime: nineAm,
+  } as unknown as Appointment;
+}
+
+const appointments = [
+  makeAppointment('gm-1', generalMedicine, 'Alice GM'),
+  makeAppointment('gm-2', generalMedicine, 'Bob GM'),
+  makeAppointment('gm-3', generalMedicine, 'Carol GM'),
+  makeAppointment('hiv-1', hivClinic, 'Dave HIV'),
+  makeAppointment('hiv-2', hivClinic, 'Eve HIV'),
+];
 
 vi.mock('../hooks/useAppointmentsCalendar', () => ({
-  useAppointmentsCalendar: vi.fn().mockReturnValue({ calendarEvents: [], isLoading: false, error: null }),
-}));
-
-vi.mock('../hooks/useAppointmentsByDate', () => ({
-  useAppointmentsByDate: vi.fn().mockReturnValue({ appointments: [], isLoading: false }),
-}));
-
-vi.mock('../hooks/useAppointmentService', () => ({
-  useAppointmentServices: vi.fn().mockReturnValue({
-    serviceTypes: [
+  useAppointmentsCalendar: vi.fn().mockReturnValue({
+    calendarEvents: [
       {
-        appointmentServiceId: 1,
-        name: 'General Medicine service',
-        uuid: '7ba3aa21-cc56-47ca-bb4d-a60549f666c0',
-        color: '#feecae',
-      },
-      {
-        appointmentServiceId: 2,
-        name: 'HIV Clinic',
-        uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1',
-        color: '#73a947',
+        appointmentDate: dayjs().toISOString(),
+        services: [
+          { serviceName: 'General Medicine service', serviceUuid: '7ba3aa21-cc56-47ca-bb4d-a60549f666c0', count: 3 },
+          { serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 2 },
+        ],
       },
     ],
     isLoading: false,
@@ -50,7 +48,24 @@ vi.mock('../hooks/useAppointmentService', () => ({
   }),
 }));
 
-const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
+vi.mock('../hooks/useAppointmentsByDate', () => ({
+  useAppointmentsByDate: vi.fn(),
+}));
+
+vi.mock('../hooks/useAppointmentService', () => ({
+  useAppointmentServices: vi.fn().mockReturnValue({
+    serviceTypes: [
+      { appointmentServiceId: 1, name: 'General Medicine service', uuid: '7ba3aa21-cc56-47ca-bb4d-a60549f666c0' },
+      { appointmentServiceId: 2, name: 'HIV Clinic', uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1' },
+    ],
+    isLoading: false,
+    error: null,
+  }),
+}));
+
+vi.mocked(useAppointmentsByDate).mockReturnValue({ appointments, isLoading: false } as ReturnType<
+  typeof useAppointmentsByDate
+>);
 
 function renderCalendar() {
   render(
@@ -60,6 +75,9 @@ function renderCalendar() {
   );
 }
 
+const todayCell = () => screen.getByTestId(`workload-cell-${today}`);
+const serviceArea = (uuid: string) => screen.queryByTestId(`service-area-${uuid}`);
+
 describe('Calendar service filter dropdown', () => {
   it('renders every service name in the open dropdown menu', async () => {
     const user = userEvent.setup();
@@ -67,41 +85,45 @@ describe('Calendar service filter dropdown', () => {
 
     await user.click(screen.getByRole('combobox', { name: /service/i }));
 
-    const options = screen.getAllByRole('option');
-    expect(options).toHaveLength(2);
-    expect(screen.getByText('General Medicine service')).toBeInTheDocument();
-    expect(screen.getByText('HIV Clinic')).toBeInTheDocument();
+    expect(screen.getAllByRole('option')).toHaveLength(2);
+    expect(screen.getByRole('option', { name: /General Medicine service/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /HIV Clinic/i })).toBeInTheDocument();
   });
 
-  it('narrows the calendar to only the selected service', async () => {
-    mockUseAppointmentsCalendar.mockReturnValue({
-      calendarEvents: [
-        {
-          appointmentDate: dayjs().format('YYYY-MM-DDT00:00:00.000ZZ'),
-          services: [
-            { serviceName: generalMedicine.name, serviceUuid: generalMedicine.uuid, count: 3 },
-            { serviceName: hivClinic.name, serviceUuid: hivClinic.uuid, count: 2 },
-          ],
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-
+  it('filters monthly totals and daily cards by the selected service, and restores them when cleared', async () => {
     const user = userEvent.setup();
     renderCalendar();
 
-    // Before filtering, the legend lists both services.
-    const legend = screen.getByTestId('services-legend');
-    expect(within(legend).getByText('General Medicine service')).toBeInTheDocument();
-    expect(within(legend).getByText('HIV Clinic')).toBeInTheDocument();
+    // --- Monthly: both services present, total is 3 + 2 = 5 ---
+    expect(within(todayCell()).getByText(/^5 appts$/)).toBeInTheDocument();
+    expect(serviceArea(generalMedicine.uuid)).toBeInTheDocument();
+    expect(serviceArea(hivClinic.uuid)).toBeInTheDocument();
 
-    // Select only "HIV Clinic" in the filter.
+    // --- Select only "HIV Clinic" ---
     await user.click(screen.getByRole('combobox', { name: /service/i }));
     await user.click(screen.getByRole('option', { name: /HIV Clinic/i }));
 
-    // The legend now reflects only the selected service.
-    expect(within(legend).queryByText('General Medicine service')).not.toBeInTheDocument();
-    expect(within(legend).getByText('HIV Clinic')).toBeInTheDocument();
+    // --- Monthly: only HIV remains, total drops to 2 ---
+    expect(within(todayCell()).getByText(/^2 appts$/)).toBeInTheDocument();
+    expect(serviceArea(generalMedicine.uuid)).not.toBeInTheDocument();
+    expect(serviceArea(hivClinic.uuid)).toBeInTheDocument();
+
+    // --- Daily: only the 2 HIV appointments show ---
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+    expect(screen.getByText('Dave HIV')).toBeInTheDocument();
+    expect(screen.getByText('Eve HIV')).toBeInTheDocument();
+    expect(screen.queryByText('Alice GM')).not.toBeInTheDocument();
+    expect(screen.queryByText('Bob GM')).not.toBeInTheDocument();
+    expect(screen.queryByText('Carol GM')).not.toBeInTheDocument();
+
+    // --- Clear the selection: all 5 appointments return ---
+    await user.click(screen.getByRole('combobox', { name: /service/i }));
+    await user.click(screen.getByRole('option', { name: /HIV Clinic/i }));
+
+    expect(screen.getByText('Alice GM')).toBeInTheDocument();
+    expect(screen.getByText('Bob GM')).toBeInTheDocument();
+    expect(screen.getByText('Carol GM')).toBeInTheDocument();
+    expect(screen.getByText('Dave HIV')).toBeInTheDocument();
+    expect(screen.getByText('Eve HIV')).toBeInTheDocument();
   });
 });
