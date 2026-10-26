@@ -11,13 +11,36 @@ import { useAppointmentsStore } from '../store';
 import { launchCreateAppointmentForm } from '../helpers/functions';
 import styles from './appointments-header.scss';
 
+interface CalendarServiceItem {
+  id: string;
+  label: string;
+  color?: string;
+}
+
+const ServiceFilterItem: React.FC<CalendarServiceItem> = ({ label, color }) => (
+  <span className={styles.serviceFilterItem}>
+    <span className={styles.serviceFilterSwatch} style={{ backgroundColor: color }} />
+    {label}
+  </span>
+);
+
 interface AppointmentHeaderProps {
   title: string;
   showServiceTypeFilter?: boolean;
   isCalendarView?: boolean;
+  serviceColorMap?: Map<string, string>;
+  selectedServiceUuids?: Array<string>;
+  onServiceFilterChange?: (selectedUuids: Array<string>) => void;
 }
 
-const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServiceTypeFilter, isCalendarView }) => {
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
+  title,
+  showServiceTypeFilter,
+  isCalendarView,
+  serviceColorMap,
+  selectedServiceUuids = [],
+  onServiceFilterChange,
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,14 +63,42 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServi
     [serviceTypes],
   );
 
+  const calendarServiceItems = useMemo(
+    () =>
+      serviceTypes?.map((item) => ({ id: item.uuid, label: item.name, color: serviceColorMap?.get(item.uuid) })) ?? [],
+    [serviceTypes, serviceColorMap],
+  );
+
+  const handleCalendarServiceFilterChange = useCallback(
+    ({ selectedItems }: { selectedItems: Array<CalendarServiceItem> | null }) => {
+      onServiceFilterChange?.((selectedItems ?? []).map((item) => item.id));
+    },
+    [onServiceFilterChange],
+  );
+
   return (
     <PageHeader className={styles.header} data-testid="appointments-header">
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
       <div className={styles.rightJustifiedItems}>
         {isCalendarView ? (
-          <Button kind="primary" renderIcon={Add} size="sm" onClick={() => launchCreateAppointmentForm(t)}>
-            {t('newAppointment', 'New appointment')}
-          </Button>
+          <div className={styles.calendarControls}>
+            <MultiSelect
+              id="calendarServiceFilter"
+              className={styles.calendarServiceFilter}
+              label={t('service', 'Service')}
+              titleText={t('service', 'Service')}
+              hideLabel
+              items={calendarServiceItems}
+              itemToString={(item) => item?.label ?? ''}
+              itemToElement={ServiceFilterItem}
+              onChange={handleCalendarServiceFilterChange}
+              selectedItems={calendarServiceItems.filter((item) => selectedServiceUuids.includes(item.id))}
+              size="sm"
+            />
+            <Button kind="primary" renderIcon={Add} size="sm" onClick={() => launchCreateAppointmentForm(t)}>
+              {t('newAppointment', 'New appointment')}
+            </Button>
+          </div>
         ) : (
           <>
             <OpenmrsDatePicker
