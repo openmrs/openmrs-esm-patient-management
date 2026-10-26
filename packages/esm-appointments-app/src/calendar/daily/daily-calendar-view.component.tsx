@@ -5,23 +5,29 @@ import { useTranslation } from 'react-i18next';
 import { formatAMPM } from '../../helpers/functions';
 import { type Appointment } from '../../types';
 import { useAppointmentsByDate } from '../../hooks/useAppointmentsByDate';
-import {
-  STATUS_TAG_TYPES,
-  DEFAULT_STATUS_TAG_TYPE,
-  CALENDAR_HOURS,
-  formatHourLabel,
-} from '../utils/calendar-colors';
+import { STATUS_TAG_TYPES, DEFAULT_STATUS_TAG_TYPE, CALENDAR_HOURS, formatHourLabel } from '../utils/calendar-colors';
 import styles from './daily-calendar-view.scss';
 
 interface DailyCalendarViewProps {
   calendarSelectedDate: Dayjs;
   serviceColorMap?: Map<string, string>;
+  selectedServiceUuids?: Array<string>;
 }
 
-const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedDate, serviceColorMap }) => {
+const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
+  calendarSelectedDate,
+  serviceColorMap,
+  selectedServiceUuids = [],
+}) => {
   const { t } = useTranslation();
   const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
-  const { appointments, isLoading } = useAppointmentsByDate(isoDate);
+  const { appointments: allAppointments, isLoading } = useAppointmentsByDate(isoDate);
+
+  const appointments = useMemo(() => {
+    if (selectedServiceUuids.length === 0) return allAppointments;
+    const selected = new Set(selectedServiceUuids);
+    return allAppointments.filter((a) => a.service?.uuid && selected.has(a.service.uuid));
+  }, [allAppointments, selectedServiceUuids]);
 
   const hourSlots = useMemo(
     () =>
@@ -66,7 +72,10 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
   );
 };
 
-const DailyCard: React.FC<{ appointment: Appointment; serviceColorMap?: Map<string, string> }> = ({ appointment, serviceColorMap }) => {
+const DailyCard: React.FC<{ appointment: Appointment; serviceColorMap?: Map<string, string> }> = ({
+  appointment,
+  serviceColorMap,
+}) => {
   const color = serviceColorMap?.get(appointment.service?.uuid ?? '');
   const tagType = STATUS_TAG_TYPES[appointment.status] ?? DEFAULT_STATUS_TAG_TYPE;
   const time = useMemo(() => {

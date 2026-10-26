@@ -30,6 +30,53 @@
   }
 }
 
+.calendarControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.calendarServiceFilter {
+  min-width: layout.$spacing-12 * 2;
+
+  :global(.cds--list-box) {
+    border: 1px solid var(--brand-01);
+    border-radius: 2px;
+    background-color: $ui-01;
+  }
+
+  :global(.cds--list-box__menu-item),
+  :global(.cds--list-box__menu-item__option) {
+    height: auto;
+    white-space: normal;
+  }
+
+  :global(.cds--checkbox-label-text) {
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+.serviceFilterItem {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: layout.$spacing-03;
+  color: $color-gray-100;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.serviceFilterSwatch {
+  display: inline-block;
+  width: layout.$spacing-04;
+  height: layout.$spacing-04;
+  margin-top: layout.$spacing-01;
+  border-radius: 2px;
+  border: 1px solid $ui-03;
+  flex-shrink: 0;
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .date-and-location {
