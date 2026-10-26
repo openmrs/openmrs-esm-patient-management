@@ -40,7 +40,7 @@ describe('useActiveVisits', () => {
     expect(url).toContain(`${restBaseUrl}/visit?includeInactive=false`);
     expect(url).toContain('&location=location-1');
     expect(url).toContain(`&fromStartDate=${dayjs().format('YYYY-MM-DD')}`);
-    expect(url).toContain('person:(uuid,display,age,gender,birthdate,preferredName,dead,deathDate)');
+    expect(url).toContain('person:(uuid,display,age,gender,birthdate,birthdateEstimated,preferredName,dead,deathDate)');
   });
 
   it('falls back to the session location when none is passed', () => {
