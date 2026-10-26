@@ -22,6 +22,7 @@ import {
   ErrorState,
   isDesktop as desktopLayout,
   launchWorkspace2,
+  showModal,
   showSnackbar,
   useLayoutType,
   usePagination,
