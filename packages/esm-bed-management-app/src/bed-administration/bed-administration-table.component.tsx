@@ -97,16 +97,19 @@ const BedAdministrationTable: React.FC = () => {
     [mutateBedsGroupedByLocation],
   );
 
-  const filteredData = useMemo(() => {
-    const flattenedData = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
-    return filterOption === 'ALL' ? flattenedData : flattenedData.filter((bed) => bed.status === filterOption);
-  }, [bedsGroupedByLocation, filterOption]);
+  const flattened = useMemo(
+    () => (Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : []),
+    [bedsGroupedByLocation],
+  );
+  const hasLoadedRows = flattened.length > 0;
+
+  const filteredData = useMemo(
+    () => (filterOption === 'ALL' ? flattened : flattened.filter((bed) => bed.status === filterOption)),
+    [flattened, filterOption],
+  );
 
   const [pageSize, setPageSize] = useState(10);
   const { results: paginatedData, currentPage, goTo } = usePagination(filteredData, pageSize);
-
-  const flattened = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
-  const hasLoadedRows = flattened.length > 0;
 
   useEffect(() => {
     if (errorFetchingBedsGroupedByLocation && hasLoadedRows) {
