@@ -8,6 +8,7 @@ export interface SearchedPatient {
     addresses: Array<Address>;
     age: number;
     birthdate: string;
+    birthdateEstimated?: boolean;
     gender: string;
     dead: boolean;
     deathDate: string | null;
