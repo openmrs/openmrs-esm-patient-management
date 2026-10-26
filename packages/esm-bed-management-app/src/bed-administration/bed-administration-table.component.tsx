@@ -17,7 +17,7 @@ import {
   Tag,
   Tile,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
 import {
   ErrorState,
   isDesktop as desktopLayout,
@@ -86,6 +86,17 @@ const BedAdministrationTable: React.FC = () => {
   const handleBedStatusChange = ({ selectedItem }: { selectedItem: string }) =>
     setFilterOption(selectedItem.trim().toUpperCase());
 
+  const handleDeleteBed = useCallback(
+    (bed: Bed) => {
+      const dispose = showModal('delete-bed-modal', {
+        bed,
+        mutateBeds: mutateBedsGroupedByLocation,
+        closeModal: () => dispose(),
+      });
+    },
+    [mutateBedsGroupedByLocation],
+  );
+
   const filteredData = useMemo(() => {
     const flattenedData = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
     return filterOption === 'ALL' ? flattenedData : flattenedData.filter((bed) => bed.status === filterOption);
@@ -144,18 +155,34 @@ const BedAdministrationTable: React.FC = () => {
       occupancyStatus: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
       allocationStatus: <CustomTag condition={Boolean(bed.location?.uuid)} />,
       actions: (
-        <Button
-          renderIcon={Edit}
-          onClick={() => handleLaunchBedWorkspace('edit', bed)}
-          kind={'ghost'}
-          iconDescription={t('editBed', 'Edit bed')}
-          hasIconOnly
-          size={responsiveSize}
-          tooltipPosition="right"
-        />
+        <>
+          <Button
+            renderIcon={Edit}
+            onClick={() => handleLaunchBedWorkspace('edit', bed)}
+            kind={'ghost'}
+            iconDescription={t('editBed', 'Edit bed')}
+            hasIconOnly
+            size={responsiveSize}
+            tooltipPosition="right"
+          />
+          <Button
+            renderIcon={TrashCan}
+            onClick={() => handleDeleteBed(bed)}
+            kind="danger--ghost"
+            iconDescription={
+              bed.status === 'OCCUPIED'
+                ? t('cannotDeleteOccupiedBed', 'Occupied beds cannot be deleted')
+                : t('deleteBed', 'Delete bed')
+            }
+            disabled={bed.status === 'OCCUPIED'}
+            hasIconOnly
+            size={responsiveSize}
+            tooltipPosition="left"
+          />
+        </>
       ),
     }));
-  }, [handleLaunchBedWorkspace, responsiveSize, paginatedData, t]);
+  }, [handleLaunchBedWorkspace, handleDeleteBed, responsiveSize, paginatedData, t]);
 
   if (isLoadingBedsGroupedByLocation && !bedsGroupedByLocation.length) {
     return (

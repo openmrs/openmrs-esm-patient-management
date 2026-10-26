@@ -34,6 +34,7 @@
   "errorCreatingList": "创建列表时出现错误",
   "errorDeletingList": "删除患者列表时出现错误",
   "errorRemovingPatientFromList": "未能从列表中移除患者",
+  "errorSelectedListNotLoaded": "The selected list could not be loaded. Close this window and try again.",
   "errorUpdatingList": "更新列表时出现错误",
   "filterByLocation": "Filter by location",
   "identifier": "ID",
