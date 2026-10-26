@@ -76,6 +76,13 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
     [onServiceFilterChange],
   );
 
+  const serviceSelectionLabel = useMemo(() => {
+    const count = selectedServiceUuids.length;
+    return count === 0
+      ? t('allServices', 'All services')
+      : t('serviceSelectionCount', '{{count}} service(s)', { count });
+  }, [selectedServiceUuids, t]);
+
   return (
     <PageHeader className={styles.header} data-testid="appointments-header">
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
@@ -85,7 +92,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
             <MultiSelect
               id="calendarServiceFilter"
               className={styles.calendarServiceFilter}
-              label={t('service', 'Service')}
+              label={serviceSelectionLabel}
               titleText={t('service', 'Service')}
               hideLabel
               items={calendarServiceItems}

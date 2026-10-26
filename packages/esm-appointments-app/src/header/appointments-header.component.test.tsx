@@ -90,6 +90,21 @@ describe('Calendar service filter dropdown', () => {
     expect(screen.getByRole('option', { name: /HIV Clinic/i })).toBeInTheDocument();
   });
 
+  it('summarizes the selection in the field label', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+
+    // Empty state shows the "all" summary.
+    expect(screen.getByText('All services')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('combobox', { name: /service/i }));
+    await user.click(screen.getByRole('option', { name: /HIV Clinic/i }));
+
+    // Summary now reflects the selected count.
+    expect(screen.getByText('1 service(s)')).toBeInTheDocument();
+    expect(screen.queryByText('All services')).not.toBeInTheDocument();
+  });
+
   it('filters monthly totals and daily cards by the selected service, and restores them when cleared', async () => {
     const user = userEvent.setup();
     renderCalendar();
