@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
-import { test } from '../core';
+import { wardTest as test } from '../core';
 import { PatientChartPage } from '../pages';
-import { endVisit, startVisit, changeToWardLocation, generateRandomPatient, deletePatient } from '../commands';
+import { endVisit, startVisit, generateRandomPatient, deletePatient } from '../commands';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Patient } from '../commands/types';
 
@@ -9,7 +9,6 @@ let visit: Visit;
 let wardPatient: Patient;
 
 test.beforeEach(async ({ api }) => {
-  await changeToWardLocation(api);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
   visit = await startVisit(api, wardPatient.uuid, process.env.E2E_WARD_LOCATION_UUID);
 });

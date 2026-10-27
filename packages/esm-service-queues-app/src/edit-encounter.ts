@@ -1,15 +1,5 @@
-import { launchWorkspace2, type Visit } from '@openmrs/esm-framework';
+import { type Encounter, launchWorkspace2, type Visit } from '@openmrs/esm-framework';
 import { serviceQueuesPatientFormEntryWorkspace, serviceQueuesVisitNotesWorkspace } from './constants';
-
-/**
- * The chart's mapped encounter, which we forward unchanged: the visit notes form treats the presence of `id`
- * as "editing" and reads `rawDatetime`, `obs` and `diagnoses` off it, so reshaping it here would silently
- * turn an edit into a new note.
- */
-interface EditableEncounter {
-  id: string;
-  form?: unknown;
-}
 
 interface EditEncounterContext {
   patient: fhir.Patient;
@@ -25,7 +15,7 @@ interface EditEncounterContext {
  * notes form takes it as workspace props, the form entry workspace as window props.
  */
 export function getEditEncounterHandler({ patient, patientUuid, visit, mutateVisit }: EditEncounterContext) {
-  return (encounter: EditableEncounter, isVisitNote: boolean) => {
+  return (encounter: Encounter, isVisitNote: boolean) => {
     // Both workspaces need the patient, and a click can land before `usePatient` resolves.
     if (!patient) {
       return;
@@ -42,7 +32,7 @@ export function getEditEncounterHandler({ patient, patientUuid, visit, mutateVis
     } else {
       launchWorkspace2(
         serviceQueuesPatientFormEntryWorkspace,
-        { form: encounter.form, encounterUuid: encounter.id },
+        { form: encounter.form, encounterUuid: encounter.uuid },
         { patient, patientUuid, visitContext: visit, mutateVisitContext: mutateVisit },
       );
     }

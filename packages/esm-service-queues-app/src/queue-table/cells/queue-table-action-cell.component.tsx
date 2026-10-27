@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
 import {
   deprecatedQueueEntryActions,
@@ -11,6 +11,7 @@ import {
   type QueueEntryAction,
 } from '../../config-schema';
 import { mapVisitQueueEntryProperties, serveQueueEntry } from '../../service-queues.resource';
+import { getErrorMessage } from '../../modals/queue-entry-error.utils';
 import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import styles from './queue-table-action-cell.scss';
 
@@ -42,6 +43,7 @@ function normalizeActions(actionKeys: ConfigurableQueueEntryAction[], configKey:
 }
 
 function useActionPropsByKey() {
+  const { t } = useTranslation();
   const {
     callingStatus,
     concepts: { waitingStatusConceptUuid },
@@ -58,17 +60,26 @@ function useActionPropsByKey() {
         text: 'Call',
         onClick: async (queueEntry: QueueEntry) => {
           const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry, visitQueueNumberAttributeUuid);
-          const callingQueueResponse = await serveQueueEntry(
-            mappedQueueEntry.queue.name,
-            mappedQueueEntry.visitQueueNumber,
-            callingStatus,
-          );
-          if (callingQueueResponse.ok) {
-            await mutateQueueEntries();
-            const dispose = showModal('call-queue-entry-modal', {
-              closeModal: () => dispose(),
-              queueEntry,
-              size: 'sm',
+          try {
+            const callingQueueResponse = await serveQueueEntry(
+              mappedQueueEntry.queue.name,
+              mappedQueueEntry.visitQueueNumber,
+              callingStatus,
+            );
+            if (callingQueueResponse?.ok) {
+              await mutateQueueEntries();
+              const dispose = showModal('call-queue-entry-modal', {
+                closeModal: () => dispose(),
+                queueEntry,
+                size: 'sm',
+              });
+            }
+          } catch (error) {
+            showSnackbar({
+              isLowContrast: false,
+              kind: 'error',
+              title: t('errorCallingPatient', 'Error calling patient'),
+              subtitle: getErrorMessage(error) || t('unknownError', 'An unknown error occurred'),
             });
           }
         },
@@ -146,7 +157,7 @@ function useActionPropsByKey() {
         },
       },
     };
-  }, [callingStatus, waitingStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries]);
+  }, [callingStatus, waitingStatusConceptUuid, visitQueueNumberAttributeUuid, mutateQueueEntries, t]);
   return actionPropsByKey;
 }
 

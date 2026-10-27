@@ -14,7 +14,7 @@ import {
 import { ResourcesContextProvider } from '../../../resources-context';
 import PatientIdentifierOverlay from './identifier-selection-overlay.component';
 import type { AddressTemplate, FormValues, PatientIdentifierType } from '../../patient-registration.types';
-import type { Resources } from '../../../offline.resources';
+import type { Resources } from '../../../registration.resource';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 const mockUseLayoutType = vi.mocked(useLayoutType);
@@ -111,7 +111,6 @@ const mockContextValues: PatientRegistrationContextProps = {
   inEditMode: false,
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
-  isOffline: false,
   setCapturePhotoProps: vi.fn(),
   setFieldValue: vi.fn(),
   setInitialFormValues: vi.fn(),

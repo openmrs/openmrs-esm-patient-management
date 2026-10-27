@@ -110,8 +110,12 @@ export function getValidationSchema(
         mapValues(obj, () =>
           Yup.object({
             required: Yup.bool(),
-            identifierValue: Yup.string().when('required', {
-              is: true,
+            preferred: Yup.bool(),
+            autoGeneration: Yup.bool(),
+            identifierValue: Yup.string().when(['required', 'preferred', 'autoGeneration'], {
+              is: (required: boolean, preferred: boolean, autoGeneration: boolean) =>
+                required ||
+                (config.fieldConfigurations?.identifier?.allowPreferredSelection && preferred && !autoGeneration),
               then: Yup.string().required(t('identifierValueRequired', 'Identifier value is required')),
               otherwise: Yup.string().notRequired(),
             }),

@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { launchWorkspace2 } from '@openmrs/esm-framework';
+import { launchWorkspace2, showModal } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
 import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import BedAdministrationTable from './bed-administration-table.component';
@@ -194,10 +194,28 @@ describe('BedAdministrationTable', () => {
     expect(screen.getByTitle(/loading/i)).toBeInTheDocument();
   });
 
+  it('opens deletion confirmation for the selected available bed', async () => {
+    const user = userEvent.setup();
+    renderWithSwr(<BedAdministrationTable />);
+
+    await user.click(screen.getAllByRole('button', { name: 'Delete bed' })[0]);
+
+    expect(showModal).toHaveBeenCalledWith('delete-bed-modal', {
+      bed: mockBeds[0][0],
+      mutateBeds: mockMutateBeds,
+      closeModal: expect.any(Function),
+    });
+  });
+
+  it('disables deletion of occupied beds', () => {
+    renderWithSwr(<BedAdministrationTable />);
+    expect(screen.getByRole('button', { name: 'Occupied beds cannot be deleted' })).toBeDisabled();
+  });
+
   it('renders the page header with correct title', () => {
     renderWithSwr(<BedAdministrationTable />);
 
-    expect(screen.getByRole('heading', { name: /bed allocation/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Bed allocation', level: 1 })).toBeInTheDocument();
   });
 
   //though only 3 beds are there in mock data and Carbon's Pagination will be disabled,but it will still be present in the DOM and the test checks toBeInTheDocument() so test passes

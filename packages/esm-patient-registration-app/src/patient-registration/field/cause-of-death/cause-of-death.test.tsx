@@ -56,7 +56,6 @@ const renderCauseOfDeathFieldWithFormik = (
                 setCapturePhotoProps: vi.fn(),
                 setFieldTouched: setFieldTouched as any,
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <CauseOfDeathField />

@@ -84,6 +84,9 @@ export interface RegistrationConfig {
         month: number;
       };
     };
+    identifier: {
+      allowPreferredSelection: boolean;
+    };
     phone: {
       personAttributeUuid: string;
       validation?: {
@@ -187,8 +190,9 @@ export const esmPatientRegistrationSchema = {
       },
       type: {
         _type: Type.String,
-        _description: "How this field's data will be stored—a person attribute or an obs.",
-        _validators: [validators.oneOf(['person attribute', 'obs'])],
+        _description:
+          "How this field's data will be stored—a person attribute or an obs. A field of type `text` stores nothing and displays its `label`, such as a consent statement.",
+        _validators: [validators.oneOf(['person attribute', 'obs', 'text'])],
       },
       uuid: {
         _type: Type.UUID,
@@ -202,7 +206,8 @@ export const esmPatientRegistrationSchema = {
       label: {
         _type: Type.String,
         _default: '',
-        _description: 'The label of the input. By default, uses the metadata `display` attribute.',
+        _description:
+          'The label of the input. By default, uses the metadata `display` attribute. For a field of type `text`, the text to display, translatable under the key `<id>Text`, e.g. `studyConsentStatementText`.',
       },
       placeholder: {
         _type: Type.String,
@@ -399,6 +404,14 @@ export const esmPatientRegistrationSchema = {
           _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _validators: [validators.inRange(0, 11)],
         },
+      },
+    },
+    identifier: {
+      allowPreferredSelection: {
+        _type: Type.Boolean,
+        _default: false,
+        _description:
+          'Whether to display a "Preferred" option next to each identifier, allowing the user to choose which identifier is the preferred one. When disabled, the identifier of the primary identifier type is marked as preferred.',
       },
     },
     phone: {

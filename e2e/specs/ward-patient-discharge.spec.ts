@@ -2,8 +2,6 @@ import { expect } from '@playwright/test';
 import { type Visit } from '@openmrs/esm-framework';
 import { type Bed, type BedType, type Patient } from '../commands/types';
 import {
-  changeToWardLocation,
-  changeToDefaultLocation,
   dischargePatientFromBed,
   deletePatient,
   endVisit,
@@ -16,7 +14,7 @@ import {
   waitForAdmissionRequestToBeProcessed,
   waitForAdmissionToBeProcessed,
 } from '../commands';
-import { test } from '../core';
+import { wardTest as test } from '../core';
 import { WardPage } from '../pages';
 
 let bed: Bed;
@@ -25,7 +23,6 @@ let visit: Visit;
 let wardPatient: Patient;
 
 test.beforeEach(async ({ api, page, emrConfiguration }) => {
-  await changeToWardLocation(api);
   bedType = await generateBedType(api);
   bed = await generateRandomBed(api, bedType);
   wardPatient = await generateRandomPatient(api, process.env.E2E_WARD_LOCATION_UUID);
@@ -39,7 +36,6 @@ test.afterEach(async ({ api }) => {
   await retireBedType(api, bedType.uuid, 'Retired during automated testing');
   await deletePatient(api, wardPatient.uuid);
   await endVisit(api, visit.uuid, true);
-  await changeToDefaultLocation(api);
 });
 
 test('Discharge a patient from a ward', async ({ page, api }) => {

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } fr
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
-import { type Resources } from '../../../offline.resources';
+import { type Resources } from '../../../registration.resource';
 import { type FormValues } from '../../patient-registration.types';
 import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { RelationshipsSection } from './relationships-section.component';
@@ -68,7 +68,6 @@ function renderRelationshipsSectionWithFormik(
                 setCapturePhotoProps: vi.fn(),
                 setFieldTouched: vi.fn().mockResolvedValue(undefined),
                 currentPhoto: '',
-                isOffline: false,
                 initialFormValues: formValuesRef,
               }}>
               <RelationshipsSection />

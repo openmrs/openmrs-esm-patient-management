@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-ward-app",
-  "version": "11.1.0",
+  "version": "12.1.1",
   "description": "Ward and bed management module for O3",
   "browser": "dist/openmrs-esm-ward-app.js",
   "main": "src/index.ts",
@@ -35,23 +35,25 @@
     "url": "git+https://github.com/openmrs/openmrs-esm-patient-management.git"
   },
   "bugs": {
-    "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
+    "url": "https://openmrs.atlassian.net/jira/software/c/projects/O3/boards/37"
   },
   "dependencies": {
-    "@carbon/react": "^1.83.0",
     "classnames": "^2.3.2",
     "lodash-es": "^4.17.15",
     "react-hook-form": "^7.54.0",
     "zod": "^3.24.1"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "10.x",
+    "@carbon/react": "1.x",
+    "@openmrs/esm-framework": "11.x",
     "react": "18.x",
+    "react-dom": "18.x",
     "react-i18next": "16.x",
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
   "devDependencies": {
+    "@carbon/react": "^1.83.0",
     "openmrs": "next",
     "vitest": "^4.1.2"
   }

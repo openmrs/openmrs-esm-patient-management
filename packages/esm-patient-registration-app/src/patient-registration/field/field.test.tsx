@@ -2,10 +2,11 @@ import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
+import { useTranslation } from 'react-i18next';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
-import { type Resources } from '../../offline.resources';
+import { type Resources } from '../../registration.resource';
 import type { AddressTemplate, FormValues } from '../patient-registration.types';
 import { PatientRegistrationContextProvider } from '../patient-registration-context';
 import { ResourcesContextProvider } from '../../resources-context';
@@ -100,7 +101,6 @@ const initialContextValues = {
   identifierTypes: [],
   inEditMode: false,
   initialFormValues: {} as FormValues,
-  isOffline: false,
   setCapturePhotoProps: vi.fn(),
   setFieldValue: vi.fn(),
   setFieldTouched: vi.fn(),
@@ -278,7 +278,6 @@ describe('Field', () => {
       identifierTypes: [],
       inEditMode: false,
       initialFormValues: { identifiers: { openmrsID } } as unknown as FormValues,
-      isOffline: false,
       setCapturePhotoProps: vi.fn(),
       setFieldValue: vi.fn(),
       setInitialFormValues: vi.fn(),
@@ -300,6 +299,90 @@ describe('Field', () => {
     );
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
   });
+
+  it('should render the label of a text field and no input', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [
+        { id: 'studyConsentStatement', type: 'text', label: 'I consent to being a part of the study.' },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+
+    render(<Field name="studyConsentStatement" />);
+
+    expect(screen.getByText('I consent to being a part of the study.')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('should translate the label of a text field under its id suffixed with Text', ({ onTestFinished }) => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [
+        { id: 'studyConsentStatement', type: 'text', label: 'I consent to being a part of the study.' },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+    const translate = vi
+      .spyOn(useTranslation(), 't')
+      .mockImplementation((key: string) => (key === 'studyConsentStatementText' ? 'Ninakubali' : key));
+    onTestFinished(() => translate.mockRestore());
+
+    render(<Field name="studyConsentStatement" />);
+
+    expect(screen.getByText('Ninakubali')).toBeInTheDocument();
+  });
+
+  it('should keep the line breaks of a text field label', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [
+        { id: 'studyConsentStatement', type: 'text', label: 'First paragraph.\nSecond paragraph.' },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+
+    render(<Field name="studyConsentStatement" />);
+
+    expect(screen.getByText('First paragraph.\nSecond paragraph.', { normalizer: (text) => text })).toHaveClass(
+      'textField',
+    );
+  });
+
+  it.each([
+    [false, true],
+    [true, false],
+  ])(
+    'limits the Identifiers section to half width on desktop: %s preferred selection -> %s',
+    (allowPreferredSelection, isHalfWidth) => {
+      const defaults = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+      mockUseConfig.mockReturnValue({
+        ...defaults,
+        fieldConfigurations: { ...defaults.fieldConfigurations, identifier: { allowPreferredSelection } },
+      });
+
+      renderWithContext(
+        <Formik initialValues={{}} onSubmit={vi.fn()}>
+          <Form>
+            <PatientRegistrationContextProvider
+              value={{
+                ...initialContextValues,
+                initialFormValues: { identifiers: {} } as FormValues,
+                values: { identifiers: {} } as FormValues,
+              }}>
+              <Field name="id" />
+            </PatientRegistrationContextProvider>
+          </Form>
+        </Formik>,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
+
+      const section = screen.getByTestId('identifiers-section');
+      if (isHalfWidth) {
+        expect(section).toHaveClass('halfWidthInDesktopView');
+      } else {
+        expect(section).not.toHaveClass('halfWidthInDesktopView');
+      }
+    },
+  );
 
   it('should return null and report an error for an invalid field name', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});

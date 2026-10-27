@@ -172,6 +172,12 @@
   margin: layout.$spacing-02 0 0;
 }
 
+.textField {
+  @include type.type-style('body-01');
+  margin-bottom: layout.$spacing-05;
+  white-space: pre-line;
+}
+
 .dangerLabel01 {
   @include type.type-style('label-01');
   color: colors.$red-60;

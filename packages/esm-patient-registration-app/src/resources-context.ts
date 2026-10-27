@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { type Resources } from './offline.resources';
+import { type Resources } from './registration.resource';
 
 export const ResourcesContext = createContext<Resources>(null);
 

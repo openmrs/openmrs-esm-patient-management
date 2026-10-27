@@ -2,22 +2,11 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRInfinite, { type SWRInfiniteResponse } from 'swr/infinite';
-import {
-  omrsOfflineCachingStrategyHttpHeaderName,
-  openmrsFetch,
-  useSession,
-  type FetchResponse,
-  type OmrsOfflineHttpHeaders,
-  restBaseUrl,
-} from '@openmrs/esm-framework';
+import { openmrsFetch, useSession, type FetchResponse, restBaseUrl } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
 
-const cachingStrategyHeaders: OmrsOfflineHttpHeaders = {
-  [omrsOfflineCachingStrategyHttpHeaderName]: 'network-only-or-cache-only',
-};
-
 function fetcher<T>(url: string) {
-  return openmrsFetch<T>(url, { headers: cachingStrategyHeaders });
+  return openmrsFetch<T>(url);
 }
 
 type InfinitePatientSearchResponse = FetchResponse<{

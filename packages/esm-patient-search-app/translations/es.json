@@ -46,7 +46,6 @@
   "searchingText": "Buscando...",
   "searchLocationPersonAttribute": "Buscar ubicación",
   "searchPatient": "Buscar paciente",
-  "searchPatientButton": "Botón de búsqueda de paciente",
   "searchQueriesAdded_one": "<0>{{count}}</0> search query added",
   "searchQueriesAdded_other": "<0>{{count}}</0> search queries added",
   "searchResults": "Buscar resultados",
