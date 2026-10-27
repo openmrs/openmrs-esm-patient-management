@@ -308,7 +308,11 @@ describe('Field', () => {
       ] as RegistrationConfig['fieldDefinitions'],
     });
 
-    render(<Field name="studyConsentStatement" />);
+    render(
+      <PatientRegistrationContextProvider value={initialContextValues}>
+        <Field name="studyConsentStatement" />
+      </PatientRegistrationContextProvider>,
+    );
 
     expect(screen.getByText('I consent to being a part of the study.')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
@@ -326,7 +330,11 @@ describe('Field', () => {
       .mockImplementation((key: string) => (key === 'studyConsentStatementText' ? 'Ninakubali' : key));
     onTestFinished(() => translate.mockRestore());
 
-    render(<Field name="studyConsentStatement" />);
+    render(
+      <PatientRegistrationContextProvider value={initialContextValues}>
+        <Field name="studyConsentStatement" />
+      </PatientRegistrationContextProvider>,
+    );
 
     expect(screen.getByText('Ninakubali')).toBeInTheDocument();
   });
@@ -339,7 +347,11 @@ describe('Field', () => {
       ] as RegistrationConfig['fieldDefinitions'],
     });
 
-    render(<Field name="studyConsentStatement" />);
+    render(
+      <PatientRegistrationContextProvider value={initialContextValues}>
+        <Field name="studyConsentStatement" />
+      </PatientRegistrationContextProvider>,
+    );
 
     expect(screen.getByText('First paragraph.\nSecond paragraph.', { normalizer: (text) => text })).toHaveClass(
       'textField',
