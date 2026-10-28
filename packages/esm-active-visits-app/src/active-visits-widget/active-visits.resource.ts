@@ -79,6 +79,7 @@ export function useActiveVisits() {
       name: visit?.patient?.person?.display,
       patientUuid: visit?.patient?.uuid,
       visitStartTime: formatDatetime(parseDate(visit?.startDatetime)),
+      visitStartDatetime: visit?.startDatetime,
       visitType: visit?.visitType?.display,
       visitUuid: visit.uuid,
     };
@@ -188,7 +189,11 @@ export function useActiveVisitsSorting(tableRows: Array<ActiveVisit>) {
     cellB: ActiveVisit,
     { key, sortDirection }: { key: string; sortDirection: 'ASC' | 'DESC' | 'NONE' },
   ) => {
-    setSortParams({ key, sortDirection });
+    // DataTable calls this for every comparison, so keep the same state object when nothing changed.
+    // Otherwise each call re-renders, which passes new rows to DataTable, which sorts again, and so on.
+    setSortParams((current) =>
+      current.key === key && current.sortDirection === sortDirection ? current : { key, sortDirection },
+    );
     return 0; // Return value is not used, actual sorting happens in useMemo
   };
 
@@ -209,7 +214,8 @@ export function useActiveVisitsSorting(tableRows: Array<ActiveVisit>) {
     if (value == null) return null;
 
     if (key === 'visitStartTime') {
-      return new Date(value).getTime();
+      // The displayed value can read "Today, 10:30 AM", which isn't a parseable date, so sort on the raw datetime
+      return item.visitStartDatetime ? parseDate(item.visitStartDatetime).getTime() : null;
     }
 
     if (key === 'age' && !isNaN(Number(value))) {
