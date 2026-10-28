@@ -2,7 +2,8 @@ import {
   filterOutUndefinedPatientIdentifiers,
   shouldHideElement,
   getAgeInYears,
-  getHiddenFieldIds,
+  getFieldValue,
+  getHiddenElements,
   sanitizeFormValuesForSkipLogic,
 } from './patient-registration-utils';
 import { vi, describe, it, expect, afterEach } from 'vitest';
@@ -147,7 +148,7 @@ describe('shouldHideElement', () => {
   });
 });
 
-describe('getHiddenFieldIds and sanitizeFormValuesForSkipLogic', () => {
+describe('getHiddenElements and sanitizeFormValuesForSkipLogic', () => {
   const testConfig: any = {
     sections: ['demographics', 'conditionalSection'],
     sectionDefinitions: [
@@ -204,11 +205,13 @@ describe('getHiddenFieldIds and sanitizeFormValuesForSkipLogic', () => {
       },
     };
 
-    const hiddenIds = getHiddenFieldIds(values, testConfig, 12);
+    const { fieldIds: hiddenIds, sectionIds } = getHiddenElements(values, testConfig);
     expect(hiddenIds.has('fieldHiddenIfNo')).toBe(true);
     expect(hiddenIds.has('adultOnlyField')).toBe(true);
     expect(hiddenIds.has('sectionField1')).toBe(true);
     expect(hiddenIds.has('referredBy')).toBe(false);
+    expect(sectionIds.has('conditionalSection')).toBe(true);
+    expect(sectionIds.has('demographics')).toBe(false);
   });
 
   it('should sanitize and strip values of hidden fields on form submission', () => {
@@ -291,5 +294,109 @@ describe('getHiddenFieldIds and sanitizeFormValuesForSkipLogic', () => {
     expect(sanitized.familyName).toBe('Doe');
     expect(sanitized.identifiers).toBeDefined();
     expect((sanitized as any).unmatchedCustomField).toBe('some-value');
+  });
+
+  it('hides a field whose condition depends on the stale value of a hidden field, in the UI and on submit', () => {
+    // F sits in a section that is hidden unless ref is 'Yes'. G sits in a visible section and is
+    // hidden unless F is 'Yes'. F still holds a stale 'Yes' from before ref was changed.
+    const cascadeConfig: any = {
+      sections: ['visible', 'conditional'],
+      sectionDefinitions: [
+        { id: 'visible', name: 'Visible', fields: ['ref', 'G'] },
+        { id: 'conditional', name: 'Conditional', hideIf: { fieldId: 'ref', notEquals: 'Yes' }, fields: ['F'] },
+      ],
+      fieldDefinitions: [
+        { id: 'ref', type: 'person attribute', uuid: 'ref-uuid' },
+        { id: 'F', type: 'person attribute', uuid: 'f-uuid' },
+        { id: 'G', type: 'person attribute', uuid: 'g-uuid', hideIf: { fieldId: 'F', notEquals: 'Yes' } },
+      ],
+    };
+    const values: any = { attributes: { 'ref-uuid': 'No', 'f-uuid': 'Yes', 'g-uuid': 'typed' } };
+
+    const { fieldIds } = getHiddenElements(values, cascadeConfig);
+    expect(fieldIds.has('F')).toBe(true);
+    expect(fieldIds.has('G')).toBe(true);
+
+    const sanitized = sanitizeFormValuesForSkipLogic(values, cascadeConfig);
+    expect(sanitized.attributes).toEqual({ 'ref-uuid': 'No' });
+  });
+
+  it('keeps evaluating when clearing a field un-hides one field and hides another', () => {
+    // Clearing A un-hides B (hidden while A is 'x') and hides C (hidden while A is empty),
+    // so the number of hidden fields stays the same while the members change.
+    const swapConfig: any = {
+      sections: ['main'],
+      sectionDefinitions: [{ id: 'main', name: 'Main', fields: ['trigger', 'A', 'B', 'C'] }],
+      fieldDefinitions: [
+        { id: 'trigger', type: 'person attribute', uuid: 'trigger-uuid' },
+        { id: 'A', type: 'person attribute', uuid: 'a-uuid', hideIf: { fieldId: 'trigger', value: 'hideA' } },
+        { id: 'B', type: 'person attribute', uuid: 'b-uuid', hideIf: { fieldId: 'A', value: 'x' } },
+        { id: 'C', type: 'person attribute', uuid: 'c-uuid', hideIf: { fieldId: 'A', value: '' } },
+      ],
+    };
+    const values: any = { attributes: { 'trigger-uuid': 'hideA', 'a-uuid': 'x', 'b-uuid': 'b', 'c-uuid': 'c' } };
+
+    const { fieldIds } = getHiddenElements(values, swapConfig);
+    expect([...fieldIds].sort()).toEqual(['A', 'C']);
+
+    const sanitized = sanitizeFormValuesForSkipLogic(values, swapConfig);
+    expect(sanitized.attributes).toEqual({ 'trigger-uuid': 'hideA', 'b-uuid': 'b' });
+  });
+
+  it('restores the initial address and strips the phone when the contact section is hidden', () => {
+    const contactConfig: any = {
+      sections: ['contact'],
+      sectionDefinitions: [
+        {
+          id: 'contact',
+          name: 'Contact',
+          hideIf: { fieldId: 'gender', value: 'unknown' },
+          fields: ['address', 'phone'],
+        },
+      ],
+      fieldDefinitions: [],
+      fieldConfigurations: { phone: { personAttributeUuid: 'phone-uuid' } },
+    };
+    const values: any = {
+      gender: 'unknown',
+      address: { cityVillage: 'Typed city' },
+      attributes: { 'phone-uuid': '0700000000' },
+    };
+    const initialFormValues: any = { address: { cityVillage: 'Saved city' } };
+
+    const sanitized = sanitizeFormValuesForSkipLogic(values, contactConfig, initialFormValues);
+
+    expect(sanitized.address).toEqual({ cityVillage: 'Saved city' });
+    expect(sanitized.attributes['phone-uuid']).toBeUndefined();
+  });
+});
+
+describe('getFieldValue', () => {
+  const config: any = {
+    fieldDefinitions: [{ id: 'custom', type: 'obs', uuid: 'custom-uuid' }],
+    fieldConfigurations: { phone: { personAttributeUuid: 'phone-uuid' } },
+  };
+  const values: any = {
+    gender: 'female',
+    birthdate: '2000-01-01',
+    deathCause: 'cause-uuid',
+    isDead: true,
+    attributes: { 'phone-uuid': '0700000000' },
+    obs: { 'custom-uuid': 'obs value' },
+  };
+
+  it.each([
+    ['gender', 'female'],
+    ['dob', '2000-01-01'],
+    ['phone', '0700000000'],
+    ['causeOfDeath', 'cause-uuid'],
+    ['custom', 'obs value'],
+    ['isDead', true],
+  ])('reads the value of %s', (fieldId, expected) => {
+    expect(getFieldValue(fieldId, values, config)).toBe(expected);
+  });
+
+  it('lets hideIf reference a built-in field', () => {
+    expect(shouldHideElement({ hideIf: { fieldId: 'phone', value: '0700000000' } }, values, config)).toBe(true);
   });
 });

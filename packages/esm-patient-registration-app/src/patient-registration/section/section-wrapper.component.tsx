@@ -1,12 +1,10 @@
 import React from 'react';
 import { Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useConfig } from '@openmrs/esm-framework';
-import { type RegistrationConfig, type SectionDefinition } from '../../config-schema';
+import { type SectionDefinition } from '../../config-schema';
 import { Section } from './section.component';
 import styles from './section.scss';
 import { usePatientRegistrationContext } from '../patient-registration-context';
-import { getAgeInYears, shouldHideElement } from '../patient-registration-utils';
 
 export interface SectionWrapperProps {
   sectionDefinition: SectionDefinition;
@@ -15,12 +13,9 @@ export interface SectionWrapperProps {
 
 export const SectionWrapper = ({ sectionDefinition, index }: SectionWrapperProps) => {
   const { t } = useTranslation();
-  const config = useConfig<RegistrationConfig>();
-  const { values } = usePatientRegistrationContext();
+  const { hiddenElements } = usePatientRegistrationContext();
 
-  const ageInYears = getAgeInYears(values);
-
-  if (shouldHideElement(sectionDefinition, values, config, ageInYears)) {
+  if (hiddenElements?.sectionIds.has(sectionDefinition.id)) {
     return null;
   }
 

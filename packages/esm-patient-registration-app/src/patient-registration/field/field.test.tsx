@@ -339,6 +339,27 @@ describe('Field', () => {
     expect(screen.getByText('Ninakubali')).toBeInTheDocument();
   });
 
+  it('should render nothing for a field hidden by skip logic', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldDefinitions: [
+        { id: 'studyConsentStatement', type: 'text', label: 'I consent to being a part of the study.' },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+
+    render(
+      <PatientRegistrationContextProvider
+        value={{
+          ...initialContextValues,
+          hiddenElements: { fieldIds: new Set(['studyConsentStatement']), sectionIds: new Set() },
+        }}>
+        <Field name="studyConsentStatement" />
+      </PatientRegistrationContextProvider>,
+    );
+
+    expect(screen.queryByText('I consent to being a part of the study.')).not.toBeInTheDocument();
+  });
+
   it('should keep the line breaks of a text field label', () => {
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),

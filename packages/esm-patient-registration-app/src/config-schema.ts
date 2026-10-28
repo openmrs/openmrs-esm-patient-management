@@ -130,6 +130,23 @@ export const builtInFields = [
   'dateAndTimeOfDeath',
 ] as const;
 
+const hideIfAgeOperators = ['<', '>', '<=', '>=', '=='];
+
+const hideIfValidator = validator(
+  (hideIf: HideIfCondition | null) =>
+    hideIf == null ||
+    (typeof hideIf.fieldId === 'string' &&
+      hideIf.fieldId.trim() !== '' &&
+      (hideIf.value !== undefined || hideIf.notEquals !== undefined)),
+  'hideIf must have a non-empty `fieldId` and either `value` or `notEquals`.',
+);
+
+const hideIfAgeValidator = validator(
+  (hideIfAge: HideIfAgeCondition | null) =>
+    hideIfAge == null || (hideIfAgeOperators.includes(hideIfAge.operator) && typeof hideIfAge.value === 'number'),
+  `hideIfAge must have an \`operator\` (one of ${hideIfAgeOperators.join(', ')}) and a numeric \`value\`.`,
+);
+
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
@@ -169,11 +186,13 @@ export const esmPatientRegistrationSchema = {
         _type: Type.Object,
         _default: null,
         _description: 'Skip logic: Hide this section if a field has a certain value.',
+        _validators: [hideIfValidator],
       },
       hideIfAge: {
         _type: Type.Object,
         _default: null,
         _description: 'Skip logic: Hide this section based on patient age.',
+        _validators: [hideIfAgeValidator],
       },
     },
   },
@@ -268,16 +287,19 @@ export const esmPatientRegistrationSchema = {
         _type: Type.Object,
         _default: null,
         _description: 'Skip logic: Hide this field if another field has a certain value.',
+        _validators: [hideIfValidator],
       },
       hideIfAge: {
         _type: Type.Object,
         _default: null,
         _description: 'Skip logic: Hide this field based on patient age.',
+        _validators: [hideIfAgeValidator],
       },
       displayStyle: {
         _type: Type.String,
         _default: 'dropdown',
         _description: 'How to render coded person attributes. Can be "dropdown" or "radio".',
+        _validators: [validators.oneOf(['dropdown', 'radio'])],
       },
     },
     // Do not add fields here. If you want to add a field in code, add it to built-in fields above.

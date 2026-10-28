@@ -2,7 +2,6 @@ import React from 'react';
 import { reportError, useConfig } from '@openmrs/esm-framework';
 import { builtInFields, type RegistrationConfig } from '../../config-schema';
 import { usePatientRegistrationContext } from '../patient-registration-context';
-import { getAgeInYears, shouldHideElement } from '../patient-registration-utils';
 import { AddressComponent } from './address/address-field.component';
 import { CauseOfDeathField } from './cause-of-death/cause-of-death.component';
 import { CustomField } from './custom-field.component';
@@ -19,7 +18,7 @@ export interface FieldProps {
 
 export function Field({ name }: FieldProps) {
   const config = useConfig<RegistrationConfig>();
-  const { values } = usePatientRegistrationContext();
+  const { hiddenElements } = usePatientRegistrationContext();
 
   if (
     !(builtInFields as ReadonlyArray<string>).includes(name) &&
@@ -34,13 +33,8 @@ export function Field({ name }: FieldProps) {
     return null;
   }
 
-  const fieldDef = config.fieldDefinitions.find((def) => def.id === name);
-  if (fieldDef) {
-    const ageInYears = getAgeInYears(values);
-
-    if (shouldHideElement(fieldDef, values, config, ageInYears)) {
-      return null;
-    }
+  if (hiddenElements?.fieldIds.has(name)) {
+    return null;
   }
 
   switch (name) {

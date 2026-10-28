@@ -112,19 +112,26 @@ export function CodedPersonAttributeField({
               const errorMessage = fieldError;
 
               if (displayStyle === 'radio') {
+                const labelId = `${id}-label`;
+                const errorId = `${id}-error`;
+
                 return (
                   <div
                     className={classNames(styles.attributeField, styles.radioField, {
                       [styles.radioFieldInvalid]: isInvalid,
                     })}>
                     <div className={styles.radioContentSwitcherLabel}>
-                      <span className={classNames(styles.label01, { [styles.dangerLabel01]: isInvalid })}>
+                      <span id={labelId} className={classNames(styles.label01, { [styles.dangerLabel01]: isInvalid })}>
                         {label ?? personAttributeType?.display}
                       </span>
                     </div>
                     <ContentSwitcher
                       id={id}
                       size="md"
+                      aria-labelledby={labelId}
+                      aria-describedby={isInvalid && errorMessage ? errorId : undefined}
+                      aria-invalid={isInvalid}
+                      aria-required={required}
                       onChange={(e) => {
                         setFieldValue(fieldName, e.name);
                         setFieldTouched(fieldName, true, false);
@@ -135,7 +142,9 @@ export function CodedPersonAttributeField({
                       ))}
                     </ContentSwitcher>
                     {isInvalid && errorMessage && (
-                      <div className={styles.radioFieldError}>{t(errorMessage, errorMessage)}</div>
+                      <div id={errorId} role="alert" className={styles.radioFieldError}>
+                        {t(errorMessage, errorMessage)}
+                      </div>
                     )}
                   </div>
                 );

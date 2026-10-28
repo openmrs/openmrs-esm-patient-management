@@ -49,10 +49,17 @@
   margin-bottom: layout.$spacing-05;
 }
 
-.dobField > :global(.cds--content-switcher),
-.radioField > :global(.cds--content-switcher) {
+.dobField > :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  width: max-content;
+  justify-content: flex-start;
+}
+
+.radioField > :global(.cds--content-switcher) {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   width: max-content;
   justify-content: flex-start;
 }
