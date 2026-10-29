@@ -18,7 +18,7 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
+  const { calendarEvents, isLoading, error } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
   const { serviceTypes } = useAppointmentServices();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
@@ -46,9 +46,12 @@ const AppointmentsCalendarView: React.FC = () => {
   }, []);
 
   const appointmentsCount = useMemo(() => {
+    if (isLoading || error) {
+      return null;
+    }
     const services = calendarEvents?.flatMap((event) => event.services ?? []) ?? [];
     return services.reduce((total, service) => total + (service.count ?? 0), 0);
-  }, [calendarEvents]);
+  }, [calendarEvents, isLoading, error]);
 
   const legendServices = useMemo(() => {
     const legendMap = new Map<string, { uuid: string; name: string }>();

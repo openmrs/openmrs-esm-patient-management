@@ -10,7 +10,7 @@ import styles from './calendar-header.scss';
 interface CalendarHeaderProps {
   viewMode: CalendarViewMode;
   calendarSelectedDate: Dayjs;
-  appointmentsCount: number;
+  appointmentsCount: number | null;
   onViewModeChange: (mode: CalendarViewMode) => void;
   onToday: () => void;
   onPrev: () => void;
@@ -72,11 +72,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             />
           </div>
           <span className={styles.dateLabel}>{dateLabel}</span>
-          <span className={styles.appointmentsCount}>
-            {viewMode === 'monthly'
-              ? t('appointmentsThisMonthCount', '{{count}} appointments this month', { count: appointmentsCount })
-              : t('appointmentsThisDayCount', '{{count}} appointments this day', { count: appointmentsCount })}
-          </span>
+          {appointmentsCount !== null && (
+            <span className={styles.appointmentsCount}>
+              {viewMode === 'monthly'
+                ? t('appointmentsThisMonthCount', '{{count}} appointments this month', { count: appointmentsCount })
+                : t('appointmentsThisDayCount', '{{count}} appointments this day', { count: appointmentsCount })}
+            </span>
+          )}
         </div>
       </div>
       <div className={styles.switcherSection}>

@@ -190,6 +190,28 @@ describe('Appointment calendar view', () => {
     expect(screen.getByText('0 appointments this month')).toBeInTheDocument();
   });
 
+  it('does not show a count while the request is loading', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({ calendarEvents: [], isLoading: true, error: null });
+
+    renderCalendar();
+
+    expect(screen.queryByText(/appointments this month/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/0 appointments/i)).not.toBeInTheDocument();
+  });
+
+  it('does not show a zero count when the request fails', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [],
+      isLoading: false,
+      error: new Error('request failed'),
+    });
+
+    renderCalendar();
+
+    expect(screen.queryByText(/appointments this month/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/0 appointments/i)).not.toBeInTheDocument();
+  });
+
   it('switches the count wording to the daily total when the Daily tab is selected', async () => {
     const user = userEvent.setup();
     mockUseAppointmentsCalendar.mockReturnValue({
