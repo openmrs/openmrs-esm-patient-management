@@ -53,6 +53,7 @@ import { useAppointmentServices } from '../hooks/useAppointmentService';
 import { appointmentLocationTagName, dateFormat, moduleName, weekDays } from '../constants';
 import { useProviders } from '../hooks/useProviders';
 import { useMutateAppointments } from '../hooks/useMutateAppointments';
+import { appointmentScheduleErrorText } from './appointment-schedule-error';
 import Workload from '../workload/workload.component';
 import { useSelectedDate } from '../hooks/useSelectedDate';
 import styles from './appointments-form.scss';
@@ -406,7 +407,14 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             : t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
           isLowContrast: false,
-          subtitle: error?.message,
+          subtitle: appointmentScheduleErrorText(error, {
+            fallback: t(
+              'appointmentScheduleFailed',
+              'The appointment could not be scheduled. Please check the appointment details and try again.',
+            ),
+            withReason: (reason) =>
+              t('unableToScheduleAppointment', 'Unable to schedule appointment: {{reason}}', { reason }),
+          }),
         });
       },
     );

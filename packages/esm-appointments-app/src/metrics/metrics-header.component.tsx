@@ -8,6 +8,7 @@ import { isDesktop, navigate, useLayoutType } from '@openmrs/esm-framework';
 import { spaHomePage } from '../constants';
 import styles from './metrics-header.scss';
 import { launchCreateAppointmentForm } from '../helpers';
+import { useCanManageAppointments } from '../helpers/appointment-access';
 import { useSelectedDate } from '../hooks/useSelectedDate';
 
 dayjs.extend(isToday);
@@ -17,6 +18,7 @@ const MetricsHeader: React.FC = () => {
   const selectedDate = useSelectedDate();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
+  const canManageAppointments = useCanManageAppointments();
 
   return (
     <div className={styles.metricsContainer}>
@@ -30,13 +32,15 @@ const MetricsHeader: React.FC = () => {
           }>
           {t('appointmentsCalendar', 'Appointments calendar')}
         </Button>
-        <Button
-          kind="primary"
-          renderIcon={(props) => <Hospital size={32} {...props} />}
-          size={responsiveSize}
-          onClick={() => launchCreateAppointmentForm(t)}>
-          {t('createNewAppointment', 'Create new appointment')}
-        </Button>
+        {canManageAppointments && (
+          <Button
+            kind="primary"
+            renderIcon={(props) => <Hospital size={32} {...props} />}
+            size={responsiveSize}
+            onClick={() => launchCreateAppointmentForm(t)}>
+            {t('createNewAppointment', 'Create new appointment')}
+          </Button>
+        )}
       </div>
     </div>
   );

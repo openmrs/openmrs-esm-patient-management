@@ -41,6 +41,7 @@ import {
   showModal,
   TableBatchActions,
 } from '@openmrs/esm-framework';
+import { useCanManageAppointments } from '../../helpers/appointment-access';
 import { exportAppointmentsToSpreadsheet } from '../../helpers/excel';
 import { AppointmentStatus, type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
@@ -71,6 +72,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const { visits, mutateVisits } = useActiveVisits();
+  const canManageAppointments = useCanManageAppointments();
 
   const activeVisitsByPatientUuid = useMemo(
     () =>
@@ -128,7 +130,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
               />
             </div>
           ),
-          overflowMenu: (
+          overflowMenu: canManageAppointments ? (
             <OverflowMenu align="left" aria-label={t('actions', 'Actions')} flipped size={responsiveSize}>
               <OverflowMenuItem
                 className={styles.menuItem}
@@ -141,11 +143,20 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                 }
               />
             </OverflowMenu>
-          ),
+          ) : null,
           appointment,
         };
       }),
-    [results, customPatientChartUrl, patientIdentifierType, responsiveSize, t, activeVisitsByPatientUuid, mutateVisits],
+    [
+      results,
+      customPatientChartUrl,
+      patientIdentifierType,
+      responsiveSize,
+      t,
+      activeVisitsByPatientUuid,
+      mutateVisits,
+      canManageAppointments,
+    ],
   );
 
   if (isLoading) {
@@ -182,22 +193,26 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
             <TableContainer {...getTableContainerProps()}>
               <TableToolbar {...getToolbarProps()} size={responsiveSize}>
                 <TableBatchActions
-                  shouldShowBatchActions={selectedAppointmentUuids.size > 0}
+                  shouldShowBatchActions={canManageAppointments && selectedAppointmentUuids.size > 0}
                   totalSelected={selectedAppointmentUuids.size}
                   // TODO: add translation for Carbon's table batch actions
                   // https://openmrs.atlassian.net/browse/O3-5409
                   onCancel={() => setSelectedAppointmentUuids(new Set())}>
-                  <TableBatchAction
-                    renderIcon={Calendar}
-                    onClick={() => {
-                      const selectedAppointments = appointments.filter((app) => selectedAppointmentUuids.has(app.uuid));
-                      const closeModal = showModal('batch-change-appointments-statuses-modal', {
-                        appointments: selectedAppointments,
-                        closeModal: () => closeModal(),
-                      });
-                    }}>
-                    {t('changeStatus', 'Change status')}
-                  </TableBatchAction>
+                  {canManageAppointments && (
+                    <TableBatchAction
+                      renderIcon={Calendar}
+                      onClick={() => {
+                        const selectedAppointments = appointments.filter((app) =>
+                          selectedAppointmentUuids.has(app.uuid),
+                        );
+                        const closeModal = showModal('batch-change-appointments-statuses-modal', {
+                          appointments: selectedAppointments,
+                          closeModal: () => closeModal(),
+                        });
+                      }}>
+                      {t('changeStatus', 'Change status')}
+                    </TableBatchAction>
+                  )}
                 </TableBatchActions>
                 <TableToolbarContent className={styles.toolbarContent}>
                   <TableToolbarSearch

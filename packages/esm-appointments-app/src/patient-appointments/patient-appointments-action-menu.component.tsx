@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchWorkspace2, showModal, useLayoutType } from '@openmrs/esm-framework';
+import { useCanManageAppointments } from '../helpers/appointment-access';
 import type { Appointment } from '../types';
 import styles from './patient-appointments-action-menu.scss';
 
@@ -24,6 +25,11 @@ export const PatientAppointmentsActionMenu = ({
 }: appointmentsActionMenuProps) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const canManageAppointments = useCanManageAppointments();
+
+  if (!canManageAppointments) {
+    return null;
+  }
 
   const handleLaunchEditAppointmentForm = () => {
     if (launchAppointmentForm) {

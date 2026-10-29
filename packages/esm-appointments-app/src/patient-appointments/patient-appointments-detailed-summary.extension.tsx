@@ -10,6 +10,7 @@ import {
   launchWorkspace2,
   useLayoutType,
 } from '@openmrs/esm-framework';
+import { useCanManageAppointments } from '../helpers/appointment-access';
 import { type Appointment } from '../types';
 import { usePatientAppointments } from './patient-appointments.resource';
 import PatientAppointmentsTable from './patient-appointments-table.component';
@@ -45,6 +46,7 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
   const { t } = useTranslation();
   const headerTitle = t('appointments', 'Appointments');
   const isTablet = useLayoutType() === 'tablet';
+  const canManageAppointments = useCanManageAppointments();
   const [switchedView, setSwitchedView] = useState(false);
 
   // Default implementation for patient chart context
@@ -97,13 +99,15 @@ const PatientAppointmentsDetailedSummary: React.FC<PatientAppointmentsDetailProp
               <Switch name={'past'}>{t('past', 'Past')}</Switch>
             </ContentSwitcher>
             <div className={styles.divider}>|</div>
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <AddIcon size={16} {...props} />}
-              iconDescription={t('addAppointments', 'Add Appointments')}
-              onClick={() => handleLaunchAppointmentForm(patientUuid)}>
-              {t('add', 'Add')}
-            </Button>
+            {canManageAppointments && (
+              <Button
+                kind="ghost"
+                renderIcon={(props) => <AddIcon size={16} {...props} />}
+                iconDescription={t('addAppointments', 'Add Appointments')}
+                onClick={() => handleLaunchAppointmentForm(patientUuid)}>
+                {t('add', 'Add')}
+              </Button>
+            )}
           </div>
         </CardHeader>
         {(() => {

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { navigate, showModal, useConfig } from '@openmrs/esm-framework';
 import { type Appointment, AppointmentStatus } from '../../types';
 import { type ConfigObject } from '../../config-schema';
+import { useCanManageAppointments } from '../../helpers/appointment-access';
 import CheckInButton from './checkin-button.component';
 import styles from './appointments-actions.scss';
 
@@ -16,6 +17,7 @@ interface AppointmentsActionsProps {
 const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment, hasActiveVisit, mutateVisits }) => {
   const { t } = useTranslation();
   const { checkInButton, checkOutButton } = useConfig<ConfigObject>();
+  const canManageAppointments = useCanManageAppointments();
 
   const patientUuid = appointment.patient.uuid;
 
@@ -50,7 +52,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment, 
       return null;
     }
 
-    if (checkOutButton.enabled && isCheckedIn) {
+    if (canManageAppointments && checkOutButton.enabled && isCheckedIn) {
       return (
         <Button onClick={handleCheckout} kind="danger--tertiary" size="sm">
           {t('checkOut', 'Check out')}

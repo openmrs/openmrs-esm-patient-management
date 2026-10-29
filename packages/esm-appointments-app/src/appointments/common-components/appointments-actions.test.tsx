@@ -1,7 +1,7 @@
 import React from 'react';
-import { vi, describe, it, expect, afterAll, type Mock } from 'vitest';
+import { vi, describe, it, expect, afterAll, beforeEach, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig, useSession, userHasAccess } from '@openmrs/esm-framework';
 import { type ConfigObject, configSchema } from '../../config-schema';
 import { type Appointment, AppointmentKind, AppointmentStatus } from '../../types';
 import AppointmentActions from './appointments-actions.component';
@@ -61,8 +61,23 @@ const defaultProps = {
 };
 
 const mockUseConfig = vi.mocked(useConfig<ConfigObject>);
+const mockUseSession = vi.mocked(useSession);
+const mockUserHasAccess = vi.mocked(userHasAccess);
+
+function sessionWithAppointmentWrite(allowed: boolean) {
+  mockUseSession.mockReturnValue({
+    authenticated: true,
+    sessionId: 'session',
+    user: { uuid: 'user', display: 'User', username: 'user', privileges: [], roles: [] },
+  } as ReturnType<typeof useSession>);
+  mockUserHasAccess.mockReturnValue(allowed);
+}
 
 describe('AppointmentActions', () => {
+  beforeEach(() => {
+    sessionWithAppointmentWrite(true);
+  });
+
   afterAll(() => {
     vi.useRealTimers();
   });
@@ -122,6 +137,24 @@ describe('AppointmentActions', () => {
     render(<AppointmentActions {...defaultProps} />);
 
     expect(screen.queryByText(/check in/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/check out/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps check in available and hides check out without Manage Appointments', () => {
+    appointment.status = AppointmentStatus.SCHEDULED;
+    sessionWithAppointmentWrite(false);
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      checkInButton: { enabled: true, customUrl: '' },
+      checkOutButton: { enabled: true, customUrl: '' },
+    });
+
+    const { rerender } = render(<AppointmentActions {...defaultProps} />);
+    expect(screen.getByText(/check in/i)).toBeInTheDocument();
+    expect(screen.queryByText(/check out/i)).not.toBeInTheDocument();
+
+    appointment.status = AppointmentStatus.CHECKEDIN;
+    rerender(<AppointmentActions {...defaultProps} />);
     expect(screen.queryByText(/check out/i)).not.toBeInTheDocument();
   });
 

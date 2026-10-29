@@ -1,8 +1,8 @@
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, useSession, userHasAccess } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '__mocks__';
 import {
   mockPatient,
@@ -22,8 +22,18 @@ const testProps = {
 };
 
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
+const mockUseSession = vi.mocked(useSession);
+const mockUserHasAccess = vi.mocked(userHasAccess);
 
 describe('AppointmentsDetailedSummary', () => {
+  beforeEach(() => {
+    mockUseSession.mockReturnValue({
+      authenticated: true,
+      sessionId: 'session',
+      user: { uuid: 'user', display: 'User', username: 'user', privileges: [], roles: [] },
+    } as ReturnType<typeof useSession>);
+    mockUserHasAccess.mockReturnValue(true);
+  });
   it('renders an empty state if appointments data is unavailable', async () => {
     mockOpenmrsFetch.mockResolvedValueOnce({
       data: [],
@@ -36,6 +46,20 @@ describe('AppointmentsDetailedSummary', () => {
     expect(screen.getByRole('heading', { name: /appointments/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
     expect(screen.getByText(/there are no upcoming appointments to display for this patient/i)).toBeInTheDocument();
+  });
+
+  it('hides add without Manage Appointments', async () => {
+    mockUserHasAccess.mockReturnValue(false);
+    mockOpenmrsFetch.mockResolvedValueOnce({
+      data: [],
+    } as unknown as FetchResponse<AppointmentsFetchResponse>);
+
+    renderWithSwr(<AppointmentsDetailedSummary {...testProps} />);
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByRole('heading', { name: /appointments/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /add/i })).not.toBeInTheDocument();
   });
 
   it('renders an error state if there was a problem fetching appointments data', async () => {

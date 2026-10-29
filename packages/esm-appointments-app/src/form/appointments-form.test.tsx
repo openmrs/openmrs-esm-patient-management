@@ -254,6 +254,11 @@ describe('AppointmentForm', () => {
         status: 500,
         statusText: 'Internal Server Error',
       },
+      responseBody: {
+        error: {
+          message: 'Start date is required',
+        },
+      },
     };
 
     mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
@@ -319,7 +324,7 @@ describe('AppointmentForm', () => {
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       isLowContrast: false,
       kind: 'error',
-      subtitle: 'Internal Server Error',
+      subtitle: 'Unable to schedule appointment: Start date is required',
       title: 'Error scheduling appointment',
     });
   });
