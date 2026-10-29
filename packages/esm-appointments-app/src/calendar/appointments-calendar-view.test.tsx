@@ -182,6 +182,24 @@ describe('Appointment calendar view', () => {
     expect(screen.getByText('10 appointments this month')).toBeInTheDocument();
   });
 
+  it('uses the singular wording when there is exactly one appointment', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: '2026-08-14',
+          services: [{ serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 1 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+
+    renderCalendar();
+
+    expect(screen.getByText('1 appointment this month')).toBeInTheDocument();
+    expect(screen.queryByText('1 appointments this month')).not.toBeInTheDocument();
+  });
+
   it('shows a zero total when there are no appointments', () => {
     mockUseAppointmentsCalendar.mockReturnValue({ calendarEvents: [], isLoading: false, error: null });
 

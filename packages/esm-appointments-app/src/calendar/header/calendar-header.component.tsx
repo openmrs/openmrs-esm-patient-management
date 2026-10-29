@@ -42,6 +42,20 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     );
   }, [viewMode, calendarSelectedDate, locale, calendar]);
 
+  const appointmentsCountLabel = useMemo(() => {
+    if (appointmentsCount === null) {
+      return null;
+    }
+    if (viewMode === 'monthly') {
+      return appointmentsCount === 1
+        ? t('oneAppointmentThisMonth', '1 appointment this month')
+        : t('appointmentsThisMonthCount', '{{total}} appointments this month', { total: appointmentsCount });
+    }
+    return appointmentsCount === 1
+      ? t('oneAppointmentThisDay', '1 appointment this day')
+      : t('appointmentsThisDayCount', '{{total}} appointments this day', { total: appointmentsCount });
+  }, [appointmentsCount, viewMode, t]);
+
   const viewModeIndex = viewMode === 'monthly' ? 0 : 1;
   const VIEW_MODES: CalendarViewMode[] = ['monthly', 'daily'];
 
@@ -72,12 +86,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             />
           </div>
           <span className={styles.dateLabel}>{dateLabel}</span>
-          {appointmentsCount !== null && (
-            <span className={styles.appointmentsCount}>
-              {viewMode === 'monthly'
-                ? t('appointmentsThisMonthCount', '{{count}} appointments this month', { count: appointmentsCount })
-                : t('appointmentsThisDayCount', '{{count}} appointments this day', { count: appointmentsCount })}
-            </span>
+          {appointmentsCountLabel !== null && (
+            <span className={styles.appointmentsCount}>{appointmentsCountLabel}</span>
           )}
         </div>
       </div>
