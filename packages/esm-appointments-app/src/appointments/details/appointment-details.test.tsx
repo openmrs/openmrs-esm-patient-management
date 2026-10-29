@@ -125,3 +125,19 @@ test('shows the birth date on the right day in timezones behind UTC', () => {
     process.env.TZ = originalTz;
   }
 });
+
+test.each([
+  { label: 'the year', birthDate: '2020', expected: '2020' },
+  { label: 'the month', birthDate: '2020-03', expected: 'Mar 2020' },
+])('shows an estimated birth date known to $label at that precision', ({ birthDate, expected }) => {
+  mockUsePatient.mockReturnValue({
+    error: null,
+    isLoading: false,
+    patientUuid: mockPatient.id,
+    patient: { birthDate },
+  });
+
+  render(<AppointmentDetails appointment={appointment} />);
+
+  expect(screen.getByText(expected)).toBeInTheDocument();
+});
