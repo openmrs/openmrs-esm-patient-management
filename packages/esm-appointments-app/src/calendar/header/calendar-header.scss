@@ -22,7 +22,9 @@
 .navGroup {
   display: flex;
   align-items: center;
-  gap: layout.$spacing-05;
+  flex-wrap: wrap;
+  row-gap: layout.$spacing-03;
+  column-gap: layout.$spacing-05;
 }
 
 .navButtonGroup {
