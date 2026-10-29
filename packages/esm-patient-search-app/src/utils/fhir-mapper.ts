@@ -1,6 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { SearchedPatient } from '../types';
 
+function getEstimatedBirthDate(birthdate: string, age: number) {
+  const dateParts = /^(\d{4})(?:-(\d{2}))?/.exec(birthdate);
+  if (!dateParts) {
+    return birthdate;
+  }
+
+  const [, year, month] = dateParts;
+  return age <= 5 && month ? `${year}-${month}` : year;
+}
+
 const getGender = (gender: string) => {
   switch (gender) {
     case 'M':
@@ -35,7 +45,9 @@ export function mapToFhirPatient(patient: SearchedPatient) {
           },
         ]
       : [],
-    birthDate: patient.person.birthdate,
+    birthDate: patient.person.birthdateEstimated
+      ? getEstimatedBirthDate(patient.person.birthdate, patient.person.age)
+      : patient.person.birthdate,
     deceasedBoolean: patient.person.dead,
     deceasedDateTime: patient.person.deathDate ?? undefined,
     gender: getGender(patient.person.gender),
