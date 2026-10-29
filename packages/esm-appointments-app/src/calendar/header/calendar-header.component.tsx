@@ -10,7 +10,9 @@ import styles from './calendar-header.scss';
 interface CalendarHeaderProps {
   viewMode: CalendarViewMode;
   calendarSelectedDate: Dayjs;
+  appointmentsCount: number;
   onViewModeChange: (mode: CalendarViewMode) => void;
+  onToday: () => void;
   onPrev: () => void;
   onNext: () => void;
 }
@@ -18,7 +20,9 @@ interface CalendarHeaderProps {
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   viewMode,
   calendarSelectedDate,
+  appointmentsCount,
   onViewModeChange,
+  onToday,
   onPrev,
   onNext,
 }) => {
@@ -45,6 +49,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     <div className={styles.calendarHeaderContainer}>
       <div className={styles.navigationSection}>
         <div className={styles.navGroup}>
+          <Button className={styles.todayButton} kind="tertiary" size="sm" onClick={onToday}>
+            {t('today', 'Today')}
+          </Button>
           <div className={styles.navButtonGroup}>
             <Button
               hasIconOnly
@@ -65,6 +72,11 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             />
           </div>
           <span className={styles.dateLabel}>{dateLabel}</span>
+          <span className={styles.appointmentsCount}>
+            {viewMode === 'monthly'
+              ? t('appointmentsThisMonthCount', '{{count}} appointments this month', { count: appointmentsCount })
+              : t('appointmentsThisDayCount', '{{count}} appointments this day', { count: appointmentsCount })}
+          </span>
         </div>
       </div>
       <div className={styles.switcherSection}>

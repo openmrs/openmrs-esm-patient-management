@@ -146,6 +146,71 @@ describe('Appointment calendar view', () => {
     expect(lastCall?.[1]).toBe('daily');
   });
 
+  it('resets the calendar to the current month when Today is clicked', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+    const today = dayjs();
+
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    await user.click(screen.getByRole('button', { name: /^today$/i }));
+
+    expect(latestRequestedDate().isSame(today, 'day')).toBe(true);
+  });
+
+  it('sums appointment counts across all events and days, and shows the monthly total', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: '2026-08-14',
+          services: [
+            { serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 3 },
+            { serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', count: 5 },
+          ],
+        },
+        {
+          appointmentDate: '2026-08-20',
+          services: [{ serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', count: 2 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+
+    renderCalendar();
+
+    expect(screen.getByText('10 appointments this month')).toBeInTheDocument();
+  });
+
+  it('shows a zero total when there are no appointments', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({ calendarEvents: [], isLoading: false, error: null });
+
+    renderCalendar();
+
+    expect(screen.getByText('0 appointments this month')).toBeInTheDocument();
+  });
+
+  it('switches the count wording to the daily total when the Daily tab is selected', async () => {
+    const user = userEvent.setup();
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: '2026-08-14',
+          services: [{ serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 4 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+
+    renderCalendar();
+
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+
+    expect(screen.getByText('4 appointments this day')).toBeInTheDocument();
+    expect(screen.queryByText(/appointments this month/i)).not.toBeInTheDocument();
+  });
+
   it('renders the services legend when services are present', () => {
     mockUseAppointmentsCalendar.mockReturnValue({
       calendarEvents: [
