@@ -49,7 +49,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     <div className={styles.calendarHeaderContainer}>
       <div className={styles.navigationSection}>
         <div className={styles.navGroup}>
-          <Button className={styles.todayButton} kind="tertiary" size="sm" onClick={onToday}>
+          <Button kind="tertiary" size="sm" onClick={onToday}>
             {t('today', 'Today')}
           </Button>
           <div className={styles.navButtonGroup}>
