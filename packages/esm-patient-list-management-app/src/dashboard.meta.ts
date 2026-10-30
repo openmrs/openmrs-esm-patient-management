@@ -3,4 +3,5 @@ export const dashboardMeta = {
   slot: 'patient-lists-dashboard-slot',
   title: 'patientLists',
   basePath: `${window.spaBase}/home`,
+  icon: 'omrs-icon-group',
 } as const;
