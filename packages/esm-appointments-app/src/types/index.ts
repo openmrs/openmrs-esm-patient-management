@@ -156,7 +156,7 @@ export enum DurationPeriod {
   daily,
 }
 
-export type CalendarViewMode = 'monthly' | 'daily';
+export type CalendarViewMode = 'monthly' | 'weekly' | 'daily';
 
 export interface Identifier {
   identifier: string;

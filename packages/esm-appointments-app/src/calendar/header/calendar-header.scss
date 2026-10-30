@@ -7,88 +7,154 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: layout.$spacing-03;
+  gap: layout.$spacing-04 layout.$spacing-05;
   padding: layout.$spacing-04 layout.$spacing-05;
-  background: colors.$gray-10;
-  border-bottom: 1px solid colors.$gray-20;
+  background: colors.$white;
+  border: 1px solid colors.$gray-20;
+  margin-bottom: 1px;
 }
 
 .navigationSection {
   display: flex;
   align-items: center;
-  gap: layout.$spacing-03;
+  gap: layout.$spacing-05;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
-.navGroup {
-  display: flex;
+.todayButton {
+  height: 2rem;
+  padding: 0 layout.$spacing-04;
+  background: colors.$white;
+  border: 1px solid var(--brand-03, #017d79);
+  color: var(--brand-03, #017d79);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0;
+  display: inline-flex;
   align-items: center;
-  gap: layout.$spacing-05;
+  justify-content: center;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background-color: var(--brand-01, #e8f5f4);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-03, #017d79);
+    outline-offset: 1px;
+  }
 }
 
 .navButtonGroup {
   display: flex;
   align-items: center;
-  border: 1px solid colors.$gray-30;
+  gap: 0;
+}
 
-  :global(.cds--btn--ghost.cds--btn--icon-only) {
-    border: none;
-    border-radius: 0;
+.navButton {
+  width: 2rem;
+  height: 2rem;
+  background: colors.$white;
+  border: 1px solid colors.$gray-20;
+  color: colors.$gray-100;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 0;
+  transition: background-color 0.15s ease;
 
-    &:hover {
-      background-color: colors.$gray-10;
-    }
+  &:hover {
+    background-color: colors.$gray-10;
+  }
 
-    &:focus:not(:focus-visible) {
-      box-shadow: none;
-      outline: none;
-    }
+  &:focus-visible {
+    outline: 2px solid var(--brand-03, #017d79);
+    outline-offset: 1px;
+    z-index: 1;
   }
 }
 
-.navDivider {
-  width: 0.5px;
-  height: 2rem;
-  background-color: colors.$gray-30;
+.navButtonNext {
+  border-left: none;
+}
+
+.titleCountGroup {
+  display: flex;
+  align-items: baseline;
+  gap: layout.$spacing-04;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .dateLabel {
-  @include type.type-style('heading-compact-02');
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
   color: colors.$gray-100;
   white-space: nowrap;
 }
 
+.appointmentCount {
+  font-size: 0.8125rem;
+  color: colors.$gray-60;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
 .switcherSection {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: layout.$spacing-04;
-  flex-wrap: wrap;
+  border: 1px solid var(--brand-03, #017d79);
+  border-radius: 0;
+  overflow: hidden;
+  flex: none;
+}
 
-  :global(.cds--content-switcher) {
-    --cds-layer-selected-inverse: var(--brand-03);
-    --cds-text-inverse: #{colors.$white};
-    --cds-border-interactive: var(--brand-03);
-    --cds-focus: var(--brand-03);
-    --cds-border-subtle-00: var(--brand-03);
-    border-color: var(--brand-03) !important;
+.segmentedButton {
+  height: 2rem;
+  padding: 0 layout.$spacing-05;
+  background: colors.$white;
+  color: var(--brand-03, #017d79);
+  border: none;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover:not(.segmentedButtonSelected) {
+    background-color: var(--brand-01, #e8f5f4);
   }
 
-  :global(.cds--content-switcher-btn) {
-    white-space: nowrap;
-    min-width: fit-content;
-    color: var(--brand-03);
-    border-color: var(--brand-03);
-    &:focus {
-      box-shadow: inset 0 0 0 2px var(--brand-03) !important;
-      outline: none !important;
-    }
+  &:focus-visible {
+    outline: 2px solid var(--brand-03, #017d79);
+    outline-offset: -2px;
+    z-index: 1;
   }
+}
 
-  :global(.cds--content-switcher-btn.cds--content-switcher--selected),
-  :global(.cds--content-switcher-btn.cds--content-switcher--selected:hover),
-  :global(.cds--content-switcher-btn.cds--content-switcher--selected:focus) {
-    background-color: var(--brand-03) !important;
-    border-color: var(--brand-03) !important;
-    color: colors.$white !important;
-    box-shadow: none !important;
-  }
+.segmentedButtonWithDivider {
+  border-left: 1px solid var(--brand-03, #017d79);
+}
+
+.segmentedButtonSelected {
+  background-color: var(--brand-03, #017d79);
+  color: colors.$white;
+  font-weight: 600;
 }
