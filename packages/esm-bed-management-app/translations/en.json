@@ -4,6 +4,7 @@
   "addBedTag": "Create bed tag",
   "addBedType": "Add bed type",
   "allocationStatus": "Allocated",
+  "backgroundFetchFailed": "Background fetch failed",
   "bedAllocation": "Bed allocation",
   "bedColumn": "Bed column",
   "bedCreated": "Bed created successfully",
