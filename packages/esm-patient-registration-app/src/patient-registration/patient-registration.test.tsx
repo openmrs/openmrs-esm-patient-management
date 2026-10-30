@@ -712,4 +712,50 @@ describe('Updating an existing patient record', () => {
       expect(nextManager).toEqual(new SavePatientTransactionManager());
     },
   );
+
+  it('hides sections and fields matched by skip logic and does not save their values', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      ...mockOpenmrsConfig,
+      sectionDefinitions: [
+        { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob', 'nickname'] },
+        { id: 'contact', name: 'Contact Info', fields: ['address'], hideIf: { fieldId: 'gender', value: 'male' } },
+      ],
+      fieldDefinitions: [
+        {
+          id: 'nickname',
+          type: 'person attribute',
+          uuid: 'nickname-uuid',
+          hideIf: { fieldId: 'gender', value: 'male' },
+        },
+      ] as RegistrationConfig['fieldDefinitions'],
+    });
+    const [initialFormValues, setInitialFormValues] = mockUseInitialFormValues(undefined, mockPatient.id);
+    mockUseInitialFormValues.mockReturnValue([
+      { ...initialFormValues, address: { cityVillage: 'Saved city' }, attributes: { 'nickname-uuid': 'Stale' } },
+      setInitialFormValues,
+    ]);
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    await screen.findByRole('heading', { name: /edit patient details/i });
+
+    expect(screen.getByRole('region', { name: /demographics section/i })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: /contact info section/i })).not.toBeInTheDocument();
+    expect(screen.getByText('Demographics', { selector: 'a' })).toBeInTheDocument();
+    expect(screen.queryByText('Contact Info', { selector: 'a' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /update patient/i }));
+
+    expect(mockSavePatientForm).toHaveBeenCalledOnce();
+    const savedValues: FormValues = mockSavePatientForm.mock.calls[0][1];
+    expect(savedValues.attributes).not.toHaveProperty('nickname-uuid');
+    expect(savedValues.address).toEqual({ cityVillage: 'Saved city' });
+  });
 });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { reportError, useConfig } from '@openmrs/esm-framework';
 import { builtInFields, type RegistrationConfig } from '../../config-schema';
+import { usePatientRegistrationContext } from '../patient-registration-context';
 import { AddressComponent } from './address/address-field.component';
 import { CauseOfDeathField } from './cause-of-death/cause-of-death.component';
 import { CustomField } from './custom-field.component';
@@ -17,6 +18,8 @@ export interface FieldProps {
 
 export function Field({ name }: FieldProps) {
   const config = useConfig<RegistrationConfig>();
+  const { hiddenElements } = usePatientRegistrationContext();
+
   if (
     !(builtInFields as ReadonlyArray<string>).includes(name) &&
     !config.fieldDefinitions.some((def) => def.id === name)
@@ -27,6 +30,10 @@ export function Field({ name }: FieldProps) {
         .concat(builtInFields)
         .join("', '")}'.`,
     );
+    return null;
+  }
+
+  if (hiddenElements?.fieldIds.has(name)) {
     return null;
   }
 

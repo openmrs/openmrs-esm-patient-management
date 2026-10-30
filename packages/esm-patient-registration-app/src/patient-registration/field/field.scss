@@ -56,6 +56,14 @@
   justify-content: flex-start;
 }
 
+.radioField > :global(.cds--content-switcher) {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  width: max-content;
+  justify-content: flex-start;
+}
+
 .photoExtension {
   margin-bottom: layout.$spacing-05;
   grid-row: 1;
@@ -90,7 +98,8 @@
   margin-left: layout.$spacing-02;
 }
 
-.dobContentSwitcherLabel {
+.dobContentSwitcherLabel,
+.radioContentSwitcherLabel {
   margin-bottom: layout.$spacing-03;
 }
 
@@ -174,4 +183,14 @@
   @include type.type-style('body-01');
   margin-bottom: layout.$spacing-05;
   white-space: pre-line;
+}
+
+.dangerLabel01 {
+  @include type.type-style('label-01');
+  color: colors.$red-60;
+}
+
+.radioFieldInvalid > :global(.cds--content-switcher) {
+  outline: 2px solid colors.$red-60;
+  outline-offset: -1px;
 }
