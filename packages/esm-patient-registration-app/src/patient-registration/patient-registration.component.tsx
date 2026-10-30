@@ -139,12 +139,19 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
     }
   };
 
+  const getAttributeLabel = (uuid: string) => {
+    const field = config.fieldDefinitions.find((definition) => definition.uuid === uuid);
+    return field?.label ?? field?.id ?? uuid;
+  };
+
   const getDescription = (errors: FormikErrors<FormValues>): React.JSX.Element => {
     return (
       <ul style={{ listStyle: 'inside' }}>
-        {Object.keys(errors).map((error, index) => {
-          return <li key={index}>{t(`${error}LabelText`, error)}</li>;
-        })}
+        {Object.keys(errors).flatMap((error) =>
+          error === 'attributes'
+            ? Object.keys(errors.attributes).map((uuid) => <li key={uuid}>{getAttributeLabel(uuid)}</li>)
+            : [<li key={error}>{t(`${error}LabelText`, error)}</li>],
+        )}
       </ul>
     );
   };
@@ -206,7 +213,24 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
               <Button
                 className={styles.submitButton}
                 type="submit"
-                onClick={() => props.validateForm().then((errors) => displayErrors(errors))}
+                onClick={() =>
+                  props.validateForm().then((errors) => {
+                    displayErrors(errors);
+                    // A required attribute's native validation blocks the submit, so Formik never touches it
+                    if (errors.attributes) {
+                      props.setTouched(
+                        {
+                          ...props.touched,
+                          attributes: {
+                            ...(props.touched.attributes as Record<string, boolean>),
+                            ...Object.fromEntries(Object.keys(errors.attributes).map((uuid) => [uuid, true])),
+                          },
+                        },
+                        false,
+                      );
+                    }
+                  })
+                }
                 // Current session and identifiers are required for patient registration.
                 // If currentSession or identifierTypes are not available, then the
                 // user should be blocked to register the patient.

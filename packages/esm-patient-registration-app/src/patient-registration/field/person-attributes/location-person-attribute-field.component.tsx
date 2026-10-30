@@ -115,7 +115,7 @@ export function LocationPersonAttributeField({
       }}>
       <Layer>
         <Field name={fieldName}>
-          {({ form: { touched, errors } }) => {
+          {({ meta }) => {
             return (
               <ComboBox
                 id={id}
@@ -129,7 +129,8 @@ export function LocationPersonAttributeField({
                 onChange={handleSelect}
                 selectedItem={selectedItem}
                 downshiftActions={downshiftActions}
-                invalid={errors[fieldName] && touched[fieldName]}
+                invalid={!!(meta.touched && meta.error)}
+                invalidText={meta.error}
                 typeahead
               />
             );

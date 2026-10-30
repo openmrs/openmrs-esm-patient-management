@@ -40,13 +40,12 @@ export function TextPersonAttributeField({
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Field name={fieldName} validate={validateInput}>
-        {({ field, form: { touched, errors }, meta }) => {
+        {({ field }) => {
           return (
             <Input
               id={id}
               name={`person-attribute-${personAttributeType.uuid}`}
               labelText={label ?? personAttributeType?.display}
-              invalid={errors[fieldName] && touched[fieldName]}
               {...field}
               required={required}
             />
