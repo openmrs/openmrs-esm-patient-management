@@ -34,9 +34,10 @@ const renderNodes = (reactNodes, values) => {
 
 const useMock = [(key) => key, {}];
 useMock.t = (key, defaultValue, options = {}) => {
-  let translatedString = defaultValue || key;
+  const pluralDefaultValue = options.count === 1 ? options.defaultValue_one : options.defaultValue_other;
+  let translatedString = pluralDefaultValue || defaultValue || key;
   Object.entries(options).forEach(([k, v]) => {
-    if (key !== 'interpolation') {
+    if (key !== 'interpolation' && !k.startsWith('defaultValue')) {
       translatedString = translatedString.replace(new RegExp(`{{${k}}}`, 'g'), v);
     }
   });

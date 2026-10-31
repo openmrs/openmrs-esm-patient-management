@@ -47,13 +47,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       return null;
     }
     if (viewMode === 'monthly') {
-      return appointmentsCount === 1
-        ? t('oneAppointmentThisMonth', '1 appointment this month')
-        : t('appointmentsThisMonthCount', '{{total}} appointments this month', { total: appointmentsCount });
+      return t('appointmentsThisMonthCount', '{{count}} appointments this month', {
+        count: appointmentsCount,
+        defaultValue_one: '{{count}} appointment this month',
+      });
     }
-    return appointmentsCount === 1
-      ? t('oneAppointmentThisDay', '1 appointment this day')
-      : t('appointmentsThisDayCount', '{{total}} appointments this day', { total: appointmentsCount });
+    return t('appointmentsThisDayCount', '{{count}} appointments this day', {
+      count: appointmentsCount,
+      defaultValue_one: '{{count}} appointment this day',
+    });
   }, [appointmentsCount, viewMode, t]);
 
   const viewModeIndex = viewMode === 'monthly' ? 0 : 1;
