@@ -18,7 +18,7 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
+  const { calendarEvents, isLoading, error } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
   const { serviceTypes } = useAppointmentServices();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
@@ -32,6 +32,10 @@ const AppointmentsCalendarView: React.FC = () => {
     else setCalendarSelectedDate((d) => d.add(1, 'day'));
   }, [viewMode]);
 
+  const handleToday = useCallback(() => {
+    setCalendarSelectedDate(dayjs());
+  }, []);
+
   const handleViewModeChange = useCallback((mode: CalendarViewMode) => {
     setViewMode(mode);
   }, []);
@@ -40,6 +44,14 @@ const AppointmentsCalendarView: React.FC = () => {
     setCalendarSelectedDate(dayjs(isoDate));
     setViewMode('daily');
   }, []);
+
+  const appointmentsCount = useMemo(() => {
+    if (isLoading || error) {
+      return null;
+    }
+    const services = calendarEvents?.flatMap((event) => event.services ?? []) ?? [];
+    return services.reduce((total, service) => total + (service.count ?? 0), 0);
+  }, [calendarEvents, isLoading, error]);
 
   const legendServices = useMemo(() => {
     const legendMap = new Map<string, { uuid: string; name: string }>();
@@ -57,24 +69,28 @@ const AppointmentsCalendarView: React.FC = () => {
   return (
     <div data-testid="appointments-calendar" className={styles.backgroundColor}>
       <AppointmentsHeader title={t('calendar', 'Calendar')} isCalendarView />
-      <CalendarHeader
-        viewMode={viewMode}
-        calendarSelectedDate={calendarSelectedDate}
-        onViewModeChange={handleViewModeChange}
-        onPrev={handlePrev}
-        onNext={handleNext}
-      />
-      {viewMode === 'monthly' && (
-        <MonthlyCalendarView
-          events={calendarEvents}
+      <div className={styles.calendarContent}>
+        <CalendarHeader
+          viewMode={viewMode}
           calendarSelectedDate={calendarSelectedDate}
-          onSelectDate={handleSelectDate}
-          serviceColorMap={serviceColorMap}
+          appointmentsCount={appointmentsCount}
+          onViewModeChange={handleViewModeChange}
+          onToday={handleToday}
+          onPrev={handlePrev}
+          onNext={handleNext}
         />
-      )}
-      {viewMode === 'daily' && (
-        <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />
-      )}
+        {viewMode === 'monthly' && (
+          <MonthlyCalendarView
+            events={calendarEvents}
+            calendarSelectedDate={calendarSelectedDate}
+            onSelectDate={handleSelectDate}
+            serviceColorMap={serviceColorMap}
+          />
+        )}
+        {viewMode === 'daily' && (
+          <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />
+        )}
+      </div>
       <ServicesLegend services={legendServices} serviceColorMap={serviceColorMap} />
     </div>
   );

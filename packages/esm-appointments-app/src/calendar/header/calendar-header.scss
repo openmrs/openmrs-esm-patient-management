@@ -9,7 +9,7 @@
   flex-wrap: wrap;
   gap: layout.$spacing-03;
   padding: layout.$spacing-04 layout.$spacing-05;
-  background: colors.$gray-10;
+  background: colors.$white;
   border-bottom: 1px solid colors.$gray-20;
 }
 
@@ -22,7 +22,9 @@
 .navGroup {
   display: flex;
   align-items: center;
-  gap: layout.$spacing-05;
+  flex-wrap: wrap;
+  row-gap: layout.$spacing-03;
+  column-gap: layout.$spacing-05;
 }
 
 .navButtonGroup {
@@ -54,6 +56,12 @@
 .dateLabel {
   @include type.type-style('heading-compact-02');
   color: colors.$gray-100;
+  white-space: nowrap;
+}
+
+.appointmentsCount {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
   white-space: nowrap;
 }
 
