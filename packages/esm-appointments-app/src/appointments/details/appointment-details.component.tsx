@@ -45,7 +45,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
           {patient && patient?.birthDate ? (
             <div className={styles.labelContainer}>
               <p className={styles.labelBold}>{t('dateOfBirth', 'Date of birth')}: </p>
-              <p className={styles.label}>{formatPartialDate(patient.birthDate, { time: false })}</p>
+              <p className={styles.label}>{formatPartialDate(patient.birthDate, { time: false, noToday: true })}</p>
             </div>
           ) : (
             ''

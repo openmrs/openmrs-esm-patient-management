@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, expect, test } from 'vitest';
+import { afterEach, vi, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { usePatient } from '@openmrs/esm-framework';
 import { mockPatient } from 'tools';
@@ -52,6 +52,8 @@ const appointment: Appointment = {
 };
 
 const mockUsePatient = vi.mocked(usePatient);
+
+afterEach(() => vi.useRealTimers());
 
 vi.mock('../../hooks/usePatientAppointmentHistory', () => ({
   usePatientAppointmentHistory: () => ({
@@ -130,6 +132,25 @@ test.each([
   { label: 'the year', birthDate: '2020', expected: '2020' },
   { label: 'the month', birthDate: '2020-03', expected: 'Mar 2020' },
 ])('shows an estimated birth date known to $label at that precision', ({ birthDate, expected }) => {
+  mockUsePatient.mockReturnValue({
+    error: null,
+    isLoading: false,
+    patientUuid: mockPatient.id,
+    patient: { birthDate },
+  });
+
+  render(<AppointmentDetails appointment={appointment} />);
+
+  expect(screen.getByText(expected)).toBeInTheDocument();
+});
+
+test.each([
+  { birthDate: '2026', expected: '2026' },
+  { birthDate: '2026-11', expected: 'Nov 2026' },
+  { birthDate: '2026-11-02', expected: '02-Nov-2026' },
+])('shows birthdate $birthDate without a relative date label', ({ birthDate, expected }) => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2026-11-02T12:00:00Z'));
   mockUsePatient.mockReturnValue({
     error: null,
     isLoading: false,
