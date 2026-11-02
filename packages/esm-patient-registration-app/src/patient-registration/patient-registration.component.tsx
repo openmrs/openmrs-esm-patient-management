@@ -141,7 +141,8 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
 
   const getAttributeLabel = (uuid: string) => {
     const field = config.fieldDefinitions.find((definition) => definition.uuid === uuid);
-    return field?.label ?? field?.id ?? uuid;
+    // A field definition's label defaults to ''
+    return field?.label || field?.id || uuid;
   };
 
   const getDescription = (errors: FormikErrors<FormValues>): React.JSX.Element => {

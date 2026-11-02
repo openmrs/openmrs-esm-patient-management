@@ -271,13 +271,17 @@ describe('Patient registration validation', () => {
     const clinicUuid = 'fe261119-2911-5b36-be40-8f9827826987';
     const consentUuid = 'e15bf9b7-249e-5d75-907d-937b8d9b0c46';
 
-    const validateWithAttributes = async (attributes: Record<string, unknown>, shownFields = ['clinic', 'consent']) => {
+    const validateWithAttributes = async (
+      attributes: Record<string, unknown>,
+      shownFields = ['clinic', 'consent'],
+      { sectionId = 'rhd', isDead = false } = {},
+    ) => {
       const config = (await getConfig('@openmrs/esm-patient-registration-app')) as unknown as RegistrationConfig;
       const validationSchema = getValidationSchema(
         {
           ...config,
-          sections: ['demographics', 'rhd'],
-          sectionDefinitions: [{ id: 'rhd', fields: shownFields }],
+          sections: ['demographics', sectionId],
+          sectionDefinitions: [{ id: sectionId, fields: shownFields }],
           fieldDefinitions: [
             {
               id: 'clinic',
@@ -292,7 +296,7 @@ describe('Patient registration validation', () => {
         (key: string, defaultValue: string) => defaultValue,
       );
       try {
-        await validationSchema.validate({ ...validFormValues, attributes }, { abortEarly: false });
+        await validationSchema.validate({ ...validFormValues, isDead, attributes }, { abortEarly: false });
       } catch (err) {
         return err;
       }
@@ -313,6 +317,12 @@ describe('Patient registration validation', () => {
 
     it('does not require a person attribute that is in no section shown', async () => {
       expect(await validateWithAttributes({}, ['consent'])).toBeFalsy();
+    });
+
+    it('requires a person attribute in the death section only for a patient marked dead', async () => {
+      expect(await validateWithAttributes({}, ['clinic'], { sectionId: 'death' })).toBeFalsy();
+      const validationError = await validateWithAttributes({}, ['clinic'], { sectionId: 'death', isDead: true });
+      expect(validationError.inner.map((e) => e.path)).toContain(`attributes.${clinicUuid}`);
     });
   });
 });

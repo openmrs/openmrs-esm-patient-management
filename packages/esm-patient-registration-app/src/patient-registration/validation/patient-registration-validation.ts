@@ -123,7 +123,9 @@ export function getValidationSchema(
         ),
       ),
     ),
-    attributes: Yup.object(getRequiredAttributeSchema(config, t)),
+    attributes: Yup.object().when('isDead', (isDead, schema) =>
+      schema.shape(getRequiredAttributeSchema(config, t, isDead)),
+    ),
     relationships: Yup.array().of(
       Yup.object().shape({
         relatedPersonUuid: Yup.string().required(),
@@ -135,15 +137,17 @@ export function getValidationSchema(
 
 /**
  * The person attributes marked `validation.required` in `fieldDefinitions` and shown in a section. Their fields also
- * carry the native `required` attribute, which blocks the submit without a message; this gives them one.
+ * carry the native `required` attribute, which blocks the submit without a message; this gives them one. The death
+ * section shows its fields only for a patient marked dead, so its attributes are required only then.
  */
 function getRequiredAttributeSchema(
   config: RegistrationConfig,
   t: (key: string, defaultValue: string) => string,
+  isDead: boolean,
 ): Record<string, Yup.AnySchema> {
   const shownFields = new Set(
     (config.sectionDefinitions ?? [])
-      .filter((section) => config.sections?.includes(section.id))
+      .filter((section) => config.sections?.includes(section.id) && (isDead || section.id !== 'death'))
       .flatMap((section) => section.fields),
   );
   return Object.fromEntries(
