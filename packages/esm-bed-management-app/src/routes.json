@@ -40,6 +40,10 @@
   ],
   "modals": [
     {
+      "name": "delete-bed-modal",
+      "component": "deleteBedModal"
+    },
+    {
       "name": "delete-bed-tag-modal",
       "component": "deleteBedTagModal"
     },
