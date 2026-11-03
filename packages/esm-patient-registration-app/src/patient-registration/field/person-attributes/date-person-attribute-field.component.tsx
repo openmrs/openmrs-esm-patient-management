@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer } from '@carbon/react';
 import { OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { requiredAttributeValidator } from './required-attribute';
 import styles from './../field.scss';
 
 export interface DatePersonAttributeFieldProps {
@@ -33,7 +34,7 @@ export function DatePersonAttributeField({
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Layer>
-        <Field name={fieldName}>
+        <Field name={fieldName} validate={requiredAttributeValidator(required, t('fieldRequired', 'Required'))}>
           {({ field, form: { setFieldValue, setFieldTouched }, meta }) => {
             return (
               <OpenmrsDatePicker

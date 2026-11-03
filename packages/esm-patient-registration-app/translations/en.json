@@ -89,6 +89,7 @@
   "optionalIdentifierLabel": "{{identifierName}} (optional)",
   "other": "Other",
   "patientNameKnown": "Patient's Name is Known?",
+  "phoneNumberInputLabelText": "Phone number",
   "preferredIdentifierLabel": "Preferred",
   "refreshOrContactAdmin": "Try refreshing the page or contact your system administrator",
   "registerPatient": "Register patient",

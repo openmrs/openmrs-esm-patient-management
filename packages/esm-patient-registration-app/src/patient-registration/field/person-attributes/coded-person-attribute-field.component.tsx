@@ -5,6 +5,7 @@ import { Field } from 'formik';
 import { Layer, Select, SelectItem } from '@carbon/react';
 import { reportError } from '@openmrs/esm-framework';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { requiredAttributeValidator } from './required-attribute';
 import { useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
 
@@ -93,7 +94,7 @@ export function CodedPersonAttributeField({
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
         <Layer>
-          <Field name={fieldName}>
+          <Field name={fieldName} validate={requiredAttributeValidator(required, t('fieldRequired', 'Required'))}>
             {({ field, meta }) => {
               return (
                 <>

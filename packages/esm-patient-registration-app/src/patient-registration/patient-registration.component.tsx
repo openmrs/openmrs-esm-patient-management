@@ -140,6 +140,10 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
   };
 
   const getAttributeLabel = (uuid: string) => {
+    // The built-in phone field is configured in fieldConfigurations, not fieldDefinitions
+    if (uuid === config.fieldConfigurations?.phone?.personAttributeUuid) {
+      return t('phoneNumberInputLabelText', 'Phone number');
+    }
     const field = config.fieldDefinitions.find((definition) => definition.uuid === uuid);
     // A field definition's label defaults to ''
     return field?.label || field?.id || uuid;

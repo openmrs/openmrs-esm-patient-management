@@ -4,6 +4,7 @@ import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../input/basic-input/input/input.component';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { requiredAttributeValidator } from './required-attribute';
 import styles from './../field.scss';
 
 export interface TextPersonAttributeFieldProps {
@@ -23,7 +24,13 @@ export function TextPersonAttributeField({
 }: TextPersonAttributeFieldProps) {
   const { t } = useTranslation();
 
+  const validateRequired = requiredAttributeValidator(required, t('fieldRequired', 'Required'));
+
   const validateInput = (value: string) => {
+    const requiredError = validateRequired(value);
+    if (requiredError) {
+      return requiredError;
+    }
     if (!value || !validationRegex || validationRegex === '' || typeof validationRegex !== 'string' || value === '') {
       return;
     }
@@ -40,12 +47,13 @@ export function TextPersonAttributeField({
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Field name={fieldName} validate={validateInput}>
-        {({ field }) => {
+        {({ field, form: { touched, errors }, meta }) => {
           return (
             <Input
               id={id}
               name={`person-attribute-${personAttributeType.uuid}`}
               labelText={label ?? personAttributeType?.display}
+              invalid={errors[fieldName] && touched[fieldName]}
               {...field}
               required={required}
             />
