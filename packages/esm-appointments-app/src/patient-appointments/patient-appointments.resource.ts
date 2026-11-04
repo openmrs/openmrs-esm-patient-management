@@ -33,21 +33,24 @@ export function usePatientAppointments(patientUuid: string, startDate: string, a
   const appointments = data?.data?.length ? data.data : null;
 
   const pastAppointments = appointments
-    ?.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
+    ?.slice()
+    .sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
     ?.filter(({ status }) => status !== 'Cancelled')
     ?.filter(({ startDateTime }) =>
       dayjs(new Date(startDateTime).toISOString()).isBefore(new Date().setHours(0, 0, 0, 0)),
     );
 
   const upcomingAppointments = appointments
-    ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
+    ?.slice()
+    .sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
     ?.filter(({ status }) => status !== 'Cancelled')
     // "Upcoming" means strictly future days. Comparing against the end of today (rather than `now`)
     // keeps appointments occurring later today out of this list, since they belong to `todaysAppointments`.
     ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isAfter(dayjs().endOf('day')));
 
   const todaysAppointments = appointments
-    ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
+    ?.slice()
+    .sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
     ?.filter(({ status }) => status !== 'Cancelled')
     ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isToday());
 
