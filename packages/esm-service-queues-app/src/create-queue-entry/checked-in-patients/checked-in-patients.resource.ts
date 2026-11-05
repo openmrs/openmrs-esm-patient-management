@@ -7,6 +7,16 @@ const genderMap = {
   U: 'unknown',
 } as const satisfies Record<string, fhir.Patient['gender']>;
 
+function getEstimatedBirthDate(birthdate: string, age: number) {
+  const dateParts = /^(\d{4})(?:-(\d{2}))?/.exec(birthdate);
+  if (!dateParts) {
+    return birthdate;
+  }
+
+  const [, year, month] = dateParts;
+  return age <= 5 && month ? `${year}-${month}` : year;
+}
+
 /**
  * Maps the REST `visit.patient` returned by `useActiveVisits` to the minimal `fhir.Patient` shape
  * consumed by the framework patient-banner components (`PatientBannerPatientInfo`,
@@ -28,7 +38,9 @@ export function mapActiveVisitPatientToFhir(patient: Visit['patient']): fhir.Pat
     ],
     // Pass an unmapped gender code through unchanged rather than dropping it.
     gender: genderMap[person?.gender] ?? person?.gender,
-    birthDate: person?.birthdate,
+    // Match the FHIR API, which returns an estimated birthdate as a partial date: year and month for
+    // patients aged 5 or under, otherwise the year only.
+    birthDate: person?.birthdateEstimated ? getEstimatedBirthDate(person.birthdate, person.age) : person?.birthdate,
     // FHIR deceased[x] is a choice type: emit exactly one of the two representations.
     ...(person?.deathDate ? { deceasedDateTime: person.deathDate } : { deceasedBoolean: person?.dead }),
     identifier: (patient?.identifiers ?? []).map((identifier) => ({

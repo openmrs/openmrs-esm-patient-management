@@ -16,7 +16,7 @@ export function useActiveVisits(locationUuid?: string) {
 
   const customRepresentation =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid,identifierType:(uuid,name)),' +
-    'person:(uuid,display,age,gender,birthdate,preferredName,dead,deathDate)),' +
+    'person:(uuid,display,age,gender,birthdate,birthdateEstimated,preferredName,dead,deathDate)),' +
     'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,' +
     'stopDatetime)' +
     '&fromStartDate=' +
