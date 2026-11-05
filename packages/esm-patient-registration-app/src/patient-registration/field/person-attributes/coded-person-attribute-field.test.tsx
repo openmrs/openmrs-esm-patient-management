@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { useConceptAnswers } from '../field.resource';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 import { initialFormValues } from '../../patient-registration.component';
@@ -33,6 +33,7 @@ const renderCodedPersonAttributeFieldWithFormik = (
     answerConceptSetUuid?: string | null;
     customConceptAnswers?: Array<{ uuid: string; label?: string }>;
     required?: boolean;
+    displayStyle?: 'dropdown' | 'radio';
   } = {},
   initialValues: Partial<FormValues> = {},
   options?: { enableReinitialize?: boolean },
@@ -49,7 +50,7 @@ const renderCodedPersonAttributeFieldWithFormik = (
       {({ setFieldValue, values, setFieldTouched }) => {
         formValuesRef = { ...initialFormValues, ...values } as FormValues;
         return (
-          <Form>
+          <Form aria-label="attribute-form">
             <CodedPersonAttributeField
               id="attributeId"
               personAttributeType={personAttributeType}
@@ -57,7 +58,9 @@ const renderCodedPersonAttributeFieldWithFormik = (
               label={personAttributeType.display}
               customConceptAnswers={props.customConceptAnswers ?? []}
               required={props.required ?? false}
+              displayStyle={props.displayStyle}
             />
+            <button type="submit">Submit</button>
           </Form>
         );
       }}
@@ -200,6 +203,43 @@ describe('CodedPersonAttributeField', () => {
 
       // Component returns null while loading, so select should not be in document
       expect(screen.queryByRole('combobox', { name: /Referred by/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Radio display style and validation', () => {
+    it('renders ContentSwitcher with options when displayStyle is radio', () => {
+      renderCodedPersonAttributeFieldWithFormik({ displayStyle: 'radio' });
+
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'Option 1' })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'Option 2' })).toBeInTheDocument();
+    });
+
+    it('updates form values when a radio option is clicked', async () => {
+      const user = userEvent.setup();
+      const { getFormValues } = renderCodedPersonAttributeFieldWithFormik({ displayStyle: 'radio' });
+
+      await user.click(screen.getByRole('tab', { name: 'Option 2' }));
+      expect(getFormValues().attributes[personAttributeType.uuid]).toBe('2');
+    });
+
+    it('shows validation error when required and submitted without selection', async () => {
+      const user = userEvent.setup();
+      renderCodedPersonAttributeFieldWithFormik({ displayStyle: 'radio', required: true });
+
+      expect(screen.queryByText(/This field is required/i)).not.toBeInTheDocument();
+
+      fireEvent.submit(screen.getByRole('form', { name: 'attribute-form' }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/This field is required/i)).toBeInTheDocument();
+      });
+
+      // Error clears after selection
+      await user.click(screen.getByRole('tab', { name: 'Option 1' }));
+      await waitFor(() => {
+        expect(screen.queryByText(/This field is required/i)).not.toBeInTheDocument();
+      });
     });
   });
 });
