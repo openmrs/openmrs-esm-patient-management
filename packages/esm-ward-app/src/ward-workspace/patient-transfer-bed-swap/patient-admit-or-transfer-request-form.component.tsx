@@ -16,9 +16,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useAppContext } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, showSnackbar, useAppContext, useConfig } from '@openmrs/esm-framework';
 import { useCreateEncounter } from '../../ward.resource';
 import type { ObsPayload, WardPatient, WardViewContext } from '../../types';
+import type { WardConfigObject } from '../../config-schema';
 import LocationSelector from '../../location-selector/location-selector.component';
 import WardPatientName from '../../ward-patient-card/row-elements/ward-patient-name.component';
 import WardPatientIdentifier from '../../ward-patient-card/row-elements/ward-patient-identifier.component';
@@ -57,6 +58,7 @@ export default function PatientAdmitOrTransferForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createEncounter, emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } =
     useCreateEncounter();
+  const { restrictTransferLocationsToVisitLocation } = useConfig<WardConfigObject>();
 
   const dispositionType = wardPatient.inpatientRequest?.dispositionType ?? 'TRANSFER';
   const isTransfer = dispositionType === 'TRANSFER';
@@ -295,7 +297,7 @@ export default function PatientAdmitOrTransferForm({
                 field={field}
                 invalid={!!error?.message}
                 invalidText={error?.message}
-                ancestorLocation={visit?.location}
+                ancestorLocation={restrictTransferLocationsToVisitLocation ? visit?.location : undefined}
                 excludeLocations={currentAdmission ? [currentAdmission.currentInpatientLocation] : []}
               />
             )}
