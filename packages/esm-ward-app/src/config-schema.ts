@@ -263,6 +263,12 @@ export const configSchema = {
     _description:
       'List of uuids of concepts that represent notes to display in the notes view in addition to the consultFreeTextCommentsConcept defined by EMR-API',
   },
+  restrictTransferLocationsToVisitLocation: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      "Whether the location selector of the transfer and 'Admit elsewhere' forms only offers locations within the patient's visit location (that is, locations below it in the location hierarchy). Set to false to offer every location tagged with the EMR API 'supportsTransferLocationTag', for implementations where each service is its own visit location and the wards sit under a separate parent location.",
+  },
 };
 
 export interface WardConfigObject {
@@ -277,6 +283,7 @@ export interface WardConfigObject {
   wards: Array<WardDefinition>;
   hideWorkspaceVitalsLinks: boolean;
   additionalInpatientNotesConceptUuids: Array<string>;
+  restrictTransferLocationsToVisitLocation: boolean;
 }
 
 export interface PendingItemsElementConfig {
