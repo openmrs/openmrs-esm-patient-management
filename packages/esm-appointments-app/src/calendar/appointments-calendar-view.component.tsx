@@ -24,13 +24,19 @@ const AppointmentsCalendarView: React.FC = () => {
 
   const handlePrev = useCallback(() => {
     if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.subtract(1, 'month'));
+    else if (viewMode === 'weekly') setCalendarSelectedDate((d) => d.subtract(1, 'week'));
     else setCalendarSelectedDate((d) => d.subtract(1, 'day'));
   }, [viewMode]);
 
   const handleNext = useCallback(() => {
     if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.add(1, 'month'));
+    else if (viewMode === 'weekly') setCalendarSelectedDate((d) => d.add(1, 'week'));
     else setCalendarSelectedDate((d) => d.add(1, 'day'));
   }, [viewMode]);
+
+  const handleToday = useCallback(() => {
+    setCalendarSelectedDate(dayjs());
+  }, []);
 
   const handleViewModeChange = useCallback((mode: CalendarViewMode) => {
     setViewMode(mode);
@@ -40,6 +46,15 @@ const AppointmentsCalendarView: React.FC = () => {
     setCalendarSelectedDate(dayjs(isoDate));
     setViewMode('daily');
   }, []);
+
+  const appointmentCount = useMemo(() => {
+    return (
+      calendarEvents?.reduce((total, event) => {
+        const dayTotal = event.services?.reduce((sum, s) => sum + (s.count || 0), 0) ?? 0;
+        return total + dayTotal;
+      }, 0) ?? 0
+    );
+  }, [calendarEvents]);
 
   const legendServices = useMemo(() => {
     const legendMap = new Map<string, { uuid: string; name: string }>();
@@ -60,9 +75,11 @@ const AppointmentsCalendarView: React.FC = () => {
       <CalendarHeader
         viewMode={viewMode}
         calendarSelectedDate={calendarSelectedDate}
+        appointmentCount={appointmentCount}
         onViewModeChange={handleViewModeChange}
         onPrev={handlePrev}
         onNext={handleNext}
+        onToday={handleToday}
       />
       {viewMode === 'monthly' && (
         <MonthlyCalendarView
