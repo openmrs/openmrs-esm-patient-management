@@ -84,7 +84,7 @@
     white-space: nowrap;
     min-width: fit-content;
     color: var(--brand-03);
-    border-color: var(--brand-03);
+    border-color: var(--brand-03) !important;
     &:focus {
       box-shadow: inset 0 0 0 2px var(--brand-03) !important;
       outline: none !important;
