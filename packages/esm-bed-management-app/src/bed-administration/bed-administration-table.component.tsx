@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -23,6 +23,7 @@ import {
   isDesktop as desktopLayout,
   launchWorkspace2,
   showModal,
+  showSnackbar,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
@@ -48,6 +49,7 @@ const BedAdministrationTable: React.FC = () => {
     errorFetchingBedsGroupedByLocation,
   } = useBedsGroupedByLocation();
   const [filterOption, setFilterOption] = useState('ALL');
+  const hasShownBackgroundFetchWarning = useRef(false);
 
   function CustomTag({ condition }: { condition: boolean }) {
     const { t } = useTranslation();
@@ -96,13 +98,35 @@ const BedAdministrationTable: React.FC = () => {
     [mutateBedsGroupedByLocation],
   );
 
-  const filteredData = useMemo(() => {
-    const flattenedData = Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : [];
-    return filterOption === 'ALL' ? flattenedData : flattenedData.filter((bed) => bed.status === filterOption);
-  }, [bedsGroupedByLocation, filterOption]);
+  const flattened = useMemo(
+    () => (Array.isArray(bedsGroupedByLocation) ? bedsGroupedByLocation.flat() : []),
+    [bedsGroupedByLocation],
+  );
+  const hasLoadedRows = flattened.length > 0;
+
+  const filteredData = useMemo(
+    () => (filterOption === 'ALL' ? flattened : flattened.filter((bed) => bed.status === filterOption)),
+    [flattened, filterOption],
+  );
 
   const [pageSize, setPageSize] = useState(10);
   const { results: paginatedData, currentPage, goTo } = usePagination(filteredData, pageSize);
+
+  useEffect(() => {
+    if (errorFetchingBedsGroupedByLocation && hasLoadedRows) {
+      if (!hasShownBackgroundFetchWarning.current) {
+        showSnackbar({
+          kind: 'warning',
+          isLowContrast: true,
+          title: t('backgroundFetchFailed', 'Background fetch failed'),
+        });
+        hasShownBackgroundFetchWarning.current = true;
+      }
+      return;
+    }
+
+    hasShownBackgroundFetchWarning.current = false;
+  }, [errorFetchingBedsGroupedByLocation, hasLoadedRows, t]);
 
   const tableHeaders = [
     {
@@ -175,7 +199,7 @@ const BedAdministrationTable: React.FC = () => {
     );
   }
 
-  if (errorFetchingBedsGroupedByLocation) {
+  if (errorFetchingBedsGroupedByLocation && !hasLoadedRows) {
     return (
       <>
         <Header title={t('bedAllocation', 'Bed allocation')} />
