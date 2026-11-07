@@ -103,7 +103,7 @@ export interface Resource {
   };
 }
 
-export interface Identifer {
+export interface Identifier {
   identifier: string;
   display?: string;
   uuid: string;
@@ -112,6 +112,8 @@ export interface Identifer {
     display: string;
   };
 }
+
+export type Identifer = Identifier;
 
 export interface NewVisitPayload {
   uuid?: string;
