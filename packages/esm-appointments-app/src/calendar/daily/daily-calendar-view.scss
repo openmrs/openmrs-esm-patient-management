@@ -1,158 +1,517 @@
-@use '@carbon/colors';
-@use '@carbon/layout';
-@use '@carbon/type';
+@use '@carbon/styles/scss/type' as *;
+@use '@carbon/styles/scss/spacing' as *;
+@use '@carbon/styles/scss/theme' as *;
 
 .container {
-  margin: layout.$spacing-05;
-  border: 1px solid colors.$gray-20;
-  background: colors.$white;
-  overflow-x: auto;
+  padding: $spacing-05;
+  background-color: $layer-01;
+  min-height: 100vh;
 }
 
 .heading {
-  display: flex;
-  align-items: baseline;
-  gap: layout.$spacing-03;
-  padding: layout.$spacing-03 layout.$spacing-05;
-  border-bottom: 1px solid colors.$gray-20;
-  background: colors.$gray-10;
+  margin-bottom: $spacing-05;
 }
 
 .subtitle {
-  @include type.type-style('label-01');
-  color: colors.$gray-60;
-  margin: 0;
+  @include type-style('body-short-01');
+  color: $text-secondary;
+}
+
+.hourRow {
+  display: flex;
+  align-items: flex-start;
+  min-height: 4rem;
+  border-top: 1px solid $border-subtle-01;
+
+  &:last-child {
+    border-bottom: 1px solid $border-subtle-01;
+  }
+}
+
+.emptyHourRow {
+  background-color: $layer-02;
+  opacity: 0.6;
+}
+
+.hourLabel {
+  width: 5.5rem;
+  padding: $spacing-04 $spacing-03;
+  @include type-style('label-01');
+  color: $text-secondary;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.hourSlot {
+  flex: 1;
+  padding: $spacing-03;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-03;
 }
 
 .collapsedRangeRow {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: layout.$spacing-03 layout.$spacing-05;
-  border-bottom: 1px solid colors.$gray-20;
-  background: colors.$gray-10;
+  align-items: center;
+  padding: $spacing-03 $spacing-05;
+  background-color: #f4f4f4;
+  border-top: 1px solid $border-subtle-01;
+  border-bottom: 1px solid $border-subtle-01;
+  margin: $spacing-02 0;
 }
 
 .collapsedRangeLeft {
   display: flex;
   align-items: center;
-  gap: layout.$spacing-04;
+  gap: $spacing-04;
 }
 
 .collapsedRangeLabel {
-  @include type.type-style('label-01');
-  font-weight: 600;
-  color: colors.$gray-80;
+  @include type-style('heading-compact-01');
+  color: $text-primary;
 }
 
 .noApptsBadge {
-  @include type.type-style('label-01');
-  background: colors.$gray-30;
-  color: colors.$gray-80;
-  padding: 2px layout.$spacing-03;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  background-color: #e0e0e0;
+  color: $text-secondary;
+  padding: 0.125rem $spacing-03;
+  border-radius: 0.75rem;
+  @include type-style('label-01');
 }
 
 .expandToggleBtn {
   background: none;
   border: none;
-  color: colors.$blue-60;
+  color: #0f62fe;
   cursor: pointer;
-  @include type.type-style('label-01');
-  display: inline-flex;
+  @include type-style('body-compact-01');
+  display: flex;
   align-items: center;
-  gap: layout.$spacing-02;
-  padding: 0;
+  gap: $spacing-02;
 
   &:hover {
-    color: colors.$blue-70;
     text-decoration: underline;
   }
 }
 
-.hourRow {
-  display: flex;
-  border-bottom: 1px solid colors.$gray-20;
-  min-height: 4rem;
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.emptyHourRow {
-  background: colors.$gray-10;
-}
-
-.hourLabel {
-  @include type.type-style('label-01');
-  color: colors.$gray-60;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  min-width: 5rem;
-  padding: layout.$spacing-03 layout.$spacing-03 0 layout.$spacing-03;
-  text-align: right;
-  border-right: 1px solid colors.$gray-20;
-  background: colors.$white;
-  flex-shrink: 0;
-}
-
-.hourSlot {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: layout.$spacing-03;
-  padding: layout.$spacing-02 layout.$spacing-03;
-  background: colors.$white;
-}
-
 .card {
+  border-left: 4px solid;
+  border-radius: 2px;
+  padding: $spacing-03 $spacing-04;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  padding: layout.$spacing-03 layout.$spacing-04;
-  border-left: 4px solid;
-  border-radius: 0 4px 4px 0;
-  flex: 1;
-  min-width: 220px;
-  transition: box-shadow 0.15s ease-in-out;
+  gap: $spacing-02;
 
   &:hover {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    filter: brightness(0.96);
   }
 }
 
 .cardHeader {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: layout.$spacing-03;
+  align-items: center;
 }
 
 .cardPatientName {
-  @include type.type-style('heading-compact-01');
-  font-weight: 600;
-  color: colors.$gray-100;
+  @include type-style('heading-compact-01');
+  color: $text-primary;
 }
 
 .cardMeta {
-  @include type.type-style('label-01');
-  color: colors.$gray-70;
   display: flex;
   align-items: center;
-  gap: layout.$spacing-02;
-  flex-wrap: wrap;
+  gap: $spacing-03;
+  @include type-style('body-short-01');
+  color: $text-secondary;
+}
+
+.cardTime {
+  font-weight: 600;
 }
 
 .cardService {
+  font-weight: 600;
+}
+
+.cardProvider {
+  color: $text-secondary;
+}
+
+.highDensityCard {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #0f62fe;
+  border-radius: 4px;
+  padding: $spacing-04 $spacing-05;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-04;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.highDensityHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.highDensityCountTitle {
+  @include type-style('heading-02');
+  font-weight: 700;
+  color: #161616;
+}
+
+.highDensitySubtitle {
+  @include type-style('body-short-01');
+  color: #525252;
+}
+
+.serviceChipsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-02;
+}
+
+.filterToServiceLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #6f6f6f;
+  text-transform: uppercase;
+}
+
+.serviceChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-03;
+}
+
+.serviceChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: #f4f4f4;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.25rem 0.625rem;
+}
+
+.chipColorSwatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.chipText {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #161616;
+}
+
+.openTableBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: none;
+  border: none;
+  color: #0f62fe;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.tableHeaderSection {
+  display: flex;
+  align-items: center;
+  gap: $spacing-05;
+  margin-bottom: $spacing-05;
+  padding-bottom: $spacing-04;
+  border-bottom: 1px solid $border-subtle-01;
+}
+
+.backButton {
+  padding-left: 0;
+  color: #0f62fe;
+}
+
+.tableHeaderTitles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.tableTitle {
+  @include type-style('heading-03');
+  margin: 0;
+  color: #161616;
+}
+
+.tableSubtitle {
+  @include type-style('body-short-01');
+  color: #525252;
+}
+
+.interactiveTable {
+  width: 100%;
+}
+
+.clickableRow {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #f4f4f4 !important;
+  }
+}
+
+.tableServiceCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.serviceColorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.drawerOverlay {
+  position: fixed;
+  top: 3rem;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 9000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawerPanel {
+  width: 28rem;
+  max-width: 90vw;
+  height: 100%;
+  background-color: #ffffff;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 0.2s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.drawerTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #161616;
+}
+
+.drawerCloseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  color: #161616;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
+}
+
+.drawerBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.mockPatientCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.avatarTile {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-color: #589694;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+.mockPatientInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.patientNameLine {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mockPatientName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #161616;
+}
+
+.mockPatientGender {
+  font-size: 0.875rem;
+  color: #525252;
+}
+
+.mockDemographics {
+  font-size: 0.8125rem;
+  color: #525252;
+}
+
+.identifierPill {
+  margin-top: 0.25rem;
+  align-self: flex-start;
+  background-color: #e8e8e8;
+  padding: 0.125rem 0.625rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  color: #525252;
+
+  strong {
+    color: #161616;
+  }
+}
+
+.dateTimeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sectionMetaLabel {
+  font-size: 0.75rem;
+  color: #525252;
+}
+
+.dateTimeValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #161616;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem 1rem;
+}
+
+.gridField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.gridLabel {
+  font-size: 0.75rem;
+  color: #525252;
+}
+
+.gridValue {
+  font-size: 0.9375rem;
+  color: #161616;
   font-weight: 500;
 }
 
-.emptyStateMessage {
-  padding: layout.$spacing-06;
-  text-align: center;
-  color: colors.$gray-60;
+.singleFieldSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.noteSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.noteCallout {
+  background-color: #f4f4f4;
+  border-left: 3px solid #525252;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #161616;
+}
+
+.drawerFooter {
+  display: flex;
+  height: 3.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.modalCloseBtn {
+  flex: 1;
+  background-color: #393939;
+  color: #ffffff;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #4c4c4c;
+  }
+}
+
+.modalEditBtn {
+  flex: 1;
+  background-color: #005d5d;
+  color: #ffffff;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #004144;
+  }
 }
