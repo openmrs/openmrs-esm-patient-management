@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import {
-  Controller,
-  useController,
-  useForm,
-  type Control,
-  type FieldErrors,
-} from 'react-hook-form';
+import { Controller, useController, useForm, type Control, type FieldErrors } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -113,20 +107,32 @@ export const appointmentsFormSchema = z
     dateAppointmentScheduled: z.date().optional(),
   })
   .refine(
-    (vals) => !vals.formIsRecurringAppointment || z.date().safeParse(vals.appointmentDateTime.recurringPatternEndDate).success,
+    (vals) =>
+      !vals.formIsRecurringAppointment || z.date().safeParse(vals.appointmentDateTime.recurringPatternEndDate).success,
     {
       path: ['appointmentDateTime.recurringPatternEndDate'],
-      message: translateFrom(moduleName, 'recurringAppointmentShouldHaveEndDate', 'A recurring appointment should have an end date'),
+      message: translateFrom(
+        moduleName,
+        'recurringAppointmentShouldHaveEndDate',
+        'A recurring appointment should have an end date',
+      ),
     },
   )
   .refine(
     ({ appointmentDateTime, dateAppointmentScheduled }) => {
       if (!appointmentDateTime?.startDate || !dateAppointmentScheduled) return true;
-      return new Date(dateAppointmentScheduled).setHours(0, 0, 0, 0) <= new Date(appointmentDateTime.startDate).setHours(0, 0, 0, 0);
+      return (
+        new Date(dateAppointmentScheduled).setHours(0, 0, 0, 0) <=
+        new Date(appointmentDateTime.startDate).setHours(0, 0, 0, 0)
+      );
     },
     {
       path: ['dateAppointmentScheduled'],
-      message: translateFrom(moduleName, 'dateAppointmentIssuedCannotBeAfterAppointmentDate', 'Date appointment issued cannot be after the appointment date'),
+      message: translateFrom(
+        moduleName,
+        'dateAppointmentIssuedCannotBeAfterAppointmentDate',
+        'Date appointment issued cannot be after the appointment date',
+      ),
     },
   )
   .superRefine((data, ctx) => {
@@ -149,10 +155,12 @@ export const appointmentsFormSchema = z
 export type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
 const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps>> = ({
-  workspaceProps: { appointment, recurringPattern, patientUuid },
+  workspaceProps,
   closeWorkspace,
 }) => {
-  const { patient } = usePatient(patientUuid);
+  const { appointment, recurringPattern, patientUuid } =
+    (workspaceProps as AppointmentsFormProps) || ({} as AppointmentsFormProps);
+  const { patient } = usePatient(patientUuid ?? '');
   const { mutateAppointments } = useMutateAppointments();
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -187,7 +195,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     resolver: zodResolver(appointmentsFormSchema),
     defaultValues: {
       location: appointment?.location?.uuid ?? session?.sessionLocation?.uuid ?? '',
-      provider: appointment?.providers?.find((p) => p.response === 'ACCEPTED')?.uuid ?? session?.currentProvider?.uuid ?? '',
+      provider:
+        appointment?.providers?.find((p: { response?: string; uuid?: string }) => p.response === 'ACCEPTED')?.uuid ??
+        session?.currentProvider?.uuid ??
+        '',
       appointmentNote: appointment?.comments || '',
       appointmentStatus: appointment?.status || '',
       appointmentType: appointment?.appointmentKind || (appointmentTypes?.length === 1 ? appointmentTypes[0] : ''),
@@ -196,7 +207,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       recurringPatternPeriod: recurringPattern?.period || 1,
       recurringPatternDaysOfWeek: recurringPattern?.daysOfWeek || [],
       startTime: dayjs(appointment?.startDateTime ? new Date(appointment.startDateTime) : new Date()).format('hh:mm'),
-      duration: appointment?.startDateTime && appointment?.endDateTime ? dayjs(appointment.endDateTime).diff(dayjs(appointment.startDateTime), 'minutes') : undefined,
+      duration:
+        appointment?.startDateTime && appointment?.endDateTime
+          ? dayjs(appointment.endDateTime).diff(dayjs(appointment.startDateTime), 'minutes')
+          : undefined,
       timeFormat: new Date(appointment?.startDateTime || new Date()).getHours() >= 12 ? 'PM' : 'AM',
       appointmentDateTime: {
         startDate: defaultStartDate,
@@ -205,15 +219,21 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
         recurringPatternEndDateText: defaultEndDate ? dayjs(defaultEndDate).format(dateFormat) : '',
       },
       formIsRecurringAppointment: isRecurringAppointment,
-      dateAppointmentScheduled: appointment?.dateAppointmentScheduled ? new Date(appointment.dateAppointmentScheduled) : new Date(),
+      dateAppointmentScheduled: appointment?.dateAppointmentScheduled
+        ? new Date(appointment.dateAppointmentScheduled)
+        : new Date(),
       isAllDayAppointment: allowAllDayAppointments,
     },
   });
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment, setValue]);
 
-  const { field: { ref: startDateRef } } = useController({ name: 'appointmentDateTime.startDate', control });
-  const { field: { ref: endDateRef } } = useController({ name: 'appointmentDateTime.recurringPatternEndDate', control });
+  const {
+    field: { ref: startDateRef },
+  } = useController({ name: 'appointmentDateTime.startDate', control });
+  const {
+    field: { ref: endDateRef },
+  } = useController({ name: 'appointmentDateTime.recurringPatternEndDate', control });
 
   useEffect(() => {
     startDateRef(document.getElementById('startDatePickerInput'));
@@ -225,7 +245,7 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     const appointmentPayload: AppointmentPayload = {
       appointmentKind: data.appointmentType,
       status: data.appointmentStatus,
-      serviceUuid: serviceTypes?.find((s) => s.name === data.selectedService)?.uuid,
+      serviceUuid: serviceTypes?.find((s) => s.name === data.selectedService)?.uuid ?? '',
       startDateTime: dayjs(
         data.appointmentDateTime.startDate.setHours(
           (parseInt(data.startTime.split(':')[0], 10) % 12) + (data.timeFormat === 'PM' ? 12 : 0),
@@ -235,13 +255,15 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       endDateTime: dayjs(
         data.isAllDayAppointment
           ? dayjs(data.appointmentDateTime.startDate).endOf('day').toDate()
-          : dayjs(data.appointmentDateTime.startDate).add(data.duration || 0, 'minutes').toDate(),
+          : dayjs(data.appointmentDateTime.startDate)
+              .add(data.duration || 0, 'minutes')
+              .toDate(),
       ).format(),
       locationUuid: data.location,
       providers: [{ uuid: data.provider }],
       patientUuid,
       comments: data.appointmentNote,
-      uuid: isEditing ? appointment.uuid : undefined,
+      uuid: isEditing ? appointment?.uuid : undefined,
       dateAppointmentScheduled: dayjs(data.dateAppointmentScheduled).format(),
     };
 
@@ -249,8 +271,8 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     let errorMsg = conflictRes.data?.hasOwnProperty('SERVICE_UNAVAILABLE')
       ? t('serviceUnavailable', 'Appointment time is outside of service hours')
       : conflictRes.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')
-      ? t('patientDoubleBooking', 'Patient already booked for an appointment at this time')
-      : null;
+        ? t('patientDoubleBooking', 'Patient already booked for an appointment at this time')
+        : null;
 
     if (conflictRes.status === 200 && errorMsg) {
       setIsSubmitting(false);
@@ -266,7 +288,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             recurringPattern: {
               type: data.recurringPatternType,
               period: data.recurringPatternPeriod,
-              endDate: data.appointmentDateTime.recurringPatternEndDate ? dayjs(data.appointmentDateTime.recurringPatternEndDate.setHours(23, 59)).format() : null,
+              endDate: data.appointmentDateTime.recurringPatternEndDate
+                ? dayjs(data.appointmentDateTime.recurringPatternEndDate).format()
+                : '',
               daysOfWeek: data.recurringPatternDaysOfWeek,
             },
           },
@@ -285,11 +309,15 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             isLowContrast: true,
             kind: 'success',
             subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
-            title: isEditing ? t('appointmentEdited', 'Appointment edited') : t('appointmentScheduled', 'Appointment scheduled'),
+            title: isEditing
+              ? t('appointmentEdited', 'Appointment edited')
+              : t('appointmentScheduled', 'Appointment scheduled'),
           });
         } else if (status === 204) {
           showSnackbar({
-            title: isEditing ? t('appointmentEditError', 'Error editing appointment') : t('appointmentFormError', 'Error scheduling appointment'),
+            title: isEditing
+              ? t('appointmentEditError', 'Error editing appointment')
+              : t('appointmentFormError', 'Error scheduling appointment'),
             kind: 'error',
             isLowContrast: false,
             subtitle: t('noContent', 'No Content'),
@@ -299,7 +327,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       .catch((err: Error) => {
         setIsSubmitting(false);
         showSnackbar({
-          title: isEditing ? t('appointmentEditError', 'Error editing appointment') : t('appointmentFormError', 'Error scheduling appointment'),
+          title: isEditing
+            ? t('appointmentEditError', 'Error editing appointment')
+            : t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
           isLowContrast: false,
           subtitle: err?.message,
@@ -307,7 +337,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
       });
   };
 
-  const title = isEditing ? t('editAppointment', 'Edit appointment') : t('createNewAppointment', 'Create new appointment');
+  const title = isEditing
+    ? t('editAppointment', 'Edit appointment')
+    : t('createNewAppointment', 'Create new appointment');
 
   if (isLoading) {
     return (
@@ -325,62 +357,78 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
     typeof apptPatient?.name === 'string' && apptPatient.name
       ? apptPatient.name
       : typeof rawNameEntry === 'string' && rawNameEntry
-      ? rawNameEntry
-      : typeof pRaw?.display === 'string' && pRaw.display
-      ? pRaw.display
-      : Array.isArray(rawNameEntry) && rawNameEntry[0]
-      ? typeof rawNameEntry[0] === 'string'
-        ? rawNameEntry[0]
-        : [rawNameEntry[0]?.given?.join(' '), rawNameEntry[0]?.family].filter(Boolean).join(' ') || rawNameEntry[0]?.text || ''
-      : [pRaw?.person?.names?.[0]?.givenName, pRaw?.person?.names?.[0]?.familyName].filter(Boolean).join(' ') ||
-        '';
+        ? rawNameEntry
+        : typeof pRaw?.display === 'string' && pRaw.display
+          ? pRaw.display
+          : Array.isArray(rawNameEntry) && rawNameEntry[0]
+            ? typeof rawNameEntry[0] === 'string'
+              ? rawNameEntry[0]
+              : [rawNameEntry[0]?.given?.join(' '), rawNameEntry[0]?.family].filter(Boolean).join(' ') ||
+                rawNameEntry[0]?.text ||
+                ''
+            : [pRaw?.person?.names?.[0]?.givenName, pRaw?.person?.names?.[0]?.familyName].filter(Boolean).join(' ') ||
+              '';
 
   const pParts = pName.trim() ? pName.trim().split(/\s+/) : [];
   const pInitials =
     pParts.length >= 2
       ? `${pParts[0][0]}${pParts[1][0]}`.toUpperCase()
       : pName.trim().length > 0
-      ? pName.trim().slice(0, 2).toUpperCase()
-      : 'PT';
+        ? pName.trim().slice(0, 2).toUpperCase()
+        : 'PT';
 
   const rawGen = apptPatient?.gender || apptPatient?.sex || pRaw?.gender || pRaw?.sex || '';
   const pGender =
     rawGen === 'M' || rawGen.toLowerCase() === 'male'
       ? 'Male'
       : rawGen === 'F' || rawGen.toLowerCase() === 'female'
-      ? 'Female'
-      : rawGen;
+        ? 'Female'
+        : rawGen;
 
   const rawBirthDate = apptPatient?.birthDate || pRaw?.birthDate;
   const pBirthDate = rawBirthDate ? dayjs(rawBirthDate).format('DD-MMM-YYYY') : '';
 
   const rawAge =
-    apptPatient?.age ??
-    pRaw?.age ??
-    (rawBirthDate ? dayjs().diff(dayjs(rawBirthDate), 'year') : undefined);
+    apptPatient?.age ?? pRaw?.age ?? (rawBirthDate ? dayjs().diff(dayjs(rawBirthDate), 'year') : undefined);
   const pAge = rawAge !== undefined && rawAge !== null && rawAge !== '' ? `${rawAge} yrs` : '';
 
-  const rawId =
-    apptPatient?.identifier ||
-    apptPatient?.identifiers?.[0] ||
-    pRaw?.identifier ||
-    pRaw?.identifiers?.[0];
+  const rawId = apptPatient?.identifier || apptPatient?.identifiers?.[0] || pRaw?.identifier || pRaw?.identifiers?.[0];
 
   const pId: string =
     typeof rawId === 'string'
       ? rawId
       : typeof rawId?.value === 'string'
-      ? rawId.value
-      : typeof rawId?.identifier === 'string'
-      ? rawId.identifier
-      : patientUuid?.slice(0, 7) || '—';
+        ? rawId.value
+        : typeof rawId?.identifier === 'string'
+          ? rawId.identifier
+          : patientUuid?.slice(0, 7) || '—';
 
   return (
     <Workspace2 title={title} hasUnsavedChanges={isDirty}>
       <Form onSubmit={handleSubmit(handleSaveAppointment)}>
         {(patient || apptPatient) && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.875rem', padding: '1rem 1.25rem', borderBottom: '1px solid #e0e0e0', backgroundColor: '#fff' }}>
-            <div style={{ width: '3.25rem', height: '3.25rem', backgroundColor: '#589694', color: '#fff', fontSize: '1.125rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.875rem',
+              padding: '1rem 1.25rem',
+              borderBottom: '1px solid #e0e0e0',
+              backgroundColor: '#fff',
+            }}>
+            <div
+              style={{
+                width: '3.25rem',
+                height: '3.25rem',
+                backgroundColor: '#589694',
+                color: '#fff',
+                fontSize: '1.125rem',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}>
               {pInitials}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
@@ -388,8 +436,21 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                 <span style={{ fontSize: '1.0625rem', fontWeight: 700, color: '#161616' }}>{pName}</span>
                 {pGender && <span style={{ fontSize: '0.875rem', color: '#525252' }}>{pGender}</span>}
               </div>
-              {(pAge || pBirthDate) && <div style={{ fontSize: '0.8125rem', color: '#525252' }}>{[pAge, pBirthDate].filter(Boolean).join(' · ')}</div>}
-              <div style={{ marginTop: '0.25rem', alignSelf: 'flex-start', backgroundColor: '#e8e8e8', padding: '0.125rem 0.625rem', borderRadius: '1rem', fontSize: '0.75rem', color: '#525252' }}>
+              {(pAge || pBirthDate) && (
+                <div style={{ fontSize: '0.8125rem', color: '#525252' }}>
+                  {[pAge, pBirthDate].filter(Boolean).join(' · ')}
+                </div>
+              )}
+              <div
+                style={{
+                  marginTop: '0.25rem',
+                  alignSelf: 'flex-start',
+                  backgroundColor: '#e8e8e8',
+                  padding: '0.125rem 0.625rem',
+                  borderRadius: '1rem',
+                  fontSize: '0.75rem',
+                  color: '#525252',
+                }}>
                 <span>OpenMRS ID: </span>
                 <strong style={{ color: '#161616' }}>{pId}</strong>
               </div>
@@ -404,10 +465,15 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                 name="location"
                 control={control}
                 render={({ field }) => (
-                  <Select id="location" invalid={!!errors?.location} invalidText={errors?.location?.message} labelText={t('selectALocation', 'Select a location')} {...field}>
+                  <Select
+                    id="location"
+                    invalid={!!errors?.location}
+                    invalidText={errors?.location?.message}
+                    labelText={t('selectALocation', 'Select a location')}
+                    {...field}>
                     <SelectItem key="chooseLocation" text={t('chooseLocation', 'Choose a location')} value="" />
                     {locations?.map((loc) => (
-                      <SelectItem key={loc.uuid} text={loc.display} value={loc.uuid} />
+                      <SelectItem key={loc.uuid} text={loc.display ?? ''} value={loc.uuid} />
                     ))}
                   </Select>
                 )}
@@ -429,12 +495,16 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     {...field}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                       const dur = serviceTypes?.find((s) => s.name === e.target.value)?.durationMins;
-                      if (!isEditing || (dur && serviceTypes?.find((s) => s.name === getValues('selectedService'))?.durationMins === getValues('duration'))) {
+                      if (
+                        !isEditing ||
+                        (dur &&
+                          serviceTypes?.find((s) => s.name === getValues('selectedService'))?.durationMins ===
+                            getValues('duration'))
+                      ) {
                         setValue('duration', dur);
                       }
                       field.onChange(e);
-                    }}
-                  >
+                    }}>
                     <SelectItem key="chooseService" text={t('chooseService', 'Select service')} value="" />
                     {serviceTypes?.map((s) => (
                       <SelectItem key={s.uuid} text={s.name} value={s.name} />
@@ -451,7 +521,13 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                 name="appointmentType"
                 control={control}
                 render={({ field }) => (
-                  <Select disabled={!appointmentTypes?.length} id="appointmentType" invalid={!!errors?.appointmentType} invalidText={errors?.appointmentType?.message} labelText={t('selectAppointmentType', 'Select the type of appointment')} {...field}>
+                  <Select
+                    disabled={!appointmentTypes?.length}
+                    id="appointmentType"
+                    invalid={!!errors?.appointmentType}
+                    invalidText={errors?.appointmentType?.message}
+                    labelText={t('selectAppointmentType', 'Select the type of appointment')}
+                    {...field}>
                     <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
                     {appointmentTypes?.map((type) => (
                       <SelectItem key={type} text={t(type)} value={type} />
@@ -463,7 +539,13 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
           </FormGroup>
 
           <FormGroup className={styles.formGroup} legendText={t('recurringAppointment', 'Recurring Appointment')}>
-            <Toggle id="recurringToggle" labelB={t('yes', 'Yes')} labelA={t('no', 'No')} labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')} onClick={() => setIsRecurringAppointment(!isRecurringAppointment)} />
+            <Toggle
+              id="recurringToggle"
+              labelB={t('yes', 'Yes')}
+              labelA={t('no', 'No')}
+              labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')}
+              onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
+            />
           </FormGroup>
 
           <FormGroup className={styles.formGroup} legendText={t('dateTime', 'Appointment time')}>
@@ -475,7 +557,14 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       name="isAllDayAppointment"
                       control={control}
                       render={({ field: { value, onChange } }) => (
-                        <Toggle id="allDayToggle" labelA={t('no', 'No')} labelB={t('yes', 'Yes')} labelText={t('allDay', 'All day')} toggled={value} onToggle={onChange} />
+                        <Toggle
+                          id="allDayToggle"
+                          labelA={t('no', 'No')}
+                          labelB={t('yes', 'Yes')}
+                          labelText={t('allDay', 'All day')}
+                          toggled={value}
+                          onToggle={onChange}
+                        />
                       )}
                     />
                   )}
@@ -485,7 +574,11 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       control={control}
                       render={({ field: { onChange, value }, fieldState }) => (
                         <OpenmrsDateRangePicker
-                          value={value.startDate && value.recurringPatternEndDate ? [value.startDate, value.recurringPatternEndDate] : null}
+                          value={
+                            value?.startDate && value?.recurringPatternEndDate
+                              ? [value.startDate, value.recurringPatternEndDate]
+                              : undefined
+                          }
                           onChange={([startDate, endDate]) => {
                             onChange({
                               ...value,
@@ -524,7 +617,13 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                           invalidText={t('invalidNumber', 'Number is not valid')}
                           value={value}
                           onBlur={onBlur}
-                          onChange={(e, state) => onChange((state?.value ?? (e.target as HTMLInputElement).value) === '' ? null : Number(state?.value ?? (e.target as HTMLInputElement).value))}
+                          onChange={(e, state) =>
+                            onChange(
+                              (state?.value ?? (e.target as HTMLInputElement).value) === ''
+                                ? null
+                                : Number(state?.value ?? (e.target as HTMLInputElement).value),
+                            )
+                          }
                         />
                       )}
                     />
@@ -535,7 +634,11 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       name="recurringPatternType"
                       control={control}
                       render={({ field: { onChange, value } }) => (
-                        <RadioButtonGroup aria-label={t('period', 'Period')} name="radio-button-group" onChange={(type) => onChange(type)} valueSelected={value}>
+                        <RadioButtonGroup
+                          aria-label={t('period', 'Period')}
+                          name="radio-button-group"
+                          onChange={(type) => onChange(type)}
+                          valueSelected={value}>
                           <RadioButton labelText={t('day', 'Day')} value="DAY" id="radioDay" />
                           <RadioButton labelText={t('week', 'Week')} value="WEEK" id="radioWeek" />
                         </RadioButtonGroup>
@@ -547,18 +650,32 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                     <Controller
                       name="selectedDaysOfWeekText"
                       control={control}
-                      defaultValue={weekDays.filter((i) => getValues('recurringPatternDaysOfWeek').includes(i.id)).map((w) => w.label).join(', ') || t('daysOfWeek', 'Days of the week')}
+                      defaultValue={
+                        weekDays
+                          .filter((i) => getValues('recurringPatternDaysOfWeek').includes(i.id))
+                          .map((w) => w.label)
+                          .join(', ') || t('daysOfWeek', 'Days of the week')
+                      }
                       render={({ field: { onChange } }) => (
                         <MultiSelect
                           className={styles.weekSelect}
                           id="daysOfWeek"
-                          initialSelectedItems={weekDays.filter((i) => getValues('recurringPatternDaysOfWeek').includes(i.id))}
+                          initialSelectedItems={weekDays.filter((i) =>
+                            getValues('recurringPatternDaysOfWeek').includes(i.id),
+                          )}
                           items={weekDays}
                           itemToString={(i) => (i ? t(i.labelCode, i.label) : '')}
-                          label={getValues('selectedDaysOfWeekText')}
+                          label={getValues('selectedDaysOfWeekText') ?? ''}
                           onChange={(e) => {
-                            onChange(e?.selectedItems?.length ? e.selectedItems.map((w) => w.label).join(', ') : t('daysOfWeek', 'Days of the week'));
-                            setValue('recurringPatternDaysOfWeek', e.selectedItems.map((s) => s.id));
+                            onChange(
+                              e?.selectedItems?.length
+                                ? e.selectedItems.map((w) => w.label).join(', ')
+                                : t('daysOfWeek', 'Days of the week'),
+                            );
+                            setValue(
+                              'recurringPatternDaysOfWeek',
+                              e.selectedItems?.map((s: { id: string }) => s.id) ?? [],
+                            );
                           }}
                           selectionFeedback="top-after-reopen"
                           sortItems={(items) => [...items].sort((a, b) => a.order - b.order)}
@@ -574,7 +691,14 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                       name="isAllDayAppointment"
                       control={control}
                       render={({ field: { value, onChange } }) => (
-                        <Toggle id="allDayToggle" labelA={t('no', 'No')} labelB={t('yes', 'Yes')} labelText={t('allDay', 'All day')} toggled={value} onToggle={onChange} />
+                        <Toggle
+                          id="allDayToggle"
+                          labelA={t('no', 'No')}
+                          labelB={t('yes', 'Yes')}
+                          labelText={t('allDay', 'All day')}
+                          toggled={value}
+                          onToggle={onChange}
+                        />
                       )}
                     />
                   )}
@@ -609,7 +733,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
               <ResponsiveWrapper>
                 <Workload
                   appointmentDate={watch('appointmentDateTime').startDate}
-                  onWorkloadDateChange={(date) => setValue('appointmentDateTime', { ...getValues('appointmentDateTime'), startDate: date })}
+                  onWorkloadDateChange={(date) =>
+                    setValue('appointmentDateTime', { ...getValues('appointmentDateTime'), startDate: date })
+                  }
                   selectedService={watch('selectedService')}
                 />
               </ResponsiveWrapper>
@@ -623,8 +749,17 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                   name="appointmentStatus"
                   control={control}
                   render={({ field }) => (
-                    <Select id="appointmentStatus" invalid={!!errors?.appointmentStatus} invalidText={errors?.appointmentStatus?.message} labelText={t('selectAppointmentStatus', 'Select status')} {...field}>
-                      <SelectItem key="selectAppointmentStatus" text={t('selectAppointmentStatus', 'Select status')} value="" />
+                    <Select
+                      id="appointmentStatus"
+                      invalid={!!errors?.appointmentStatus}
+                      invalidText={errors?.appointmentStatus?.message}
+                      labelText={t('selectAppointmentStatus', 'Select status')}
+                      {...field}>
+                      <SelectItem
+                        key="selectAppointmentStatus"
+                        text={t('selectAppointmentStatus', 'Select status')}
+                        value=""
+                      />
                       {appointmentStatuses?.map((st) => (
                         <SelectItem key={st} text={t(st)} value={st} />
                       ))}
@@ -641,7 +776,11 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
                 name="provider"
                 control={control}
                 render={({ field }) => (
-                  <Select id="provider" invalidText="Required" labelText={t('selectProvider', 'Select a provider')} {...field}>
+                  <Select
+                    id="provider"
+                    invalidText="Required"
+                    labelText={t('selectProvider', 'Select a provider')}
+                    {...field}>
                     <SelectItem key="chooseProvider" text={t('chooseProvider', 'Choose a provider')} value="" />
                     {providers?.providers?.map((p) => (
                       <SelectItem key={p.uuid} text={p.display} value={p.uuid} />
@@ -652,7 +791,9 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
             </ResponsiveWrapper>
           </FormGroup>
 
-          <FormGroup className={styles.formGroup} legendText={t('dateAppointmentScheduled', 'Date appointment scheduled')}>
+          <FormGroup
+            className={styles.formGroup}
+            legendText={t('dateAppointmentScheduled', 'Date appointment scheduled')}>
             <ResponsiveWrapper>
               <Controller
                 name="dateAppointmentScheduled"
@@ -698,7 +839,10 @@ const AppointmentsForm: React.FC<Workspace2DefinitionProps<AppointmentsFormProps
         </Stack>
 
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} onClick={() => closeWorkspace({ discardUnsavedChanges: true })} kind="secondary">
+          <Button
+            className={styles.button}
+            onClick={() => closeWorkspace({ discardUnsavedChanges: true })}
+            kind="secondary">
             {t('discard', 'Discard')}
           </Button>
           <Button className={styles.button} disabled={isSubmitting} type="submit">
@@ -732,8 +876,7 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
               labelText={t('time', 'Time')}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
               style={{ marginLeft: '0.125rem', flex: 'none' }}
-              value={value}
-            >
+              value={value}>
               <Controller
                 name="timeFormat"
                 control={control}
@@ -742,8 +885,7 @@ function TimeAndDuration({ t, control, errors }: TimeAndDurationProps) {
                     id="time-picker-select-1"
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => fOnChange(e.target.value as 'AM' | 'PM')}
                     value={fVal}
-                    aria-label={t('time', 'Time')}
-                  >
+                    aria-label={t('time', 'Time')}>
                     <SelectItem value="AM" text="AM" />
                     <SelectItem value="PM" text="PM" />
                   </TimePickerSelect>

@@ -18,12 +18,7 @@ import { launchWorkspace2 } from '@openmrs/esm-framework';
 import { formatAMPM } from '../../helpers/functions';
 import { type Appointment, AppointmentStatus, AppointmentKind } from '../../types';
 import { useAppointmentsByDate } from '../../hooks/useAppointmentsByDate';
-import {
-  STATUS_TAG_TYPES,
-  DEFAULT_STATUS_TAG_TYPE,
-  CALENDAR_HOURS,
-  formatHourLabel,
-} from '../utils/calendar-colors';
+import { STATUS_TAG_TYPES, DEFAULT_STATUS_TAG_TYPE, CALENDAR_HOURS, formatHourLabel } from '../utils/calendar-colors';
 import styles from './daily-calendar-view.scss';
 
 export interface DailyCalendarViewProps {
@@ -35,25 +30,22 @@ type TimelineSegment =
   | { type: 'occupied'; hour: number; appointments: Array<Appointment> }
   | { type: 'empty-range'; startHour: number; endHour: number; hours: Array<number> };
 
-interface ExtendedPatient {
-  name?: string;
-  uuid?: string;
-  gender?: string;
+type BasePatient = NonNullable<Appointment['patient']>;
+
+export interface ExtendedPatient extends BasePatient {
   sex?: string;
-  age?: number;
   birthDate?: string;
-  identifier?: string;
   identifiers?: Array<{ identifier?: string; value?: string }>;
 }
 
-interface ExtendedAppointment extends Appointment {
+export type ExtendedAppointment = Omit<Appointment, 'patient' | 'provider' | 'appointmentType'> & {
   patient?: ExtendedPatient;
   dateTimeCreated?: string;
   provider?: { display?: string; name?: string };
   appointmentType?: { name?: string; display?: string };
   recurringPattern?: string;
   note?: string;
-}
+};
 
 function formatRangeLabel(startHr: number, endHr: number): string {
   const startStr = formatHourLabel(startHr);
@@ -124,7 +116,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
     if (existing3pm.length < 5 && existing3pm.length > 0) {
       const base = existing3pm[0];
       const baseStart = base.startDateTime ?? new Date().getTime();
-      const mockList: Array<ExtendedAppointment> = [
+      const mockList: Array<unknown> = [
         {
           ...base,
           uuid: 'mock-1',
@@ -236,7 +228,6 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
           comments: 'Consultation rescheduled.',
         },
       ];
-      map.set(15, mockList);
     }
 
     return map;
@@ -332,8 +323,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
             size="sm"
             renderIcon={ArrowLeft}
             onClick={() => setActiveTableHour(null)}
-            className={styles.backButton}
-          >
+            className={styles.backButton}>
             {t('backToDay', 'Back to day')}
           </Button>
           <div className={styles.tableHeaderTitles}>
@@ -366,8 +356,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
                       {...getRowProps({ row })}
                       key={row.id}
                       className={styles.clickableRow}
-                      onClick={() => original?.rawAppointment && setSelectedAppointment(original.rawAppointment)}
-                    >
+                      onClick={() => original?.rawAppointment && setSelectedAppointment(original.rawAppointment)}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value}</TableCell>
                       ))}
@@ -395,7 +384,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
       <div className={styles.heading}>
         <p className={styles.subtitle}>
           {appointments.length === 0
-            ? t('noAppointments', 'No appointments scheduled')
+            ? t('noAppointmentsBadge', 'No appointments')
             : t('appointmentCount', '{{count}} appointment(s)', { count: appointments.length })}
         </p>
       </div>
@@ -445,8 +434,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedD
                 type="button"
                 className={styles.expandToggleBtn}
                 onClick={() => toggleRange(rangeKey)}
-                aria-expanded={isExpanded}
-              >
+                aria-expanded={isExpanded}>
                 {isExpanded ? `▴ ${t('collapse', 'Collapse')}` : `▾ ${t('expand', 'Expand')}`}
               </button>
             </div>
@@ -479,11 +467,7 @@ interface AppointmentDetailsDrawerProps {
   onEdit: () => void;
 }
 
-const AppointmentDetailsDrawer: React.FC<AppointmentDetailsDrawerProps> = ({
-  appointment,
-  onClose,
-  onEdit,
-}) => {
+const AppointmentDetailsDrawer: React.FC<AppointmentDetailsDrawerProps> = ({ appointment, onClose, onEdit }) => {
   const { t } = useTranslation();
   const rawAppt = appointment as ExtendedAppointment;
 
@@ -510,15 +494,9 @@ const AppointmentDetailsDrawer: React.FC<AppointmentDetailsDrawerProps> = ({
     return appointment.startDateTime ? dayjs(appointment.startDateTime).format('DD-MMM-YYYY') : '—';
   }, [rawAppt.dateTimeCreated, appointment.startDateTime]);
 
-  const providerName =
-    appointment.providers?.[0]?.name ||
-    rawAppt.provider?.display ||
-    rawAppt.provider?.name ||
-    '—';
+  const providerName = appointment.providers?.[0]?.name || rawAppt.provider?.display || rawAppt.provider?.name || '—';
 
-  const locationName =
-    appointment.location?.name ||
-    'Outpatient Clinic';
+  const locationName = appointment.location?.name || 'Outpatient Clinic';
 
   const serviceName = appointment.service?.name || '—';
   const appointmentType = rawAppt.appointmentType?.name || rawAppt.appointmentType?.display || 'New';
@@ -530,8 +508,8 @@ const AppointmentDetailsDrawer: React.FC<AppointmentDetailsDrawerProps> = ({
     rawGender === 'M' || rawGender.toLowerCase() === 'male'
       ? 'Male'
       : rawGender === 'F' || rawGender.toLowerCase() === 'female'
-      ? 'Female'
-      : rawGender;
+        ? 'Female'
+        : rawGender;
   const age = patient?.age ? `${patient.age} yrs` : '';
   const birthDate = patient?.birthDate ? dayjs(patient.birthDate).format('DD-MMM-YYYY') : '';
   const identifier =
@@ -546,12 +524,7 @@ const AppointmentDetailsDrawer: React.FC<AppointmentDetailsDrawerProps> = ({
       <div className={styles.drawerPanel}>
         <div className={styles.drawerHeader}>
           <span className={styles.drawerTitle}>{t('appointmentDetails', 'Appointment details')}</span>
-          <button
-            type="button"
-            className={styles.drawerCloseBtn}
-            onClick={onClose}
-            aria-label={t('close', 'Close')}
-          >
+          <button type="button" className={styles.drawerCloseBtn} onClick={onClose} aria-label={t('close', 'Close')}>
             <Close size={20} />
           </button>
         </div>
@@ -568,9 +541,7 @@ const AppointmentDetailsDrawer: React.FC<AppointmentDetailsDrawerProps> = ({
                 </Tag>
               </div>
               {(age || birthDate) && (
-                <div className={styles.mockDemographics}>
-                  {[age, birthDate].filter(Boolean).join(' · ')}
-                </div>
+                <div className={styles.mockDemographics}>{[age, birthDate].filter(Boolean).join(' · ')}</div>
               )}
               <div className={styles.identifierPill}>
                 <span>OpenMRS ID: </span>
@@ -626,9 +597,7 @@ const AppointmentDetailsDrawer: React.FC<AppointmentDetailsDrawerProps> = ({
 
           <div className={styles.noteSection}>
             <span className={styles.gridLabel}>{t('note', 'Note')}</span>
-            <div className={styles.noteCallout}>
-              {appointment.comments || rawAppt.note || t('noNotes', 'None')}
-            </div>
+            <div className={styles.noteCallout}>{appointment.comments || rawAppt.note || t('noNotes', 'None')}</div>
           </div>
         </div>
 
@@ -663,8 +632,8 @@ const HighDensitySummaryCard: React.FC<HighDensitySummaryCardProps> = ({
     const defaultPalette: Record<string, string> = {
       'General Medicine': '#0f62fe',
       'Outpatient Dept.': '#24a148',
-      'Rehabilitation': '#a56eff',
-      'Laboratory': '#ff832b',
+      Rehabilitation: '#a56eff',
+      Laboratory: '#ff832b',
     };
 
     const counts = new Map<string, { name: string; count: number; color: string }>();
@@ -672,9 +641,7 @@ const HighDensitySummaryCard: React.FC<HighDensitySummaryCardProps> = ({
       const sId = appt.service?.uuid ?? 'unknown';
       const sName = appt.service?.name ?? t('other', 'Other');
       const sColor =
-        (appt.service?.uuid && serviceColorMap?.get(appt.service.uuid)) ||
-        defaultPalette[sName] ||
-        '#0f62fe';
+        (appt.service?.uuid && serviceColorMap?.get(appt.service.uuid)) || defaultPalette[sName] || '#0f62fe';
       if (!counts.has(sId)) {
         counts.set(sId, { name: sName, count: 0, color: sColor });
       }
@@ -693,7 +660,7 @@ const HighDensitySummaryCard: React.FC<HighDensitySummaryCardProps> = ({
           {t(
             'highDensityNotice',
             '{{count}} overlap at once — over the legible limit. Narrow it down or open the full list.',
-            { count: appointments.length }
+            { count: appointments.length },
           )}
         </span>
       </div>
@@ -738,8 +705,7 @@ const DailyCard: React.FC<DailyCardProps> = ({ appointment, serviceColorMap, onC
   }, [appointment.endDateTime]);
 
   const extAppt = appointment as ExtendedAppointment;
-  const providerName =
-    appointment.providers?.[0]?.name || extAppt.provider?.display || extAppt.provider?.name || '';
+  const providerName = appointment.providers?.[0]?.name || extAppt.provider?.display || extAppt.provider?.name || '';
   const serviceName = appointment.service?.name;
 
   return (
@@ -758,8 +724,7 @@ const DailyCard: React.FC<DailyCardProps> = ({ appointment, serviceColorMap, onC
       style={{
         borderLeftColor: serviceColor,
         backgroundColor: hexToRgba(serviceColor, 0.1),
-      }}
-    >
+      }}>
       <div className={styles.cardHeader}>
         <div className={styles.cardPatientName}>{appointment.patient?.name ?? '—'}</div>
         {appointment.status && (
