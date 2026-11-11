@@ -207,19 +207,19 @@ describe('CodedPersonAttributeField', () => {
   });
 
   describe('Radio display style and validation', () => {
-    it('renders ContentSwitcher with options when displayStyle is radio', () => {
+    it('renders radio buttons with options when displayStyle is radio', () => {
       renderCodedPersonAttributeFieldWithFormik({ displayStyle: 'radio' });
 
       expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: 'Option 1' })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: 'Option 2' })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: 'Option 1' })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: 'Option 2' })).toBeInTheDocument();
     });
 
     it('updates form values when a radio option is clicked', async () => {
       const user = userEvent.setup();
       const { getFormValues } = renderCodedPersonAttributeFieldWithFormik({ displayStyle: 'radio' });
 
-      await user.click(screen.getByRole('tab', { name: 'Option 2' }));
+      await user.click(screen.getByRole('radio', { name: 'Option 2' }));
       expect(getFormValues().attributes[personAttributeType.uuid]).toBe('2');
     });
 
@@ -236,7 +236,7 @@ describe('CodedPersonAttributeField', () => {
       });
 
       // Error clears after selection
-      await user.click(screen.getByRole('tab', { name: 'Option 1' }));
+      await user.click(screen.getByRole('radio', { name: 'Option 1' }));
       await waitFor(() => {
         expect(screen.queryByText(/This field is required/i)).not.toBeInTheDocument();
       });

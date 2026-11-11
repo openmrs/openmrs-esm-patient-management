@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Field, getIn } from 'formik';
-import { Layer, Select, SelectItem, ContentSwitcher, Switch } from '@carbon/react';
+import { Layer, RadioButton, RadioButtonGroup, Select, SelectItem } from '@carbon/react';
 import { reportError } from '@openmrs/esm-framework';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
 import { useConceptAnswers } from '../field.resource';
@@ -112,41 +112,28 @@ export function CodedPersonAttributeField({
               const errorMessage = fieldError;
 
               if (displayStyle === 'radio') {
-                const labelId = `${id}-label`;
-                const errorId = `${id}-error`;
-
                 return (
-                  <div
-                    className={classNames(styles.attributeField, styles.radioField, {
-                      [styles.radioFieldInvalid]: isInvalid,
-                    })}>
-                    <div className={styles.radioContentSwitcherLabel}>
-                      <span id={labelId} className={classNames(styles.label01, { [styles.dangerLabel01]: isInvalid })}>
-                        {label ?? personAttributeType?.display}
-                      </span>
-                    </div>
-                    <ContentSwitcher
-                      id={id}
-                      size="md"
-                      aria-labelledby={labelId}
-                      aria-describedby={isInvalid && errorMessage ? errorId : undefined}
-                      aria-invalid={isInvalid}
-                      aria-required={required}
-                      onChange={(e) => {
-                        setFieldValue(fieldName, e.name);
-                        setFieldTouched(fieldName, true, false);
-                      }}
-                      selectedIndex={answers.findIndex((a) => a.uuid === field.value)}>
-                      {answers.map((answer) => (
-                        <Switch key={answer.uuid} name={answer.uuid} text={answer.label} />
-                      ))}
-                    </ContentSwitcher>
-                    {isInvalid && errorMessage && (
-                      <div id={errorId} role="alert" className={styles.radioFieldError}>
-                        {t(errorMessage, errorMessage)}
-                      </div>
-                    )}
-                  </div>
+                  <RadioButtonGroup
+                    name={fieldName}
+                    legendText={label ?? personAttributeType?.display}
+                    orientation="horizontal"
+                    invalid={isInvalid}
+                    invalidText={errorMessage ? t(errorMessage, errorMessage) : undefined}
+                    required={required}
+                    valueSelected={field.value}
+                    onChange={(value) => {
+                      setFieldValue(fieldName, value);
+                      setFieldTouched(fieldName, true, false);
+                    }}>
+                    {answers.map((answer) => (
+                      <RadioButton
+                        key={answer.uuid}
+                        id={`${id}-${answer.uuid}`}
+                        labelText={answer.label}
+                        value={answer.uuid}
+                      />
+                    ))}
+                  </RadioButtonGroup>
                 );
               }
               return (

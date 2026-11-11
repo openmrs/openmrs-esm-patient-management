@@ -290,7 +290,7 @@ function clearHiddenFieldValues(
   values: FormValues,
   hiddenFieldIds: Set<string>,
   config: RegistrationConfig,
-  initialAddress?: FormValues['address'],
+  initialValues?: FormValues,
 ): FormValues {
   const clearedValues = { ...values };
   if (clearedValues.attributes) {
@@ -324,15 +324,17 @@ function clearHiddenFieldValues(
       case 'address':
         // Restore the address the form started with, so typed values are not saved and an
         // existing patient's address is not wiped
-        clearedValues.address = { ...(initialAddress ?? {}) };
+        clearedValues.address = { ...(initialValues?.address ?? {}) };
         break;
       case 'causeOfDeath':
-        clearedValues.deathCause = '';
-        clearedValues.nonCodedCauseOfDeath = '';
-        break;
       case 'dateAndTimeOfDeath':
-        clearedValues.deathDate = '';
-        clearedValues.deathTime = '';
+        // Restore the death details the form started with, so a patient already recorded as dead keeps them
+        clearedValues.isDead = initialValues?.isDead ?? false;
+        clearedValues.deathDate = initialValues?.deathDate ?? '';
+        clearedValues.deathTime = initialValues?.deathTime ?? '';
+        clearedValues.deathTimeFormat = initialValues?.deathTimeFormat ?? 'AM';
+        clearedValues.deathCause = initialValues?.deathCause ?? '';
+        clearedValues.nonCodedCauseOfDeath = initialValues?.nonCodedCauseOfDeath ?? '';
         break;
     }
   });
@@ -350,5 +352,5 @@ export function sanitizeFormValuesForSkipLogic(
   }
 
   const { fieldIds } = getHiddenElements(values, config);
-  return clearHiddenFieldValues(values, fieldIds, config, initialFormValues?.address);
+  return clearHiddenFieldValues(values, fieldIds, config, initialFormValues);
 }

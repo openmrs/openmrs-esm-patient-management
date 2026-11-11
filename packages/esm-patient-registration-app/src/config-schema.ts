@@ -185,13 +185,15 @@ export const esmPatientRegistrationSchema = {
       hideIf: {
         _type: Type.Object,
         _default: null,
-        _description: 'Skip logic: Hide this section if a field has a certain value.',
+        _description:
+          'Skip logic: hide this section when a field has a certain value. Takes a `fieldId` (a field definition id, or one of gender, dob, phone, causeOfDeath or dateAndTimeOfDeath) and either `value` (hide when equal) or `notEquals` (hide when not equal, including when empty).',
         _validators: [hideIfValidator],
       },
       hideIfAge: {
         _type: Type.Object,
         _default: null,
-        _description: 'Skip logic: Hide this section based on patient age.',
+        _description:
+          'Skip logic: hide this section based on the patient\'s age in years. Takes an `operator` (`<`, `>`, `<=`, `>=` or `==`) and a numeric `value`, e.g. { "operator": "<", "value": 18 } hides it for patients under 18.',
         _validators: [hideIfAgeValidator],
       },
     },
@@ -286,13 +288,15 @@ export const esmPatientRegistrationSchema = {
       hideIf: {
         _type: Type.Object,
         _default: null,
-        _description: 'Skip logic: Hide this field if another field has a certain value.',
+        _description:
+          'Skip logic: hide this field when another field has a certain value. Takes a `fieldId` (a field definition id, or one of gender, dob, phone, causeOfDeath or dateAndTimeOfDeath) and either `value` (hide when equal) or `notEquals` (hide when not equal, including when empty).',
         _validators: [hideIfValidator],
       },
       hideIfAge: {
         _type: Type.Object,
         _default: null,
-        _description: 'Skip logic: Hide this field based on patient age.',
+        _description:
+          'Skip logic: hide this field based on the patient\'s age in years. Takes an `operator` (`<`, `>`, `<=`, `>=` or `==`) and a numeric `value`, e.g. { "operator": "<", "value": 18 } hides it for patients under 18.',
         _validators: [hideIfAgeValidator],
       },
       displayStyle: {

@@ -369,6 +369,44 @@ describe('getHiddenElements and sanitizeFormValuesForSkipLogic', () => {
     expect(sanitized.address).toEqual({ cityVillage: 'Saved city' });
     expect(sanitized.attributes['phone-uuid']).toBeUndefined();
   });
+
+  it('restores the initial death details when the death section is hidden', () => {
+    const deathConfig: any = {
+      sections: ['death'],
+      sectionDefinitions: [
+        {
+          id: 'death',
+          name: 'Death info',
+          hideIf: { fieldId: 'gender', value: 'unknown' },
+          fields: ['dateAndTimeOfDeath', 'causeOfDeath'],
+        },
+      ],
+      fieldDefinitions: [],
+    };
+    const initialFormValues: any = {
+      isDead: true,
+      deathDate: '2026-01-01',
+      deathTime: '10:30',
+      deathTimeFormat: 'PM',
+      deathCause: 'saved-cause-uuid',
+      nonCodedCauseOfDeath: '',
+    };
+    const editedValues: any = {
+      ...initialFormValues,
+      gender: 'unknown',
+      deathDate: '',
+      deathCause: 'typed-cause-uuid',
+    };
+
+    const sanitized = sanitizeFormValuesForSkipLogic(editedValues, deathConfig, initialFormValues);
+    expect(sanitized).toMatchObject(initialFormValues);
+
+    const sanitizedNewPatient = sanitizeFormValuesForSkipLogic(
+      { gender: 'unknown', isDead: true, deathDate: '2026-01-01', deathCause: 'typed-cause-uuid' } as any,
+      deathConfig,
+    );
+    expect(sanitizedNewPatient).toMatchObject({ isDead: false, deathDate: '', deathCause: '', deathTimeFormat: 'AM' });
+  });
 });
 
 describe('getFieldValue', () => {
