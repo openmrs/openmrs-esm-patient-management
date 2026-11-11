@@ -18,7 +18,12 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
+  const [selectedLocationUuids, setSelectedLocationUuids] = useState<Array<string>>([]);
+  const { calendarEvents } = useAppointmentsCalendar(
+    calendarSelectedDate.toISOString(),
+    viewMode,
+    selectedLocationUuids,
+  );
   const { serviceTypes } = useAppointmentServices();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
@@ -56,7 +61,12 @@ const AppointmentsCalendarView: React.FC = () => {
 
   return (
     <div data-testid="appointments-calendar" className={styles.backgroundColor}>
-      <AppointmentsHeader title={t('calendar', 'Calendar')} isCalendarView />
+      <AppointmentsHeader
+        title={t('calendar', 'Calendar')}
+        isCalendarView
+        selectedLocationUuids={selectedLocationUuids}
+        onLocationFilterChange={setSelectedLocationUuids}
+      />
       <CalendarHeader
         viewMode={viewMode}
         calendarSelectedDate={calendarSelectedDate}
@@ -73,7 +83,11 @@ const AppointmentsCalendarView: React.FC = () => {
         />
       )}
       {viewMode === 'daily' && (
-        <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />
+        <DailyCalendarView
+          calendarSelectedDate={calendarSelectedDate}
+          serviceColorMap={serviceColorMap}
+          selectedLocationUuids={selectedLocationUuids}
+        />
       )}
       <ServicesLegend services={legendServices} serviceColorMap={serviceColorMap} />
     </div>

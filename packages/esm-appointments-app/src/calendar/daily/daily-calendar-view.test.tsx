@@ -140,4 +140,24 @@ describe('DailyCalendarView', () => {
     await screen.findByText('John Wilson');
     await screen.findByText('Jane Smith');
   });
+
+  it('shows only the appointments at the selected locations', async () => {
+    mockOpenmrsFetch.mockResolvedValue({
+      data: [
+        mockAppointment(),
+        mockAppointment({
+          uuid: '5c6e8f1b-9a2d-4c3f-8b7a-1d2e3f4a5b6c',
+          location: { uuid: 'some-uuid1', name: 'Mosoriot' },
+          patient: { identifier: '100732HE', name: 'Jane Smith', uuid: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
+        }),
+      ],
+    } as FetchResponse);
+    renderWithSwr(
+      <DailyCalendarView {...defaultProps} selectedLocationUuids={['b1a8b05e-3542-4037-bbd3-998ee9c40574']} />,
+    );
+
+    await screen.findByText('John Wilson');
+    expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
+    expect(screen.getByText('1 appointment(s)')).toBeInTheDocument();
+  });
 });

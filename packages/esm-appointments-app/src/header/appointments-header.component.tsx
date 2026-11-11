@@ -9,15 +9,24 @@ import { useAppointmentServices } from '../hooks/useAppointmentService';
 import { useSelectedDate } from '../hooks/useSelectedDate';
 import { useAppointmentsStore } from '../store';
 import { launchCreateAppointmentForm } from '../helpers/functions';
+import CalendarLocationFilter from '../calendar/filters/calendar-location-filter.component';
 import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
   title: string;
   showServiceTypeFilter?: boolean;
   isCalendarView?: boolean;
+  selectedLocationUuids?: Array<string>;
+  onLocationFilterChange?: (locationUuids: Array<string>) => void;
 }
 
-const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServiceTypeFilter, isCalendarView }) => {
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
+  title,
+  showServiceTypeFilter,
+  isCalendarView,
+  selectedLocationUuids,
+  onLocationFilterChange,
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,9 +54,14 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, showServi
       <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
       <div className={styles.rightJustifiedItems}>
         {isCalendarView ? (
-          <Button kind="primary" renderIcon={Add} size="sm" onClick={() => launchCreateAppointmentForm(t)}>
-            {t('newAppointment', 'New appointment')}
-          </Button>
+          <div className={styles.calendarControls}>
+            {selectedLocationUuids && onLocationFilterChange && (
+              <CalendarLocationFilter selectedLocationUuids={selectedLocationUuids} onChange={onLocationFilterChange} />
+            )}
+            <Button kind="primary" renderIcon={Add} size="sm" onClick={() => launchCreateAppointmentForm(t)}>
+              {t('newAppointment', 'New appointment')}
+            </Button>
+          </div>
         ) : (
           <>
             <OpenmrsDatePicker

@@ -4,8 +4,12 @@ import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { useLocations } from '@openmrs/esm-framework';
+import { mockLocationInpatientWard, mockLocationMosoriot } from '__mocks__';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
+import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
+import { type Appointment } from '../types';
 
 vi.mock('../hooks/useAppointmentsCalendar', () => ({
   useAppointmentsCalendar: vi.fn().mockReturnValue({ calendarEvents: [], isLoading: false, error: null }),
@@ -23,7 +27,9 @@ vi.mock('../hooks/useAppointmentService', () => ({
   }),
 }));
 
+const mockUseAppointmentsByDate = vi.mocked(useAppointmentsByDate);
 const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
+const mockUseLocations = vi.mocked(useLocations);
 
 function renderCalendar() {
   return render(
@@ -186,5 +192,54 @@ describe('Appointment calendar view', () => {
     expect(cellSwatch).toBeInTheDocument();
     expect(legendSwatch.style.backgroundColor).toBeTruthy();
     expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
+  });
+
+  it('narrows the calendar to the selected locations and shows everything again once the filter is cleared', async () => {
+    const user = userEvent.setup();
+    mockUseLocations.mockReturnValue([mockLocationMosoriot, mockLocationInpatientWard]);
+    mockUseAppointmentsByDate.mockReturnValue({
+      appointments: [
+        {
+          uuid: '3b4d4f2a-7c8d-4e1f-9a6b-5c8d2e1f4a7b',
+          location: { uuid: mockLocationMosoriot.uuid, name: mockLocationMosoriot.name },
+          patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+          service: { name: 'HIV Clinic', uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1' },
+          startDateTime: dayjs().hour(9).valueOf(),
+          status: 'Scheduled',
+        },
+        {
+          uuid: '5c6e8f1b-9a2d-4c3f-8b7a-1d2e3f4a5b6c',
+          location: { uuid: mockLocationInpatientWard.uuid, name: mockLocationInpatientWard.name },
+          patient: { identifier: '100732HE', name: 'Jane Smith', uuid: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
+          service: { name: 'HIV Clinic', uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1' },
+          startDateTime: dayjs().hour(10).valueOf(),
+          status: 'Scheduled',
+        },
+      ] as Array<Appointment>,
+      isLoading: false,
+      error: undefined,
+    });
+
+    renderCalendar();
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+
+    const locationFilter = screen.getByRole('combobox', { name: /location/i });
+    expect(locationFilter).toHaveTextContent('All locations');
+    expect(screen.getByText('John Wilson')).toBeInTheDocument();
+    expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+
+    await user.click(locationFilter);
+    await user.click(screen.getByRole('option', { name: 'Inpatient Ward' }));
+
+    expect(locationFilter).toHaveTextContent('1 location');
+    expect(screen.queryByText('John Wilson')).not.toBeInTheDocument();
+    expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual([mockLocationInpatientWard.uuid]);
+
+    await user.click(screen.getByRole('button', { name: /clear all selected items/i }));
+
+    expect(locationFilter).toHaveTextContent('All locations');
+    expect(screen.getByText('John Wilson')).toBeInTheDocument();
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual([]);
   });
 });
