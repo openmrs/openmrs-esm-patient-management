@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useConfig, navigate, interpolateString, useDebounce } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from './config-schema';
 import { useInfinitePatientSearch } from './patient-search.resource';
-import { PatientSearchContextProvider } from './patient-search-context';
 import useArrowNavigation from './hooks/useArrowNavigation';
 import PatientSearch from './compact-patient-search/patient-search.component';
 import { type CompactPatientBannerHandle } from './compact-patient-search/compact-patient-banner.component';
@@ -101,15 +100,15 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         </Button>
       </form>
       {showSearchResults && (
-        <PatientSearchContextProvider
-          value={{
-            nonNavigationSelectPatientAction: selectPatientAction,
-            patientClickSideEffect: handleClear,
-          }}>
-          <div className={styles.floatingSearchResultsContainer}>
-            <PatientSearch query={debouncedSearchTerm} ref={bannerRef} {...patientSearchResponse} />
-          </div>
-        </PatientSearchContextProvider>
+        <div className={styles.floatingSearchResultsContainer}>
+          <PatientSearch
+            query={debouncedSearchTerm}
+            ref={bannerRef}
+            nonNavigationSelectPatientAction={selectPatientAction}
+            patientClickSideEffect={handleClear}
+            {...patientSearchResponse}
+          />
+        </div>
       )}
     </div>
   );

@@ -277,7 +277,7 @@ describe('CreateAdmissionEncounterWorkspace', () => {
       expect.objectContaining({
         patientUuid: mockPatientAlice.uuid,
         patient: mockPatientAlice,
-        startVisitWorkspaceName: '',
+        launchStartVisitWorkspace: expect.any(Function),
       }),
     );
   });

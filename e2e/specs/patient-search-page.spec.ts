@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { HomePage, PatientSearchPage } from '../pages';
-import { getPatientIdentifierStr, getPatientNames } from '../commands';
+import { getPatientIdentifierStr, getPatientNames, startVisit } from '../commands';
 
 test('Search for a patient from the dedicated search page', async ({ page, patient }) => {
   const openmrsIdentifier = getPatientIdentifierStr(patient);
@@ -89,5 +89,68 @@ test('Refine patient search results by sex and year of birth', async ({ page, pa
   await test.step('Then I should see the patient in the results again', async () => {
     await expect(searchPage.resultsCount(1)).toBeVisible();
     await expect(searchPage.patientResultLink(firstName)).toBeVisible();
+  });
+});
+
+test('Show an empty state when no patient matches the search', async ({ page }) => {
+  const searchPage = new PatientSearchPage(page);
+
+  await test.step('When I visit the search page with a query that matches no patient', async () => {
+    await searchPage.goto('zzzznomatchzzzz');
+  });
+
+  await test.step('Then I should see no results and the empty state', async () => {
+    await expect(searchPage.resultsCount(0)).toBeVisible();
+    await expect(searchPage.noResultsMessage()).toBeVisible();
+  });
+});
+
+test.describe('Starting a visit from the search page', () => {
+  test('Start a visit for a patient without an active visit', async ({ page, patient }) => {
+    const { firstName, fullName } = getPatientNames(patient);
+    const searchPage = new PatientSearchPage(page);
+
+    await test.step('Given I search for a patient who has no active visit', async () => {
+      await searchPage.goto(fullName);
+      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
+    });
+
+    await test.step('When I click the start visit button on the search result', async () => {
+      await searchPage.startVisitButton().click();
+    });
+
+    await test.step('Then the visit form opens, and the search results stay on screen', async () => {
+      await expect(searchPage.visitFormStartButton()).toBeVisible();
+      await expect(page).toHaveURL(/\/spa\/search\?query=/);
+      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
+    });
+
+    await test.step('When I fill in and submit the visit form', async () => {
+      await searchPage.startVisitInVisitForm();
+    });
+
+    await test.step('Then the visit starts, and the result no longer offers to start a visit', async () => {
+      await expect(page.getByText(/visit started successfully/i)).toBeVisible();
+      await expect(searchPage.startVisitButton()).toBeHidden();
+      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
+    });
+  });
+
+  test('Do not offer to start a visit for a patient with an active visit', async ({ api, page, patient }) => {
+    const { firstName, fullName } = getPatientNames(patient);
+    const searchPage = new PatientSearchPage(page);
+
+    await test.step('Given a patient with an active visit', async () => {
+      await startVisit(api, patient.uuid);
+    });
+
+    await test.step('When I search for the patient', async () => {
+      await searchPage.goto(fullName);
+    });
+
+    await test.step('Then I should see the patient, without a start visit button', async () => {
+      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
+      await expect(searchPage.startVisitButton()).toBeHidden();
+    });
   });
 });

@@ -26,5 +26,25 @@
       "component": "patientSearchStartVisitButton2",
       "slot": "start-visit-button-slot2"
     }
+  ],
+  "workspaces2": [
+    {
+      "name": "patient-search-app-start-visit-workspace",
+      "component": "@openmrs/esm-patient-chart-app#exportedVisitForm",
+      "window": "patient-search-app-window"
+    }
+  ],
+  "workspaceWindows2": [
+    {
+      "name": "patient-search-app-window",
+      "width": "wider",
+      "group": "patient-search-app"
+    }
+  ],
+  "workspaceGroups2": [
+    {
+      "name": "patient-search-app",
+      "overlay": true
+    }
   ]
 }

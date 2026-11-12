@@ -12,8 +12,8 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
+import { type PatientSelectionCallback } from '../patient-search-context';
 import Loader from './loader.component';
-import { usePatientSearchContext } from '../patient-search-context';
 import { mapToFhirPatient } from '../utils/fhir-mapper';
 import { searchResultSwrConfig } from '../utils/swr-config';
 import type { SearchedPatient } from '../types';
@@ -40,12 +40,27 @@ export interface CompactPatientBannerHandle {
   focusSearchResult: (index: number) => void;
 }
 
-interface ClickablePatientContainerProps {
+/** What happens when a search result is clicked. */
+export interface CompactPatientSelectionProps {
+  /**
+   * A function to execute instead of navigating the user to the patient chart. If undefined, results are
+   * links to the patient chart.
+   */
+  nonNavigationSelectPatientAction?: PatientSelectionCallback;
+  /**
+   * A function to execute when the user clicks on a result. Called whether or not
+   * `nonNavigationSelectPatientAction` is defined: just before navigation, or after
+   * `nonNavigationSelectPatientAction`.
+   */
+  patientClickSideEffect?: PatientSelectionCallback;
+}
+
+interface ClickablePatientContainerProps extends CompactPatientSelectionProps {
   children: React.ReactNode;
   patient: fhir.Patient;
 }
 
-interface CompactPatientBannerProps {
+interface CompactPatientBannerProps extends CompactPatientSelectionProps {
   patients: Array<SearchedPatient>;
   hasMore?: boolean;
   isValidating?: boolean;
@@ -64,7 +79,18 @@ interface CompactPatientBannerProps {
  * virtualized and infinitely-scrolling, mounting only the rows near the viewport.
  */
 const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatientBannerProps>(
-  ({ patients, hasMore = false, isValidating = false, fetchMore, virtualize = true }, ref) => {
+  (
+    {
+      patients,
+      hasMore = false,
+      isValidating = false,
+      fetchMore,
+      virtualize = true,
+      nonNavigationSelectPatientAction,
+      patientClickSideEffect,
+    },
+    ref,
+  ) => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [pendingFocusIndex, setPendingFocusIndex] = useState<number | null>(null);
     // Patients we've already shown as real banners, so a resumed scroll doesn't replace rows still
@@ -168,7 +194,15 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
                         ? { blockSize: virtualRow.size, transform: `translateY(${virtualRow.start}px)` }
                         : { transform: `translateY(${virtualRow.start}px)` }
                     }>
-                    {showSkeleton ? <Loader /> : <CompactPatientBannerRow patient={patients[virtualRow.index]} />}
+                    {showSkeleton ? (
+                      <Loader />
+                    ) : (
+                      <CompactPatientBannerRow
+                        patient={patients[virtualRow.index]}
+                        nonNavigationSelectPatientAction={nonNavigationSelectPatientAction}
+                        patientClickSideEffect={patientClickSideEffect}
+                      />
+                    )}
                   </div>
                 );
               })}
@@ -178,7 +212,11 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
             // find it, exactly as in the virtualized branch).
             patients.map((patient, index) => (
               <div key={patient.uuid} data-index={index}>
-                <CompactPatientBannerRow patient={patient} />
+                <CompactPatientBannerRow
+                  patient={patient}
+                  nonNavigationSelectPatientAction={nonNavigationSelectPatientAction}
+                  patientClickSideEffect={patientClickSideEffect}
+                />
               </div>
             ))
           )}
@@ -196,23 +234,36 @@ const CompactPatientBanner = forwardRef<CompactPatientBannerHandle, CompactPatie
 // Memoized so the banner subtree (photo, info, and its secondary lookups) doesn't re-render on
 // every scroll frame: `patient` references are stable across renders and when new pages append, so
 // only genuinely-changed rows re-render.
-const CompactPatientBannerRow = React.memo(({ patient }: { patient: SearchedPatient }) => {
-  const fhirPatient = useMemo(() => mapToFhirPatient(patient), [patient]);
-  const patientName = getPatientName(fhirPatient);
+const CompactPatientBannerRow = React.memo(
+  ({
+    patient,
+    nonNavigationSelectPatientAction,
+    patientClickSideEffect,
+  }: { patient: SearchedPatient } & CompactPatientSelectionProps) => {
+    const fhirPatient = useMemo(() => mapToFhirPatient(patient), [patient]);
+    const patientName = getPatientName(fhirPatient);
 
-  return (
-    <ClickablePatientContainer patient={fhirPatient}>
-      <div className={styles.patientAvatar}>
-        <PatientPhoto patientUuid={fhirPatient.id} patientName={patientName} />
-      </div>
-      <PatientBannerPatientInfo patient={fhirPatient} />
-    </ClickablePatientContainer>
-  );
-});
+    return (
+      <ClickablePatientContainer
+        patient={fhirPatient}
+        nonNavigationSelectPatientAction={nonNavigationSelectPatientAction}
+        patientClickSideEffect={patientClickSideEffect}>
+        <div className={styles.patientAvatar}>
+          <PatientPhoto patientUuid={fhirPatient.id} patientName={patientName} />
+        </div>
+        <PatientBannerPatientInfo patient={fhirPatient} />
+      </ClickablePatientContainer>
+    );
+  },
+);
 CompactPatientBannerRow.displayName = 'CompactPatientBannerRow';
 
-const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
-  const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext();
+const ClickablePatientContainer = ({
+  patient,
+  children,
+  nonNavigationSelectPatientAction,
+  patientClickSideEffect,
+}: ClickablePatientContainerProps) => {
   const config = useConfig<PatientSearchConfig>();
   const isDeceased = Boolean(patient?.deceasedDateTime);
 
