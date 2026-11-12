@@ -222,5 +222,24 @@ describe('Appointment calendar view', () => {
     await user.click(screen.getByRole('tab', { name: /daily/i }));
 
     expect(screen.queryByText(/error state/i)).not.toBeInTheDocument();
+    expect(screen.getByText('No appointments scheduled')).toBeInTheDocument();
+  });
+
+  it('keeps showing monthly counts that have already loaded when a later refresh fails', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: dayjs().format('YYYY-MM-DD'),
+          services: [{ serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', count: 5 }],
+        },
+      ],
+      isLoading: false,
+      error: new Error('Internal Server Error'),
+    });
+
+    renderCalendar();
+
+    expect(screen.getAllByText('Outpatient').length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText(/error state/i)).not.toBeInTheDocument();
   });
 });
