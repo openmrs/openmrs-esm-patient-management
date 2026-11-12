@@ -24,6 +24,18 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   </SWRConfig>
 );
 
+// Answers the requests the hook makes: the active services, and either the summary or the appointment search
+const mockBackend = ({ summary = [], appointments = [], services = [hivClinic, outpatient] }) => {
+  mockOpenmrsFetch.mockImplementation((url: string) => {
+    if (url.includes('/appointmentService/')) {
+      return Promise.resolve({ data: services } as FetchResponse);
+    }
+    return Promise.resolve({ data: url.includes('/appointments/search') ? appointments : summary } as FetchResponse);
+  });
+};
+
+const requestsTo = (path: string) => mockOpenmrsFetch.mock.calls.filter(([url]) => url.includes(path));
+
 const mockAppointment = (overrides = {}) => ({
   uuid: '3b4d4f2a-7c8d-4e1f-9a6b-5c8d2e1f4a7b',
   location: { uuid: inpatientWardUuid, name: 'Inpatient Ward' },
@@ -39,9 +51,9 @@ describe('useAppointmentsCalendar', () => {
   });
 
   it('reads the daily counts from the appointment summary when no location is selected', async () => {
-    mockOpenmrsFetch.mockResolvedValue({
-      data: [{ appointmentService: hivClinic, appointmentCountMap: { '2026-06-09': { allAppointmentsCount: 4 } } }],
-    } as FetchResponse);
+    mockBackend({
+      summary: [{ appointmentService: hivClinic, appointmentCountMap: { '2026-06-09': { allAppointmentsCount: 4 } } }],
+    });
 
     const { result } = renderHook(() => useAppointmentsCalendar('2026-06-09', 'monthly', []), { wrapper });
 
@@ -53,15 +65,15 @@ describe('useAppointmentsCalendar', () => {
         },
       ]),
     );
-    expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1);
-    expect(mockOpenmrsFetch.mock.calls[0][0]).toContain(
+    expect(requestsTo('/appointments/search')).toHaveLength(0);
+    expect(requestsTo('/appointment/appointmentSummary')[0][0]).toContain(
       `${restBaseUrl}/appointment/appointmentSummary?startDate=2026-06-01`,
     );
   });
 
   it('counts the appointments at the selected locations by day and by service', async () => {
-    mockOpenmrsFetch.mockResolvedValue({
-      data: [
+    mockBackend({
+      appointments: [
         mockAppointment(),
         mockAppointment({ startDateTime: new Date('2026-06-09T14:30:00').getTime() }),
         mockAppointment({ service: outpatient }),
@@ -69,7 +81,7 @@ describe('useAppointmentsCalendar', () => {
         mockAppointment({ status: 'Cancelled' }),
         mockAppointment({ location: { uuid: outpatientClinicUuid, name: 'Outpatient Clinic' } }),
       ],
-    } as FetchResponse);
+    });
 
     const { result } = renderHook(() => useAppointmentsCalendar('2026-06-09', 'monthly', [inpatientWardUuid]), {
       wrapper,
@@ -91,7 +103,7 @@ describe('useAppointmentsCalendar', () => {
       ]),
     );
 
-    const [url, options] = mockOpenmrsFetch.mock.calls[0];
+    const [url, options] = requestsTo('/appointments/search')[0];
     expect(url).toBe(`${restBaseUrl}/appointments/search`);
     expect(options).toMatchObject({
       method: 'POST',
@@ -102,13 +114,33 @@ describe('useAppointmentsCalendar', () => {
     });
   });
 
+  it('leaves out the appointments of deleted services, as the appointment summary does', async () => {
+    const deletedService = { uuid: '7c1b8f0e-2d4a-4b6c-9e3f-5a7d9c1e2f40', name: 'Dental' };
+    mockBackend({
+      appointments: [mockAppointment(), mockAppointment({ service: deletedService })],
+    });
+
+    const { result } = renderHook(() => useAppointmentsCalendar('2026-06-09', 'monthly', [inpatientWardUuid]), {
+      wrapper,
+    });
+
+    await waitFor(() =>
+      expect(result.current.calendarEvents).toEqual([
+        {
+          appointmentDate: '2026-06-09',
+          services: [{ serviceName: 'HIV Clinic', serviceUuid: hivClinic.uuid, count: 1 }],
+        },
+      ]),
+    );
+  });
+
   it('re-filters the appointments it already has when the selected locations change', async () => {
-    mockOpenmrsFetch.mockResolvedValue({
-      data: [
+    mockBackend({
+      appointments: [
         mockAppointment(),
         mockAppointment({ location: { uuid: outpatientClinicUuid, name: 'Outpatient Clinic' } }),
       ],
-    } as FetchResponse);
+    });
 
     const { result, rerender } = renderHook(
       ({ locationUuids }) => useAppointmentsCalendar('2026-06-09', 'monthly', locationUuids),
@@ -120,6 +152,6 @@ describe('useAppointmentsCalendar', () => {
     rerender({ locationUuids: [inpatientWardUuid, outpatientClinicUuid] });
 
     expect(result.current.calendarEvents[0].services[0].count).toBe(2);
-    expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1);
+    expect(requestsTo('/appointments/search')).toHaveLength(1);
   });
 });

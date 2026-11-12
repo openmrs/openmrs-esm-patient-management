@@ -9,6 +9,7 @@ import {
   AppointmentStatus,
   type DailyAppointmentsCountByService,
 } from '../types';
+import { useAppointmentServices } from './useAppointmentService';
 
 interface AppointmentCountMapEntry {
   allAppointmentsCount: number;
@@ -24,8 +25,9 @@ interface AppointmentSummaryResponse {
 
 const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
 
-// The statuses that the appointmentSummary endpoint counts. Appointments found through the search endpoint
-// are counted by the same rule, so that applying a location filter does not change what counts as an appointment.
+// The statuses that the appointmentSummary endpoint counts. It also leaves out the appointments of deleted
+// services. Appointments found through the search endpoint are counted by the same rules, so that applying a
+// location filter does not change what counts as an appointment.
 const countedStatuses: Array<string> = [
   AppointmentStatus.REQUESTED,
   AppointmentStatus.SCHEDULED,
@@ -38,6 +40,7 @@ export const useAppointmentsCalendar = (forDate: string | null, period: string, 
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
   const hasDateRange = Boolean(startDate && endDate);
   const isFilteredByLocation = locationUuids?.length > 0;
+  const { serviceTypes: activeServices, isLoading: isLoadingServices } = useAppointmentServices();
   const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
 
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentSummaryResponse> }>(
@@ -65,16 +68,18 @@ export const useAppointmentsCalendar = (forDate: string | null, period: string, 
     { errorRetryCount: 2 },
   );
 
-  const resultsForLocations = useMemo(
-    () =>
-      countAppointmentsByDateAndService(
-        searchData?.data?.filter(
-          (appointment) =>
-            locationUuids?.includes(appointment.location?.uuid) && countedStatuses.includes(appointment.status),
-        ) ?? [],
-      ),
-    [searchData?.data, locationUuids],
-  );
+  const resultsForLocations = useMemo(() => {
+    const activeServiceUuids = new Set(activeServices.map((service) => service.uuid));
+
+    return countAppointmentsByDateAndService(
+      searchData?.data?.filter(
+        (appointment) =>
+          locationUuids?.includes(appointment.location?.uuid) &&
+          countedStatuses.includes(appointment.status) &&
+          activeServiceUuids.has(appointment.service?.uuid),
+      ) ?? [],
+    );
+  }, [searchData?.data, locationUuids, activeServices]);
 
   // Transform API response into daily appointment counts grouped by service
   const results: DailyAppointmentsCountByService[] =
@@ -96,7 +101,7 @@ export const useAppointmentsCalendar = (forDate: string | null, period: string, 
     }, []) ?? [];
 
   if (isFilteredByLocation) {
-    return { isLoading: isSearching, calendarEvents: resultsForLocations, error: searchError };
+    return { isLoading: isSearching || isLoadingServices, calendarEvents: resultsForLocations, error: searchError };
   }
 
   return { isLoading, calendarEvents: results, error };
