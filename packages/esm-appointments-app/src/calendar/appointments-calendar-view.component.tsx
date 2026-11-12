@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { InlineLoading } from '@carbon/react';
+import { ErrorState } from '@openmrs/esm-framework';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import AppointmentsHeader from '../header/appointments-header.component';
@@ -18,7 +20,7 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-  const { calendarEvents } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
+  const { calendarEvents, isLoading, error } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
   const { serviceTypes } = useAppointmentServices();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
@@ -64,7 +66,18 @@ const AppointmentsCalendarView: React.FC = () => {
         onPrev={handlePrev}
         onNext={handleNext}
       />
-      {viewMode === 'monthly' && (
+      {/* Without these two states, a failed or pending request looks like a month with no appointments */}
+      {viewMode === 'monthly' && error && (
+        <div className={styles.calendarViewContainer}>
+          <ErrorState error={error} headerTitle={t('appointments', 'Appointments')} />
+        </div>
+      )}
+      {viewMode === 'monthly' && !error && isLoading && (
+        <div className={styles.calendarViewContainer}>
+          <InlineLoading description={t('loadingAppointments', 'Loading appointments…')} />
+        </div>
+      )}
+      {viewMode === 'monthly' && !error && !isLoading && (
         <MonthlyCalendarView
           events={calendarEvents}
           calendarSelectedDate={calendarSelectedDate}

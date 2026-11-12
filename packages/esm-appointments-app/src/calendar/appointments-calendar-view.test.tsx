@@ -187,4 +187,40 @@ describe('Appointment calendar view', () => {
     expect(legendSwatch.style.backgroundColor).toBeTruthy();
     expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
   });
+
+  it('shows a loading indicator instead of an empty month while the monthly counts are loading', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({ calendarEvents: [], isLoading: true, error: null });
+
+    renderCalendar();
+
+    expect(screen.getByText(/loading appointments/i)).toBeInTheDocument();
+    expect(screen.queryByText(/0 appointment\(s\)/i)).not.toBeInTheDocument();
+  });
+
+  it('shows an error state instead of an empty month when the monthly counts fail to load', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [],
+      isLoading: false,
+      error: new Error('Internal Server Error'),
+    });
+
+    renderCalendar();
+
+    expect(screen.getByText(/error state/i)).toBeInTheDocument();
+    expect(screen.queryByText(/0 appointment\(s\)/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps the daily view available when the monthly counts fail to load', async () => {
+    const user = userEvent.setup();
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [],
+      isLoading: false,
+      error: new Error('Internal Server Error'),
+    });
+
+    renderCalendar();
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+
+    expect(screen.queryByText(/error state/i)).not.toBeInTheDocument();
+  });
 });
