@@ -14,7 +14,7 @@ const HomeAppointments = () => {
   const { t } = useTranslation();
 
   const today = toOmrsIsoString(dayjs().startOf('day').toDate());
-  const { appointmentList, isLoading } = useAppointmentList(today);
+  const { appointmentList, isLoading, error } = useAppointmentList(today);
 
   const excludeCancelledAppointments = appointmentList.filter(
     (appointment) => appointment.status !== AppointmentStatus.CANCELLED,
@@ -24,6 +24,7 @@ const HomeAppointments = () => {
     <div className={styles.container}>
       <AppointmentsTable
         appointments={excludeCancelledAppointments}
+        error={appointmentList.length === 0 ? error : undefined}
         isLoading={isLoading}
         tableHeading={t('todaysAppointment', "Today's Appointments")}
       />

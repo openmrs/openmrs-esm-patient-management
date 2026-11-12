@@ -148,6 +148,7 @@
   "provider": "Provider",
   "providers": "Providers",
   "providersBooked": "Providers booked: {{time}}",
+  "providersBookedCardTitle": "Providers booked",
   "recurringAppointment": "Recurring Appointment",
   "repeatEvery": "Repeat every",
   "Requested": "Requested",

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import MetricsCard from './metrics-card.component';
+import MetricsErrorCard from './metrics-error-card.component';
 import { useAppointmentsAppContext } from '../../hooks/useAppointmentsAppContext';
 
 /**
@@ -11,7 +12,7 @@ import { useAppointmentsAppContext } from '../../hooks/useAppointmentsAppContext
  */
 export default function ScheduledAppointmentsExtension() {
   const { t } = useTranslation();
-  const { appointmentForSelectedDateFilteredByServiceTypes } = useAppointmentsAppContext();
+  const { appointmentForSelectedDateFilteredByServiceTypes, error } = useAppointmentsAppContext();
 
   const totalScheduledAppointments = appointmentForSelectedDateFilteredByServiceTypes.length;
 
@@ -25,6 +26,10 @@ export default function ScheduledAppointmentsExtension() {
 
     return { pendingAppointments, arrivedAppointments };
   }, [appointmentForSelectedDateFilteredByServiceTypes]);
+
+  if (error) {
+    return <MetricsErrorCard headerLabel={t('scheduledAppointments', 'Scheduled appointments')} />;
+  }
 
   return (
     <MetricsCard

@@ -19,6 +19,10 @@ const ScheduledAppointments: React.FC<{}> = () => {
 
   const { appointmentList: appointmentsForSelectedDate, isLoading, error } = useAppointmentList(selectedDate);
 
+  // A refresh that fails should not take away appointments that have already loaded, so the failure
+  // is only reported while there is nothing to show
+  const loadError = appointmentsForSelectedDate.length === 0 ? error : undefined;
+
   const appointmentForSelectedDateFilteredByServiceTypes =
     appointmentServiceTypes.length > 0
       ? appointmentsForSelectedDate.filter(({ service }) => appointmentServiceTypes.includes(service.uuid))
@@ -27,7 +31,7 @@ const ScheduledAppointments: React.FC<{}> = () => {
   useDefineAppContext<AppointmentsAppContext>('appointments', {
     appointmentForSelectedDateFilteredByServiceTypes,
     isLoading,
-    error,
+    error: loadError,
   });
   const formattedDate = formatDate(parseDate(selectedDate), { mode: 'standard', time: false });
 
@@ -35,6 +39,7 @@ const ScheduledAppointments: React.FC<{}> = () => {
     <div className={styles.container}>
       <AppointmentsTable
         appointments={appointmentForSelectedDateFilteredByServiceTypes}
+        error={loadError}
         isLoading={isLoading}
         tableHeading={t('appointmentsForDate', 'Appointments for: {{date}}', { date: formattedDate })}
       />
