@@ -66,11 +66,38 @@ describe('Appointment calendar view', () => {
     expect(initialDate.diff(latestRequestedDate(), 'month')).toBe(1);
   });
 
-  it('renders the Monthly and Daily view switcher', () => {
+  it('renders the Month, Week and Day view switcher', () => {
     renderCalendar();
-    expect(screen.getByRole('tab', { name: /monthly/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /daily/i })).toBeInTheDocument();
-    expect(screen.queryByRole('tab', { name: /weekly/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /month/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /week/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /day/i })).toBeInTheDocument();
+  });
+
+  it('renders the Today button and resets calendar to today when clicked', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+    const todayBtn = screen.getByRole('button', { name: /today/i });
+    expect(todayBtn).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    await user.click(todayBtn);
+
+    expect(latestRequestedDate().isSame(dayjs(), 'day')).toBe(true);
+  });
+
+  it('displays the appointment count in the header', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: '2026-07-15',
+          services: [{ serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0', count: 7 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+    renderCalendar();
+    expect(screen.getByText('7 appointments this month')).toBeInTheDocument();
   });
 
   it('defaults to monthly period on initial render', () => {
@@ -79,14 +106,24 @@ describe('Appointment calendar view', () => {
     expect(lastCall?.[1]).toBe('monthly');
   });
 
-  it('switches to daily period when Daily tab is clicked', async () => {
+  it('switches to daily period when Day tab is clicked', async () => {
     const user = userEvent.setup();
     renderCalendar();
 
-    await user.click(screen.getByRole('tab', { name: /daily/i }));
+    await user.click(screen.getByRole('tab', { name: /day/i }));
 
     const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
     expect(lastCall?.[1]).toBe('daily');
+  });
+
+  it('switches to weekly period when Week tab is clicked', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+
+    await user.click(screen.getByRole('tab', { name: /week/i }));
+
+    const lastCall = mockUseAppointmentsCalendar.mock.calls.at(-1);
+    expect(lastCall?.[1]).toBe('weekly');
   });
 
   it('advances by 1 day when Next is clicked in daily mode', async () => {
@@ -95,9 +132,9 @@ describe('Appointment calendar view', () => {
 
     const dateBeforeNav = latestRequestedDate();
 
-    await user.click(screen.getByRole('tab', { name: /daily/i }));
+    await user.click(screen.getByRole('tab', { name: /day/i }));
     await user.click(screen.getByRole('button', { name: /next/i }));
-    await user.click(screen.getByRole('tab', { name: /monthly/i }));
+    await user.click(screen.getByRole('tab', { name: /month/i }));
 
     expect(latestRequestedDate().diff(dateBeforeNav, 'day')).toBe(1);
   });
@@ -108,9 +145,9 @@ describe('Appointment calendar view', () => {
 
     const dateBeforeNav = latestRequestedDate();
 
-    await user.click(screen.getByRole('tab', { name: /daily/i }));
+    await user.click(screen.getByRole('tab', { name: /day/i }));
     await user.click(screen.getByRole('button', { name: /previous/i }));
-    await user.click(screen.getByRole('tab', { name: /monthly/i }));
+    await user.click(screen.getByRole('tab', { name: /month/i }));
 
     expect(dateBeforeNav.diff(latestRequestedDate(), 'day')).toBe(1);
   });
