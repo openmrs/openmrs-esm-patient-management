@@ -47,6 +47,20 @@ describe('calendar-colors utils', () => {
       expect(map.size).toBe(1);
       expect(map.get(OUTPATIENT_SERVICE_UUID)).toBe(SERVICE_COLOR_PALETTE[0]);
     });
+
+    it('uses the backend-provided color when present', () => {
+      const map = buildServiceColorMap([{ uuid: OUTPATIENT_SERVICE_UUID, color: '#feecae' }]);
+      expect(map.get(OUTPATIENT_SERVICE_UUID)).toBe('#feecae');
+    });
+
+    it('does not consume a palette slot for services with a backend color', () => {
+      const map = buildServiceColorMap([
+        { uuid: OUTPATIENT_SERVICE_UUID, color: '#feecae' },
+        { uuid: HIV_CLINIC_SERVICE_UUID },
+      ]);
+      expect(map.get(OUTPATIENT_SERVICE_UUID)).toBe('#feecae');
+      expect(map.get(HIV_CLINIC_SERVICE_UUID)).toBe(SERVICE_COLOR_PALETTE[0]);
+    });
   });
 
   describe('getFallbackServiceColor', () => {
