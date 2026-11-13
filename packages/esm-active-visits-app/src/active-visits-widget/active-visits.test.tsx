@@ -162,6 +162,55 @@ describe('ActiveVisitsTable', () => {
     expect(screen.queryByText('Some One')).not.toBeInTheDocument();
   });
 
+  it('sorts visits by start time, including visits that started today', async () => {
+    const user = userEvent.setup();
+
+    // `visitStartTime` holds the formatted display value, which reads "Today, ..." for visits that started today
+    mockUseActiveVisits.mockReturnValue({
+      activeVisits: [
+        {
+          ...mockActiveVisits[0],
+          id: 'earlier-today',
+          name: 'Earlier Today',
+          visitStartTime: 'Today, 08:15 AM',
+          visitStartDatetime: '2026-10-24T08:15:00.000+0000',
+        },
+        {
+          ...mockActiveVisits[0],
+          id: 'two-days-ago',
+          name: 'Two Days Ago',
+          visitStartTime: '22-Oct-2026, 04:00 PM',
+          visitStartDatetime: '2026-10-22T16:00:00.000+0000',
+        },
+        {
+          ...mockActiveVisits[0],
+          id: 'later-today',
+          name: 'Later Today',
+          visitStartTime: 'Today, 11:40 AM',
+          visitStartDatetime: '2026-10-24T11:40:00.000+0000',
+        },
+      ],
+      isLoading: false,
+      isValidating: false,
+      error: undefined,
+      totalResults: 3,
+    });
+
+    render(<ActiveVisitsTable />);
+
+    const getPatientNamesInOrder = () =>
+      screen.getAllByRole('link', { name: /View patient chart for/ }).map((link) => link.textContent);
+
+    // Most recent visits are shown first by default
+    expect(getPatientNamesInOrder()).toEqual(['Later Today', 'Earlier Today', 'Two Days Ago']);
+
+    await user.click(screen.getByRole('button', { name: /Visit Time/ }));
+    expect(getPatientNamesInOrder()).toEqual(['Two Days Ago', 'Earlier Today', 'Later Today']);
+
+    await user.click(screen.getByRole('button', { name: /Visit Time/ }));
+    expect(getPatientNamesInOrder()).toEqual(['Later Today', 'Earlier Today', 'Two Days Ago']);
+  });
+
   it('displays empty state when there are no active visits', () => {
     mockUseActiveVisits.mockReturnValue({
       activeVisits: [],

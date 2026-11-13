@@ -74,7 +74,7 @@ const ActiveVisitsTable = () => {
         const search = searchString.toLowerCase();
         return activeVisits?.filter((activeVisitRow) =>
           Object.entries(activeVisitRow).some(([header, value]) => {
-            if (header === 'patientUuid') {
+            if (header === 'patientUuid' || header === 'visitStartDatetime') {
               return false;
             }
             return `${value}`.toLowerCase().includes(search);
