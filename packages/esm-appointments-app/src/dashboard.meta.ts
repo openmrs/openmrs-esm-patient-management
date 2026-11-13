@@ -3,6 +3,7 @@ export const dashboardMeta = {
   slot: 'clinical-appointments-dashboard-slot',
   title: 'Appointments',
   basePath: `${window.spaBase}/home`,
+  icon: 'omrs-icon-calendar',
 } as const;
 
 export const appointmentCalendarDashboardMeta = {
