@@ -52,11 +52,17 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         defaultValue_one: '{{count}} appointment this month',
       });
     }
-    return t('appointmentsThisDayCount', '{{count}} appointments this day', {
+    if (calendarSelectedDate.isSame(dayjs(), 'day')) {
+      return t('appointmentsTodayCount', '{{count}} appointments today', {
+        count: appointmentsCount,
+        defaultValue_one: '{{count}} appointment today',
+      });
+    }
+    return t('appointmentsOnThisDayCount', '{{count}} appointments on this day', {
       count: appointmentsCount,
-      defaultValue_one: '{{count}} appointment this day',
+      defaultValue_one: '{{count}} appointment on this day',
     });
-  }, [appointmentsCount, viewMode, t]);
+  }, [appointmentsCount, calendarSelectedDate, viewMode, t]);
 
   const viewModeIndex = viewMode === 'monthly' ? 0 : 1;
   const VIEW_MODES: CalendarViewMode[] = ['monthly', 'daily'];
