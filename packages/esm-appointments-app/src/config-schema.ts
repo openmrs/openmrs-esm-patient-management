@@ -7,6 +7,12 @@ export const configSchema = {
     _default: false,
     _description: 'Whether to allow scheduling of all-day appointments (vs appointments with start time and end time)',
   },
+  requireProvider: {
+    _type: Type.Boolean,
+    _default: true,
+    _description:
+      'When true, show the provider field and require a selection. When false, hide the field; new appointments are saved without a provider, and an existing accepted provider is kept when editing.',
+  },
   appointmentStatuses: {
     _type: Type.Array,
     _default: appointmentStatuses,
@@ -103,6 +109,7 @@ export const configSchema = {
 
 export interface ConfigObject {
   allowAllDayAppointments: boolean;
+  requireProvider: boolean;
   appointmentStatuses: Array<string>;
   appointmentTypes: Array<string>;
   appointmentsTableColumns: Array<string>;
