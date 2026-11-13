@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
 import { ChevronLeft, ChevronRight } from '@carbon/react/icons';
 import { type CalendarViewMode } from '../../types';
-import { getCalendarFormat } from '../calendar-utils';
+import { formatInCalendar, getCalendarFormat } from '../calendar-utils';
 import styles from './calendar-header.scss';
 
 interface CalendarHeaderProps {
@@ -29,12 +29,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
 
     if (viewMode === 'monthly') {
-      return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', calendar }).format(
-        new Date(isoDate + 'T00:00:00'),
-      );
+      return formatInCalendar(new Date(isoDate + 'T00:00:00'), { year: 'numeric', month: 'long' }, locale, calendar);
     }
-    return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric', calendar }).format(
+    return formatInCalendar(
       new Date(isoDate + 'T00:00:00'),
+      { year: 'numeric', month: 'long', day: 'numeric' },
+      locale,
+      calendar,
     );
   }, [viewMode, calendarSelectedDate, locale, calendar]);
 

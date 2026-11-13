@@ -7,6 +7,12 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import MonthlyWorkloadView from './monthly-workload-view.component';
 import { type DailyAppointmentsCountByService } from '../../types';
 
+// The framework's test mock has no getDefaultCalendar; leaving it unset falls back to the Gregorian calendar
+vi.mock('@openmrs/esm-framework', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  getDefaultCalendar: vi.fn(),
+}));
+
 const mockUseLayoutType = vi.mocked(useLayoutType);
 
 beforeEach(() => {
