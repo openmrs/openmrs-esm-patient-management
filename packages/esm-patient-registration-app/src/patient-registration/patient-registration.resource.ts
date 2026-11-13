@@ -1,6 +1,12 @@
 import dayjs from 'dayjs';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type Patient, type Relationship, type PatientIdentifier, type Encounter } from './patient-registration.types';
+import {
+  type Encounter,
+  type EncounterObsUpdate,
+  type Patient,
+  type PatientIdentifier,
+  type Relationship,
+} from './patient-registration.types';
 
 function dataURItoFile(dataURI: string) {
   const byteString = window.atob(dataURI.split(',')[1]);
@@ -26,6 +32,16 @@ export function savePatient(patient: Patient | null, updatePatientUuid?: string)
     method: 'POST',
     body: patient,
     signal: abortController.signal,
+  });
+}
+
+export function updateEncounterObs(encounterUuid: string, obs: Array<EncounterObsUpdate>) {
+  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: { obs },
   });
 }
 

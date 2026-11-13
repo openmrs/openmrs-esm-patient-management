@@ -11,6 +11,7 @@ import {
   type AttributeValue,
   type CapturePhotoProps,
   type Encounter,
+  type EncounterObsUpdate,
   type FormValues,
   type Patient,
   type PatientIdentifier,
@@ -28,6 +29,7 @@ import {
   savePatient,
   savePatientPhoto,
   saveRelationship,
+  updateEncounterObs,
   updatePatientIdentifier,
   updateRelationship,
 } from './patient-registration.resource';
@@ -102,7 +104,14 @@ export class FormManager {
       savePatientTransactionManager.patientSaved = true;
       await this.saveRelationships(values.relationships, savePatientResponse);
 
-      await this.saveObservations(values.obs, savePatientResponse, currentLocation, currentUser, config);
+      await this.saveObservations(
+        values.obs,
+        savePatientResponse,
+        currentLocation,
+        currentUser,
+        config,
+        isNewPatient ? undefined : patientUuidMap.registrationEncounter,
+      );
 
       const { patientPhotoConceptUuid } = await getConfig<StyleguideConfigObject>('@openmrs/esm-styleguide');
 
@@ -153,34 +162,65 @@ export class FormManager {
     currentLocation: string,
     currentUser: Session,
     config: RegistrationConfig,
+    registrationEncounter?: PatientUuidMapType['registrationEncounter'],
   ) {
-    if (obss && Object.keys(obss).length > 0) {
-      if (!config.registrationObs.encounterTypeUuid) {
-        console.error(
-          'The registration form has been configured to have obs fields, ' +
-            'but no registration encounter type has been configured. Obs field values ' +
-            'will not be saved.',
-        );
-      } else {
-        const encounterToSave: Encounter = {
-          encounterDatetime: new Date(),
-          patient: savePatientResponse.data.uuid,
-          encounterType: config.registrationObs.encounterTypeUuid,
-          location: currentLocation,
-          encounterProviders: [
-            {
-              provider: currentUser.currentProvider.uuid,
-              encounterRole: config.registrationObs.encounterProviderRoleUuid,
-            },
-          ],
-          form: config.registrationObs.registrationFormUuid,
-          obs: Object.entries(obss)
-            .filter(([, value]) => value !== '')
-            .map(([conceptUuid, value]) => ({ concept: conceptUuid, value })),
-        };
-        return saveEncounter(encounterToSave);
+    const isEmpty = (value: unknown) => value === '' || value === null || value === undefined;
+
+    // When editing, update the registration encounter the form was loaded from rather than creating a new one, so
+    // a cleared value voids its obs and an unchanged value is not saved again
+    if (registrationEncounter) {
+      const obsUpdates: Array<EncounterObsUpdate> = [];
+      Object.entries(obss ?? {}).forEach(([conceptUuid, value]) => {
+        const existingObs = registrationEncounter.obs[conceptUuid];
+        if (!existingObs) {
+          if (!isEmpty(value)) {
+            obsUpdates.push({ concept: conceptUuid, value });
+          }
+        } else if (isEmpty(value)) {
+          obsUpdates.push({ uuid: existingObs.uuid, voided: true });
+        } else if (String(value) !== existingObs.value) {
+          obsUpdates.push({ uuid: existingObs.uuid, value });
+        }
+      });
+
+      if (obsUpdates.length > 0) {
+        return updateEncounterObs(registrationEncounter.uuid, obsUpdates);
       }
+      return;
     }
+
+    const obsToSave = Object.entries(obss ?? {})
+      .filter(([, value]) => !isEmpty(value))
+      .map(([conceptUuid, value]) => ({ concept: conceptUuid, value }));
+
+    if (obsToSave.length === 0) {
+      return;
+    }
+
+    if (!config.registrationObs.encounterTypeUuid) {
+      console.error(
+        'The registration form has been configured to have obs fields, ' +
+          'but no registration encounter type has been configured. Obs field values ' +
+          'will not be saved.',
+      );
+      return;
+    }
+
+    const encounterToSave: Encounter = {
+      encounterDatetime: new Date(),
+      patient: savePatientResponse.data.uuid,
+      encounterType: config.registrationObs.encounterTypeUuid,
+      location: currentLocation,
+      encounterProviders: [
+        {
+          provider: currentUser.currentProvider.uuid,
+          encounterRole: config.registrationObs.encounterProviderRoleUuid,
+        },
+      ],
+      form: config.registrationObs.registrationFormUuid,
+      obs: obsToSave,
+    };
+    return saveEncounter(encounterToSave);
   }
 
   static async savePatientIdentifiers(

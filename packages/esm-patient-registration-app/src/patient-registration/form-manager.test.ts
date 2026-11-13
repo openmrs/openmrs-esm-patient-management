@@ -8,7 +8,9 @@ import {
   deletePatientIdentifier,
   deletePersonName,
   generateIdentifier,
+  saveEncounter,
   savePatient,
+  updateEncounterObs,
 } from './patient-registration.resource';
 
 vi.mock('./patient-registration.resource', async () => ({
@@ -17,7 +19,9 @@ vi.mock('./patient-registration.resource', async () => ({
   deletePatientIdentifier: vi.fn(),
   deletePersonName: vi.fn(),
   generateIdentifier: vi.fn(),
+  saveEncounter: vi.fn(),
   savePatient: vi.fn(),
+  updateEncounterObs: vi.fn(),
 }));
 
 const mockAddPatientIdentifier = vi.mocked(addPatientIdentifier);
@@ -26,6 +30,8 @@ const mockDeletePersonName = vi.mocked(deletePersonName);
 const mockGenerateIdentifier = vi.mocked(generateIdentifier);
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockSavePatient = vi.mocked(savePatient);
+const mockSaveEncounter = vi.mocked(saveEncounter);
+const mockUpdateEncounterObs = vi.mocked(updateEncounterObs);
 
 function createDeferred<T>() {
   let resolve: (value: T) => void;
@@ -784,6 +790,98 @@ describe('FormManager', () => {
       expect(mockGenerateIdentifier).toHaveBeenCalledTimes(2);
       expect(mockGenerateIdentifier).toHaveBeenLastCalledWith('other-source-uuid');
       expect(mockSavePatient.mock.calls[1][0].identifiers).toEqual([expect.objectContaining({ identifier: '10002X' })]);
+    });
+  });
+
+  describe('saveObservations', () => {
+    const savePatientResponse = { data: { uuid: 'patient-uuid' } } as FetchResponse;
+    const currentUser = { currentProvider: { uuid: 'provider-uuid' } } as Session;
+    const config = {
+      registrationObs: {
+        encounterTypeUuid: 'registration-encounter-type-uuid',
+        encounterProviderRoleUuid: 'encounter-role-uuid',
+        registrationFormUuid: null,
+      },
+    } as RegistrationConfig;
+    const registrationEncounter = {
+      uuid: 'registration-encounter-uuid',
+      obs: {
+        'chief-complaint-uuid': { uuid: 'chief-complaint-obs-uuid', value: 'Headache' },
+        'weight-uuid': { uuid: 'weight-obs-uuid', value: '70' },
+        'nationality-uuid': { uuid: 'nationality-obs-uuid', value: 'usa' },
+      },
+    };
+
+    beforeEach(() => {
+      mockSaveEncounter.mockReset();
+      mockUpdateEncounterObs.mockReset();
+    });
+
+    it('creates a registration encounter with only the obs that have values', async () => {
+      await FormManager.saveObservations(
+        { 'chief-complaint-uuid': 'Headache', 'weight-uuid': '' },
+        savePatientResponse,
+        'location-uuid',
+        currentUser,
+        config,
+      );
+
+      expect(mockSaveEncounter).toHaveBeenCalledOnce();
+      expect(mockSaveEncounter.mock.calls[0][0]).toEqual(
+        expect.objectContaining({
+          patient: 'patient-uuid',
+          encounterType: 'registration-encounter-type-uuid',
+          obs: [{ concept: 'chief-complaint-uuid', value: 'Headache' }],
+        }),
+      );
+    });
+
+    it('does not create an encounter when every obs is empty', async () => {
+      await FormManager.saveObservations(
+        { 'chief-complaint-uuid': '', 'weight-uuid': '' },
+        savePatientResponse,
+        'location-uuid',
+        currentUser,
+        config,
+      );
+
+      expect(mockSaveEncounter).not.toHaveBeenCalled();
+    });
+
+    it('updates the existing registration encounter when editing a patient', async () => {
+      await FormManager.saveObservations(
+        { 'chief-complaint-uuid': '', 'weight-uuid': '72', 'nationality-uuid': 'usa', 'height-uuid': '180' },
+        savePatientResponse,
+        'location-uuid',
+        currentUser,
+        config,
+        registrationEncounter,
+      );
+
+      expect(mockSaveEncounter).not.toHaveBeenCalled();
+      expect(mockUpdateEncounterObs).toHaveBeenCalledOnce();
+      expect(mockUpdateEncounterObs).toHaveBeenCalledWith('registration-encounter-uuid', [
+        // A cleared value voids its obs
+        { uuid: 'chief-complaint-obs-uuid', voided: true },
+        // A changed value updates its obs
+        { uuid: 'weight-obs-uuid', value: '72' },
+        // A new value is added to the encounter; the unchanged nationality is not sent
+        { concept: 'height-uuid', value: '180' },
+      ]);
+    });
+
+    it('does not send anything when no obs changed while editing a patient', async () => {
+      await FormManager.saveObservations(
+        { 'chief-complaint-uuid': 'Headache', 'weight-uuid': '70', 'nationality-uuid': 'usa' },
+        savePatientResponse,
+        'location-uuid',
+        currentUser,
+        config,
+        registrationEncounter,
+      );
+
+      expect(mockSaveEncounter).not.toHaveBeenCalled();
+      expect(mockUpdateEncounterObs).not.toHaveBeenCalled();
     });
   });
 });

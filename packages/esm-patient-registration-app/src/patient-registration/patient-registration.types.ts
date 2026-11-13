@@ -174,7 +174,19 @@ export interface PatientUuidMapType {
   additionalNameUuid?: string;
   preferredNameUuid?: string;
   preferredAddressUuid?: string;
+  registrationEncounter?: RegistrationEncounter;
 }
+
+/** The latest registration encounter of a patient being edited, so its obs can be updated rather than duplicated. */
+export interface RegistrationEncounter {
+  uuid: string;
+  /** Each obs of the encounter, keyed by its concept uuid */
+  obs: Record<string, { uuid: string; value: string }>;
+}
+
+/** An obs change sent when updating an encounter: a new obs, a changed value, or a voided obs. */
+export type EncounterObsUpdate =
+  { concept: string; value: string } | { uuid: string; value: string } | { uuid: string; voided: true };
 
 export interface CapturePhotoProps {
   imageData: string;

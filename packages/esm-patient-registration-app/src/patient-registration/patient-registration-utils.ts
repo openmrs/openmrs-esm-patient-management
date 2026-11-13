@@ -1,11 +1,6 @@
 import camelCase from 'lodash-es/camelCase';
 import { parseDate } from '@openmrs/esm-framework';
-import {
-  type Encounter,
-  type FormValues,
-  type PatientIdentifierValue,
-  type PatientUuidMapType,
-} from './patient-registration.types';
+import { type FormValues, type PatientIdentifierValue, type PatientUuidMapType } from './patient-registration.types';
 
 export function scrollIntoView(viewId: string) {
   document.getElementById(viewId)?.scrollIntoView({
@@ -114,5 +109,7 @@ export const filterOutUndefinedPatientIdentifiers = (patientIdentifiers: Identif
     ),
   );
 
-export const latestFirstEncounter = (a: Encounter, b: Encounter) =>
-  new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime();
+export const latestFirstEncounter = (
+  a: { encounterDatetime: Date | string },
+  b: { encounterDatetime: Date | string },
+) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime();
