@@ -377,6 +377,32 @@ describe('FormManager', () => {
     });
   });
 
+  describe('getNames', () => {
+    it('sends the name parts a name template collects, such as a second family name', () => {
+      const [name] = FormManager.getNames(
+        { ...formValues, givenName: 'Ana', familyName: 'García', familyName2: 'López', prefix: '' },
+        { preferredNameUuid: 'name-uuid' },
+      );
+
+      expect(name).toEqual({
+        uuid: 'name-uuid',
+        preferred: true,
+        givenName: 'Ana',
+        middleName: '',
+        familyName: 'García',
+        familyName2: 'López',
+        // A field the user left empty is sent, so a value they removed is cleared
+        prefix: '',
+      });
+    });
+
+    it('leaves out name parts the form does not have, so they are not changed', () => {
+      const [name] = FormManager.getNames({ ...formValues, givenName: 'Ana', familyName: 'García' }, {});
+
+      expect(Object.keys(name)).toEqual(['uuid', 'preferred', 'givenName', 'middleName', 'familyName']);
+    });
+  });
+
   describe('getDeletedNames', () => {
     const patientUuid = 'patient-uuid';
     const patientUuidMap = { additionalNameUuid: 'additional-name-uuid' };
