@@ -93,6 +93,13 @@ describe('AppointmentsTable', () => {
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
+  it('renders an error state instead of an empty table when the appointments could not be loaded', () => {
+    renderAppointmentsTable({ error: new Error('Internal Server Error') });
+
+    expect(screen.getByText(/error state/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no appointments to display/i)).not.toBeInTheDocument();
+  });
+
   it('renders a tabular overview of the scheduled appointments', async () => {
     renderAppointmentsTable({ appointments: mockAppointments });
 
