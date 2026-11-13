@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { useTranslation } from 'react-i18next';
 import { type Encounter } from '@openmrs/esm-framework';
+import { useCurrentTime } from '../../hooks/useCurrentTime';
 
 dayjs.extend(duration);
 
@@ -14,12 +15,13 @@ const WardPatientTimeOnWard: React.FC<WardPatientTimeOnWardProps> = ({
   encounterAssigningToCurrentInpatientLocation,
 }) => {
   const { t } = useTranslation();
+  const currentTime = useCurrentTime();
 
   if (!encounterAssigningToCurrentInpatientLocation?.encounterDatetime) {
     return null;
   }
 
-  const dur = dayjs.duration(dayjs().diff(encounterAssigningToCurrentInpatientLocation.encounterDatetime));
+  const dur = dayjs.duration(dayjs(currentTime).diff(encounterAssigningToCurrentInpatientLocation.encounterDatetime));
   const days = Math.floor(dur.asDays());
   const hours = dur.hours();
   const minutes = dur.minutes();
