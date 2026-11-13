@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import isBetween from 'dayjs/plugin/isBetween';
 import dayjs, { type Dayjs } from 'dayjs';
 import { type DailyAppointmentsCountByService } from '../../types';
-import { monthDays } from '../../helpers';
+import { getCalendarFormat, getMonthGridDays } from '../calendar-utils';
 import MonthlyHeader from './monthly-header.component';
 import MonthlyViewWorkload from './monthly-workload-view.component';
 import styles from '../appointments-calendar-view-view.scss';
@@ -16,8 +16,17 @@ interface MonthlyCalendarViewProps {
   serviceColorMap?: Map<string, string>;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ events, calendarSelectedDate, onSelectDate, serviceColorMap }) => {
-  const gridDayCells = useMemo(() => monthDays(calendarSelectedDate), [calendarSelectedDate]);
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
+  events,
+  calendarSelectedDate,
+  onSelectDate,
+  serviceColorMap,
+}) => {
+  const { calendar } = getCalendarFormat();
+  const gridDayCells = useMemo(
+    () => getMonthGridDays(calendarSelectedDate, calendar),
+    [calendarSelectedDate, calendar],
+  );
 
   const eventsMap = useMemo(() => {
     const map = new Map<string, DailyAppointmentsCountByService>();
