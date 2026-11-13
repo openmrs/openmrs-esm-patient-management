@@ -6,6 +6,8 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
+import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
+import { type Appointment } from '../types';
 
 vi.mock('../hooks/useAppointmentsCalendar', () => ({
   useAppointmentsCalendar: vi.fn().mockReturnValue({ calendarEvents: [], isLoading: false, error: null }),
@@ -24,6 +26,7 @@ vi.mock('../hooks/useAppointmentService', () => ({
 }));
 
 const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
+const mockUseAppointmentsByDate = vi.mocked(useAppointmentsByDate);
 
 function renderCalendar() {
   return render(
@@ -232,22 +235,17 @@ describe('Appointment calendar view', () => {
 
   it('switches the count wording to the daily total when the Daily tab is selected', async () => {
     const user = userEvent.setup();
-    mockUseAppointmentsCalendar.mockReturnValue({
-      calendarEvents: [
-        {
-          appointmentDate: '2026-08-14',
-          services: [{ serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 4 }],
-        },
-      ],
+    mockUseAppointmentsByDate.mockReturnValue({
+      appointments: Array.from({ length: 4 }, (_, i) => ({ uuid: `appointment-${i}` }) as Appointment),
       isLoading: false,
-      error: null,
+      error: undefined,
     });
 
     renderCalendar();
 
     await user.click(screen.getByRole('tab', { name: /daily/i }));
 
-    expect(screen.getByText('4 appointments this day')).toBeInTheDocument();
+    expect(screen.getByText('4 appointments today')).toBeInTheDocument();
     expect(screen.queryByText(/appointments this month/i)).not.toBeInTheDocument();
   });
 
