@@ -184,6 +184,13 @@ export interface RegistrationEncounter {
   obs: Record<string, { uuid: string; value: string }>;
 }
 
+/** A registration encounter as loaded with `REGISTRATION_ENCOUNTER_REPRESENTATION`. */
+export interface RegistrationEncounterResponse {
+  uuid: string;
+  encounterDatetime: string;
+  obs: Array<{ uuid: string; concept: OpenmrsResource; value: string | number | OpenmrsResource }>;
+}
+
 /** An obs change sent when updating an encounter: a new obs, a changed value, or a voided obs. */
 export type EncounterObsUpdate =
   { concept: string; value: string } | { uuid: string; value: string } | { uuid: string; voided: true };

@@ -16,8 +16,11 @@ import {
   type Patient,
   type PatientIdentifier,
   type PatientUuidMapType,
+  type RegistrationEncounter,
+  type RegistrationEncounterResponse,
   type RelationshipValue,
 } from './patient-registration.types';
+import { getRegistrationEncounterObs } from './patient-registration-utils';
 import {
   addPatientIdentifier,
   deletePatientIdentifier,
@@ -104,13 +107,15 @@ export class FormManager {
       savePatientTransactionManager.patientSaved = true;
       await this.saveRelationships(values.relationships, savePatientResponse);
 
-      await this.saveObservations(
+      // On a retry, compare against the obs the previous attempt saved rather than those the form was loaded with
+      savePatientTransactionManager.registrationEncounter = await this.saveObservations(
         values.obs,
         savePatientResponse,
         currentLocation,
         currentUser,
         config,
-        isNewPatient ? undefined : patientUuidMap.registrationEncounter,
+        savePatientTransactionManager.registrationEncounter ??
+          (isNewPatient ? undefined : patientUuidMap.registrationEncounter),
       );
 
       const { patientPhotoConceptUuid } = await getConfig<StyleguideConfigObject>('@openmrs/esm-styleguide');
@@ -162,8 +167,8 @@ export class FormManager {
     currentLocation: string,
     currentUser: Session,
     config: RegistrationConfig,
-    registrationEncounter?: PatientUuidMapType['registrationEncounter'],
-  ) {
+    registrationEncounter?: RegistrationEncounter,
+  ): Promise<RegistrationEncounter | undefined> {
     const isEmpty = (value: unknown) => value === '' || value === null || value === undefined;
 
     // When editing, update the registration encounter the form was loaded from rather than creating a new one, so
@@ -183,10 +188,11 @@ export class FormManager {
         }
       });
 
-      if (obsUpdates.length > 0) {
-        return updateEncounterObs(registrationEncounter.uuid, obsUpdates);
+      if (obsUpdates.length === 0) {
+        return registrationEncounter;
       }
-      return;
+      const response = await updateEncounterObs(registrationEncounter.uuid, obsUpdates);
+      return FormManager.getSavedRegistrationEncounter(response);
     }
 
     const obsToSave = Object.entries(obss ?? {})
@@ -194,7 +200,7 @@ export class FormManager {
       .map(([conceptUuid, value]) => ({ concept: conceptUuid, value }));
 
     if (obsToSave.length === 0) {
-      return;
+      return undefined;
     }
 
     if (!config.registrationObs.encounterTypeUuid) {
@@ -203,7 +209,7 @@ export class FormManager {
           'but no registration encounter type has been configured. Obs field values ' +
           'will not be saved.',
       );
-      return;
+      return undefined;
     }
 
     const encounterToSave: Encounter = {
@@ -220,7 +226,15 @@ export class FormManager {
       form: config.registrationObs.registrationFormUuid,
       obs: obsToSave,
     };
-    return saveEncounter(encounterToSave);
+    const response = await saveEncounter(encounterToSave);
+    return FormManager.getSavedRegistrationEncounter(response);
+  }
+
+  /** Reads the encounter from a save response, if it has one, so a retry compares against what was saved. */
+  static getSavedRegistrationEncounter(
+    response: FetchResponse<RegistrationEncounterResponse> | undefined,
+  ): RegistrationEncounter | undefined {
+    return response?.data?.uuid ? getRegistrationEncounterObs(response.data).registrationEncounter : undefined;
   }
 
   static async savePatientIdentifiers(
@@ -477,4 +491,6 @@ export class SavePatientTransactionManager {
   generatedIdentifiers: Record<string, GeneratedIdentifier> = {};
   /** Identifier values already added to an existing patient, keyed by identifier field name. */
   addedIdentifiers: Record<string, string> = {};
+  /** The registration encounter as last saved, so a retry updates it rather than repeating or skipping changes. */
+  registrationEncounter?: RegistrationEncounter;
 }

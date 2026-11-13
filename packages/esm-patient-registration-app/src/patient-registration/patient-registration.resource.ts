@@ -5,8 +5,10 @@ import {
   type EncounterObsUpdate,
   type Patient,
   type PatientIdentifier,
+  type RegistrationEncounterResponse,
   type Relationship,
 } from './patient-registration.types';
+import { REGISTRATION_ENCOUNTER_REPRESENTATION } from './patient-registration-utils';
 
 function dataURItoFile(dataURI: string) {
   const byteString = window.atob(dataURI.split(',')[1]);
@@ -36,26 +38,32 @@ export function savePatient(patient: Patient | null, updatePatientUuid?: string)
 }
 
 export function updateEncounterObs(encounterUuid: string, obs: Array<EncounterObsUpdate>) {
-  return openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-    headers: {
-      'Content-Type': 'application/json',
+  return openmrsFetch<RegistrationEncounterResponse>(
+    `${restBaseUrl}/encounter/${encounterUuid}?v=${REGISTRATION_ENCOUNTER_REPRESENTATION}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: { obs },
     },
-    method: 'POST',
-    body: { obs },
-  });
+  );
 }
 
 export function saveEncounter(encounter: Encounter) {
   const abortController = new AbortController();
 
-  return openmrsFetch(`${restBaseUrl}/encounter`, {
-    headers: {
-      'Content-Type': 'application/json',
+  return openmrsFetch<RegistrationEncounterResponse>(
+    `${restBaseUrl}/encounter?v=${REGISTRATION_ENCOUNTER_REPRESENTATION}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: encounter,
+      signal: abortController.signal,
     },
-    method: 'POST',
-    body: encounter,
-    signal: abortController.signal,
-  });
+  );
 }
 
 export function generateIdentifier(source: string) {

@@ -12,14 +12,16 @@ import {
   type PatientIdentifierResponse,
   type PatientUuidMapType,
   type PersonAttributeResponse,
-  type RegistrationEncounter,
+  type RegistrationEncounterResponse,
 } from './patient-registration.types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
+  getRegistrationEncounterObs,
   latestFirstEncounter,
+  REGISTRATION_ENCOUNTER_REPRESENTATION,
 } from './patient-registration-utils';
 
 interface DeathInfoResults {
@@ -240,17 +242,11 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
   return result;
 }
 
-interface RegistrationEncounterResponse {
-  uuid: string;
-  encounterDatetime: string;
-  obs: Array<{ uuid: string; concept: OpenmrsResource; value: string | number | OpenmrsResource }>;
-}
-
 function useInitialEncounters(patientUuid: string, patientToEdit: fhir.Patient) {
   const { registrationObs } = useConfig<RegistrationConfig>();
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<RegistrationEncounterResponse> }>>(
     patientToEdit && registrationObs.encounterTypeUuid
-      ? `${restBaseUrl}/encounter?patient=${patientUuid}&v=custom:(uuid,encounterDatetime,obs:(uuid,concept:ref,value:ref))&encounterType=${registrationObs.encounterTypeUuid}`
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&v=${REGISTRATION_ENCOUNTER_REPRESENTATION}&encounterType=${registrationObs.encounterTypeUuid}`
       : null,
     openmrsFetch,
   );
@@ -262,15 +258,8 @@ function useInitialEncounters(patientUuid: string, patientToEdit: fhir.Patient) 
       return { data: undefined, registrationEncounter: undefined, isLoading, error };
     }
 
-    const encounters: Record<string, string> = {};
-    const registrationEncounter: RegistrationEncounter = { uuid: latestEncounter.uuid, obs: {} };
-    latestEncounter.obs?.forEach(({ uuid, concept, value }) => {
-      const formValue = typeof value === 'object' ? value?.uuid : value;
-      encounters[concept.uuid] = formValue as string;
-      registrationEncounter.obs[concept.uuid] = { uuid, value: String(formValue) };
-    });
-
-    return { data: encounters, registrationEncounter, isLoading, error };
+    const { obsValues, registrationEncounter } = getRegistrationEncounterObs(latestEncounter);
+    return { data: obsValues, registrationEncounter, isLoading, error };
   }, [data, isLoading, error]);
 }
 
