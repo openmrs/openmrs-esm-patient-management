@@ -11,12 +11,16 @@ import {
   type AttributeValue,
   type CapturePhotoProps,
   type Encounter,
+  type EncounterObsUpdate,
   type FormValues,
   type Patient,
   type PatientIdentifier,
   type PatientUuidMapType,
+  type RegistrationEncounter,
+  type RegistrationEncounterResponse,
   type RelationshipValue,
 } from './patient-registration.types';
+import { getRegistrationEncounterObs } from './patient-registration-utils';
 import {
   addPatientIdentifier,
   deletePatientIdentifier,
@@ -28,6 +32,7 @@ import {
   savePatient,
   savePatientPhoto,
   saveRelationship,
+  updateEncounterObs,
   updatePatientIdentifier,
   updateRelationship,
 } from './patient-registration.resource';
@@ -102,7 +107,16 @@ export class FormManager {
       savePatientTransactionManager.patientSaved = true;
       await this.saveRelationships(values.relationships, savePatientResponse);
 
-      await this.saveObservations(values.obs, savePatientResponse, currentLocation, currentUser, config);
+      // On a retry, compare against the obs the previous attempt saved rather than those the form was loaded with
+      savePatientTransactionManager.registrationEncounter = await this.saveObservations(
+        values.obs,
+        savePatientResponse,
+        currentLocation,
+        currentUser,
+        config,
+        savePatientTransactionManager.registrationEncounter ??
+          (isNewPatient ? undefined : patientUuidMap.registrationEncounter),
+      );
 
       const { patientPhotoConceptUuid } = await getConfig<StyleguideConfigObject>('@openmrs/esm-styleguide');
 
@@ -153,34 +167,74 @@ export class FormManager {
     currentLocation: string,
     currentUser: Session,
     config: RegistrationConfig,
-  ) {
-    if (obss && Object.keys(obss).length > 0) {
-      if (!config.registrationObs.encounterTypeUuid) {
-        console.error(
-          'The registration form has been configured to have obs fields, ' +
-            'but no registration encounter type has been configured. Obs field values ' +
-            'will not be saved.',
-        );
-      } else {
-        const encounterToSave: Encounter = {
-          encounterDatetime: new Date(),
-          patient: savePatientResponse.data.uuid,
-          encounterType: config.registrationObs.encounterTypeUuid,
-          location: currentLocation,
-          encounterProviders: [
-            {
-              provider: currentUser.currentProvider.uuid,
-              encounterRole: config.registrationObs.encounterProviderRoleUuid,
-            },
-          ],
-          form: config.registrationObs.registrationFormUuid,
-          obs: Object.entries(obss)
-            .filter(([, value]) => value !== '')
-            .map(([conceptUuid, value]) => ({ concept: conceptUuid, value })),
-        };
-        return saveEncounter(encounterToSave);
+    registrationEncounter?: RegistrationEncounter,
+  ): Promise<RegistrationEncounter | undefined> {
+    const isEmpty = (value: unknown) => value === '' || value === null || value === undefined;
+
+    // When editing, update the registration encounter the form was loaded from rather than creating a new one, so
+    // a cleared value voids its obs and an unchanged value is not saved again
+    if (registrationEncounter) {
+      const obsUpdates: Array<EncounterObsUpdate> = [];
+      Object.entries(obss ?? {}).forEach(([conceptUuid, value]) => {
+        const existingObs = registrationEncounter.obs[conceptUuid];
+        if (!existingObs) {
+          if (!isEmpty(value)) {
+            obsUpdates.push({ concept: conceptUuid, value });
+          }
+        } else if (isEmpty(value)) {
+          obsUpdates.push({ uuid: existingObs.uuid, voided: true });
+        } else if (String(value) !== existingObs.value) {
+          obsUpdates.push({ uuid: existingObs.uuid, value });
+        }
+      });
+
+      if (obsUpdates.length === 0) {
+        return registrationEncounter;
       }
+      const response = await updateEncounterObs(registrationEncounter.uuid, obsUpdates);
+      return FormManager.getSavedRegistrationEncounter(response);
     }
+
+    const obsToSave = Object.entries(obss ?? {})
+      .filter(([, value]) => !isEmpty(value))
+      .map(([conceptUuid, value]) => ({ concept: conceptUuid, value }));
+
+    if (obsToSave.length === 0) {
+      return undefined;
+    }
+
+    if (!config.registrationObs.encounterTypeUuid) {
+      console.error(
+        'The registration form has been configured to have obs fields, ' +
+          'but no registration encounter type has been configured. Obs field values ' +
+          'will not be saved.',
+      );
+      return undefined;
+    }
+
+    const encounterToSave: Encounter = {
+      encounterDatetime: new Date(),
+      patient: savePatientResponse.data.uuid,
+      encounterType: config.registrationObs.encounterTypeUuid,
+      location: currentLocation,
+      encounterProviders: [
+        {
+          provider: currentUser.currentProvider.uuid,
+          encounterRole: config.registrationObs.encounterProviderRoleUuid,
+        },
+      ],
+      form: config.registrationObs.registrationFormUuid,
+      obs: obsToSave,
+    };
+    const response = await saveEncounter(encounterToSave);
+    return FormManager.getSavedRegistrationEncounter(response);
+  }
+
+  /** Reads the encounter from a save response, if it has one, so a retry compares against what was saved. */
+  static getSavedRegistrationEncounter(
+    response: FetchResponse<RegistrationEncounterResponse> | undefined,
+  ): RegistrationEncounter | undefined {
+    return response?.data?.uuid ? getRegistrationEncounterObs(response.data).registrationEncounter : undefined;
   }
 
   static async savePatientIdentifiers(
@@ -437,4 +491,6 @@ export class SavePatientTransactionManager {
   generatedIdentifiers: Record<string, GeneratedIdentifier> = {};
   /** Identifier values already added to an existing patient, keyed by identifier field name. */
   addedIdentifiers: Record<string, string> = {};
+  /** The registration encounter as last saved, so a retry updates it rather than repeating or skipping changes. */
+  registrationEncounter?: RegistrationEncounter;
 }

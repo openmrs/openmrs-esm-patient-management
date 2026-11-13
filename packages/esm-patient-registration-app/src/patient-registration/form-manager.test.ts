@@ -1,6 +1,6 @@
 import { FormManager, SavePatientTransactionManager } from './form-manager';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { type FetchResponse, openmrsFetch, type Session } from '@openmrs/esm-framework';
+import { type FetchResponse, getConfig, openmrsFetch, type Session } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../config-schema';
 import { type FormValues, type PatientUuidMapType } from './patient-registration.types';
 import {
@@ -8,7 +8,9 @@ import {
   deletePatientIdentifier,
   deletePersonName,
   generateIdentifier,
+  saveEncounter,
   savePatient,
+  updateEncounterObs,
 } from './patient-registration.resource';
 
 vi.mock('./patient-registration.resource', async () => ({
@@ -17,7 +19,9 @@ vi.mock('./patient-registration.resource', async () => ({
   deletePatientIdentifier: vi.fn(),
   deletePersonName: vi.fn(),
   generateIdentifier: vi.fn(),
+  saveEncounter: vi.fn(),
   savePatient: vi.fn(),
+  updateEncounterObs: vi.fn(),
 }));
 
 const mockAddPatientIdentifier = vi.mocked(addPatientIdentifier);
@@ -26,6 +30,8 @@ const mockDeletePersonName = vi.mocked(deletePersonName);
 const mockGenerateIdentifier = vi.mocked(generateIdentifier);
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 const mockSavePatient = vi.mocked(savePatient);
+const mockSaveEncounter = vi.mocked(saveEncounter);
+const mockUpdateEncounterObs = vi.mocked(updateEncounterObs);
 
 function createDeferred<T>() {
   let resolve: (value: T) => void;
@@ -784,6 +790,212 @@ describe('FormManager', () => {
       expect(mockGenerateIdentifier).toHaveBeenCalledTimes(2);
       expect(mockGenerateIdentifier).toHaveBeenLastCalledWith('other-source-uuid');
       expect(mockSavePatient.mock.calls[1][0].identifiers).toEqual([expect.objectContaining({ identifier: '10002X' })]);
+    });
+  });
+
+  describe('saveObservations', () => {
+    const savePatientResponse = { data: { uuid: 'patient-uuid' } } as FetchResponse;
+    const currentUser = { currentProvider: { uuid: 'provider-uuid' } } as Session;
+    const config = {
+      registrationObs: {
+        encounterTypeUuid: 'registration-encounter-type-uuid',
+        encounterProviderRoleUuid: 'encounter-role-uuid',
+        registrationFormUuid: null,
+      },
+    } as RegistrationConfig;
+    const registrationEncounter = {
+      uuid: 'registration-encounter-uuid',
+      obs: {
+        'chief-complaint-uuid': { uuid: 'chief-complaint-obs-uuid', value: 'Headache' },
+        'weight-uuid': { uuid: 'weight-obs-uuid', value: '70' },
+        'nationality-uuid': { uuid: 'nationality-obs-uuid', value: 'usa' },
+      },
+    };
+
+    // The REST API answers with the encounter as saved; changed obs get new uuids, voided obs are left out
+    let savedEncounterObs: Record<string, { uuid: string; value: string }>;
+    const encounterResponse = (uuid: string) =>
+      ({
+        data: {
+          uuid,
+          encounterDatetime: '2026-11-13T10:00:00.000+0000',
+          obs: Object.entries(savedEncounterObs).map(([concept, obs]) => ({
+            uuid: obs.uuid,
+            concept: { uuid: concept },
+            value: obs.value,
+          })),
+        },
+      }) as never;
+
+    beforeEach(() => {
+      savedEncounterObs = { ...registrationEncounter.obs };
+      mockSaveEncounter.mockReset().mockImplementation(async (encounter) => {
+        savedEncounterObs = Object.fromEntries(
+          encounter.obs.map(({ concept, value }) => [concept, { uuid: `new-${concept}`, value: String(value) }]),
+        );
+        return encounterResponse('new-encounter-uuid');
+      });
+      mockUpdateEncounterObs.mockReset().mockImplementation(async (encounterUuid, updates) => {
+        updates.forEach((update) => {
+          const concept =
+            'concept' in update
+              ? update.concept
+              : Object.keys(savedEncounterObs).find((key) => savedEncounterObs[key].uuid === update.uuid);
+          if ('voided' in update) {
+            delete savedEncounterObs[concept];
+          } else {
+            savedEncounterObs[concept] = { uuid: `new-${concept}`, value: update.value };
+          }
+        });
+        return encounterResponse(encounterUuid);
+      });
+    });
+
+    it('creates a registration encounter with only the obs that have values', async () => {
+      await FormManager.saveObservations(
+        { 'chief-complaint-uuid': 'Headache', 'weight-uuid': '' },
+        savePatientResponse,
+        'location-uuid',
+        currentUser,
+        config,
+      );
+
+      expect(mockSaveEncounter).toHaveBeenCalledOnce();
+      expect(mockSaveEncounter.mock.calls[0][0]).toEqual(
+        expect.objectContaining({
+          patient: 'patient-uuid',
+          encounterType: 'registration-encounter-type-uuid',
+          obs: [{ concept: 'chief-complaint-uuid', value: 'Headache' }],
+        }),
+      );
+    });
+
+    it('does not create an encounter when every obs is empty', async () => {
+      await FormManager.saveObservations(
+        { 'chief-complaint-uuid': '', 'weight-uuid': '' },
+        savePatientResponse,
+        'location-uuid',
+        currentUser,
+        config,
+      );
+
+      expect(mockSaveEncounter).not.toHaveBeenCalled();
+    });
+
+    it('updates the existing registration encounter when editing a patient', async () => {
+      await FormManager.saveObservations(
+        { 'chief-complaint-uuid': '', 'weight-uuid': '72', 'nationality-uuid': 'usa', 'height-uuid': '180' },
+        savePatientResponse,
+        'location-uuid',
+        currentUser,
+        config,
+        registrationEncounter,
+      );
+
+      expect(mockSaveEncounter).not.toHaveBeenCalled();
+      expect(mockUpdateEncounterObs).toHaveBeenCalledOnce();
+      expect(mockUpdateEncounterObs).toHaveBeenCalledWith('registration-encounter-uuid', [
+        // A cleared value voids its obs
+        { uuid: 'chief-complaint-obs-uuid', voided: true },
+        // A changed value updates its obs
+        { uuid: 'weight-obs-uuid', value: '72' },
+        // A new value is added to the encounter; the unchanged nationality is not sent
+        { concept: 'height-uuid', value: '180' },
+      ]);
+    });
+
+    it('returns the encounter as saved, with the new obs uuids', async () => {
+      const savedEncounter = await FormManager.saveObservations(
+        { 'chief-complaint-uuid': '', 'weight-uuid': '72', 'nationality-uuid': 'usa' },
+        savePatientResponse,
+        'location-uuid',
+        currentUser,
+        config,
+        registrationEncounter,
+      );
+
+      expect(savedEncounter).toEqual({
+        uuid: 'registration-encounter-uuid',
+        obs: {
+          'weight-uuid': { uuid: 'new-weight-uuid', value: '72' },
+          'nationality-uuid': { uuid: 'nationality-obs-uuid', value: 'usa' },
+        },
+      });
+    });
+
+    describe('when the save is retried after the obs were saved', () => {
+      const patientValues = (obs: FormValues['obs']) => ({
+        ...formValues,
+        patientUuid: 'patient-uuid',
+        identifiers: {},
+        relationships: [],
+        obs,
+      });
+      const save = (isNewPatient: boolean, obs: FormValues['obs'], manager: SavePatientTransactionManager) =>
+        FormManager.savePatientFormOnline(
+          isNewPatient,
+          patientValues(obs),
+          isNewPatient ? {} : { registrationEncounter },
+          { imageData: '', dateTime: '' },
+          'location-uuid',
+          {},
+          currentUser,
+          config,
+          manager,
+        );
+
+      beforeEach(() => {
+        mockSavePatient.mockResolvedValue({ ok: true, data: { uuid: 'patient-uuid' } } as never);
+      });
+
+      it('saves a value restored after it was cleared and voided', async () => {
+        const manager = new SavePatientTransactionManager();
+        // The obs are saved, then a later step fails
+        vi.mocked(getConfig).mockRejectedValueOnce(new Error('Photo upload failed'));
+        await expect(save(false, { 'chief-complaint-uuid': '' }, manager)).rejects.toThrow('Photo upload failed');
+
+        await save(false, { 'chief-complaint-uuid': 'Headache' }, manager);
+
+        expect(mockUpdateEncounterObs).toHaveBeenCalledTimes(2);
+        expect(mockUpdateEncounterObs.mock.calls[1][1]).toEqual([
+          { concept: 'chief-complaint-uuid', value: 'Headache' },
+        ]);
+      });
+
+      it('does not send a changed value again', async () => {
+        const manager = new SavePatientTransactionManager();
+        vi.mocked(getConfig).mockRejectedValueOnce(new Error('Photo upload failed'));
+        await expect(save(false, { 'weight-uuid': '72' }, manager)).rejects.toThrow('Photo upload failed');
+
+        await save(false, { 'weight-uuid': '72' }, manager);
+
+        expect(mockUpdateEncounterObs).toHaveBeenCalledOnce();
+      });
+
+      it('does not create a second encounter for a new patient', async () => {
+        const manager = new SavePatientTransactionManager();
+        vi.mocked(getConfig).mockRejectedValueOnce(new Error('Photo upload failed'));
+        await expect(save(true, { 'weight-uuid': '70' }, manager)).rejects.toThrow('Photo upload failed');
+
+        await save(true, { 'weight-uuid': '70' }, manager);
+
+        expect(mockSaveEncounter).toHaveBeenCalledOnce();
+        expect(mockUpdateEncounterObs).not.toHaveBeenCalled();
+      });
+    });
+
+    it('does not send anything when no obs changed while editing a patient', async () => {
+      await FormManager.saveObservations(
+        { 'chief-complaint-uuid': 'Headache', 'weight-uuid': '70', 'nationality-uuid': 'usa' },
+        savePatientResponse,
+        'location-uuid',
+        currentUser,
+        config,
+        registrationEncounter,
+      );
+
+      expect(mockSaveEncounter).not.toHaveBeenCalled();
+      expect(mockUpdateEncounterObs).not.toHaveBeenCalled();
     });
   });
 });
