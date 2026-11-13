@@ -377,14 +377,20 @@ describe('NameField with a name template', () => {
     expect(await screen.findByText('Segundo apellido is required')).toBeInTheDocument();
   });
 
-  it('fills in the template defaults without replacing existing values', async () => {
-    useNameTemplateConfig('latinamerica-defaults');
-    respondWithTemplate({ elementDefaults: { familyName2: 'Default', middleName: 'Default' } });
+  it('waits for the template before the patient can be marked as unknown', async () => {
+    useNameTemplateConfig('latinamerica-delayed');
+    let respond: (value: unknown) => void;
+    mockOpenmrsFetch.mockReturnValue(new Promise((resolve) => (respond = resolve)) as never);
 
-    const { getFormValues } = renderNameFieldWithFormik({ middleName: 'Existing' });
+    renderNameFieldWithFormik();
 
-    await waitFor(() => expect(getFormValues().familyName2).toBe('Default'));
-    expect(getFormValues().middleName).toBe('Existing');
+    expect(screen.getByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'No' })).not.toBeInTheDocument();
+
+    respond({ data: latinAmericaNameTemplate });
+
+    expect(await screen.findByRole('tab', { name: 'No' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Segundo apellido (optional)')).toBeInTheDocument();
   });
 
   it('clears every template field when the patient is marked as unknown', async () => {

@@ -6,8 +6,9 @@ import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { Input } from '../../input/basic-input/input/input.component';
-import { type NameProperty, type NameTemplate, nameProperties } from '../../patient-registration.types';
+import { type NameProperty, type NameTemplate } from '../../patient-registration.types';
 import { useNameTemplate } from './name-template.resource';
+import { alwaysRequiredNameFields, getNameTemplateFieldNames } from './name-template';
 import styles from '../field.scss';
 
 export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
@@ -27,41 +28,30 @@ interface NameFieldLayout {
   required: boolean;
 }
 
-/**
- * The given and family names are required by the backend, so they are always shown and required, even when a name
- * template leaves them out or marks them optional. The form's validation schema checks them.
- */
-const alwaysRequiredNameFields: Array<NameProperty> = ['givenName', 'familyName'];
-
-/** Reads the name fields, in order, from a name template. Name parts the template does not know are skipped. */
+/** Reads the name fields, in order, from a name template, with the labels it gives them. */
 export function getNameTemplateLayout(
   nameTemplate: NameTemplate,
   getDefaultLabel: (name: NameProperty) => string,
 ): Array<NameFieldLayout> {
   const requiredElements = new Set([...alwaysRequiredNameFields, ...(nameTemplate.requiredElements ?? [])]);
-  const layout: Array<NameFieldLayout> = [];
-
+  const labels: Record<string, string> = {};
   nameTemplate.lines
     ?.flat()
-    .filter(({ isToken }) => isToken === 'IS_NAME_TOKEN')
+    .filter(({ isToken, displayText }) => isToken === 'IS_NAME_TOKEN' && displayText)
     .forEach(({ codeName, displayText }) => {
-      const name = codeName as NameProperty;
-      if (nameProperties.includes(name) && !layout.some((field) => field.name === name)) {
-        layout.push({ name, label: displayText || getDefaultLabel(name), required: requiredElements.has(name) });
-      }
+      labels[codeName] ??= displayText;
     });
 
-  alwaysRequiredNameFields
-    .filter((name) => !layout.some((field) => field.name === name))
-    .forEach((name) => layout.push({ name, label: getDefaultLabel(name), required: true }));
-
-  return layout;
+  return getNameTemplateFieldNames(nameTemplate).map((name) => ({
+    name,
+    label: labels[name] || getDefaultLabel(name),
+    required: requiredElements.has(name),
+  }));
 }
 
 export const NameField = () => {
   const { t } = useTranslation();
-  const { setCapturePhotoProps, currentPhoto, setFieldValue, setFieldTouched, values } =
-    usePatientRegistrationContext();
+  const { setCapturePhotoProps, currentPhoto, setFieldValue, setFieldTouched } = usePatientRegistrationContext();
 
   const {
     fieldConfigurations: {
@@ -141,24 +131,6 @@ export const NameField = () => {
     }
   }, [nameTemplateCodeName, nameTemplateError]);
 
-  // Give each template field a value, so Formik checks it on submit: the template's default, without replacing a
-  // value that is already there
-  useEffect(() => {
-    if (!nameTemplate?.lines) {
-      return;
-    }
-    nameFields.forEach(({ name }) => {
-      const defaultValue = nameTemplate.elementDefaults?.[name];
-      if (defaultValue && !values?.[name]) {
-        setFieldValue(name, defaultValue);
-      } else if (values?.[name] === undefined) {
-        setFieldValue(name, '');
-      }
-    });
-    // Only when the template loads; re-running on each value change would refill a field the user cleared
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nameTemplate]);
-
   const toggleNameKnown = (e) => {
     nameFields.forEach(({ name }) => setFieldValue(name, ''));
     if (e.name === 'known') {
@@ -185,44 +157,48 @@ export const NameField = () => {
         )}
 
         <div className={styles.nameField}>
-          {(allowUnidentifiedPatients || isPatientUnknown) && (
+          {nameTemplateCodeName && isLoadingNameTemplate ? (
+            // The whole name area waits for the template, so the patient cannot be marked unknown before its fields
+            // and defaults are known
+            <div role="progressbar" aria-label={t('loading', 'Loading')}>
+              <SkeletonText />
+            </div>
+          ) : (
             <>
-              <div className={styles.dobContentSwitcherLabel}>
-                <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
-              </div>
-              <ContentSwitcher
-                className={styles.contentSwitcher}
-                size="md"
-                selectedIndex={isPatientUnknown ? 1 : 0}
-                onChange={toggleNameKnown}>
-                <Switch name="known">{t('yes', 'Yes')}</Switch>
-                <Switch name="unknown">{t('no', 'No')}</Switch>
-              </ContentSwitcher>
+              {(allowUnidentifiedPatients || isPatientUnknown) && (
+                <>
+                  <div className={styles.dobContentSwitcherLabel}>
+                    <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
+                  </div>
+                  <ContentSwitcher
+                    className={styles.contentSwitcher}
+                    size="md"
+                    selectedIndex={isPatientUnknown ? 1 : 0}
+                    onChange={toggleNameKnown}>
+                    <Switch name="known">{t('yes', 'Yes')}</Switch>
+                    <Switch name="unknown">{t('no', 'No')}</Switch>
+                  </ContentSwitcher>
+                </>
+              )}
+              {!isPatientUnknown &&
+                nameFields.map(({ name, label, required }) => (
+                  <Input
+                    key={name}
+                    id={name}
+                    name={name}
+                    labelText={label}
+                    checkWarning={checkNumber}
+                    required={required}
+                    validate={
+                      // The validation schema checks the always-required names; other required parts are checked here
+                      required && !alwaysRequiredNameFields.includes(name)
+                        ? (value) => (value ? undefined : t('nameFieldRequired', '{{label}} is required', { label }))
+                        : undefined
+                    }
+                  />
+                ))}
             </>
           )}
-          {!isPatientUnknown &&
-            (nameTemplateCodeName && isLoadingNameTemplate ? (
-              <div role="progressbar" aria-label={t('loading', 'Loading')}>
-                <SkeletonText />
-              </div>
-            ) : (
-              nameFields.map(({ name, label, required }) => (
-                <Input
-                  key={name}
-                  id={name}
-                  name={name}
-                  labelText={label}
-                  checkWarning={checkNumber}
-                  required={required}
-                  validate={
-                    // The validation schema checks the always-required names; other required parts are checked here
-                    required && !alwaysRequiredNameFields.includes(name)
-                      ? (value) => (value ? undefined : t('nameFieldRequired', '{{label}} is required', { label }))
-                      : undefined
-                  }
-                />
-              ))
-            ))}
         </div>
       </div>
     </div>
