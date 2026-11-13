@@ -1,12 +1,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type PatientSearchContextProps } from '../patient-search-context';
 import PatientSearchWorkspace from '../patient-search-workspace/patient-search.workspace';
+import { type PatientSelectionCallback } from '../patient-search-context';
 import Overlay from '../ui-components/overlay.component';
+import { useIsSearchWorkspaceOpen } from './use-is-search-workspace-open';
 
-interface PatientSearchOverlayProps extends Pick<PatientSearchContextProps, 'patientClickSideEffect'> {
+interface PatientSearchOverlayProps {
   onClose: () => void;
   query?: string;
+  /** Called just before following a result's link to the patient chart. */
+  patientClickSideEffect?: PatientSelectionCallback;
 }
 
 /**
@@ -21,11 +24,17 @@ interface PatientSearchOverlayProps extends Pick<PatientSearchContextProps, 'pat
  */
 const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, query = '', patientClickSideEffect }) => {
   const { t } = useTranslation();
+  // The overlay covers the whole screen, above the workspaces. Hide it (rather than unmount it, which would
+  // lose the search) while the start visit workspace is open, so that the workspace can be used; the results
+  // come back when the workspace is closed.
+  const isWorkspaceOpen = useIsSearchWorkspaceOpen();
 
   return (
-    <Overlay header={t('searchResults', 'Search results')} close={onClose}>
-      <PatientSearchWorkspace initialQuery={query} patientClickSideEffect={patientClickSideEffect} />
-    </Overlay>
+    <div hidden={isWorkspaceOpen}>
+      <Overlay header={t('searchResults', 'Search results')} close={onClose}>
+        <PatientSearchWorkspace initialQuery={query} patientClickSideEffect={patientClickSideEffect} />
+      </Overlay>
+    </div>
   );
 };
 

@@ -2,10 +2,10 @@ import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContext } from '../patient-search-context';
 import CompactPatientBanner from './compact-patient-banner.component';
 
 // The virtualizer measures a 0px scroll element under happy-dom, so it would render no rows.
@@ -73,11 +73,7 @@ describe('CompactPatientBanner', () => {
   beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
 
   it('renders a compact patient banner', () => {
-    render(
-      <PatientSearchContext.Provider value={{}}>
-        <CompactPatientBanner patients={patients} />
-      </PatientSearchContext.Provider>,
-    );
+    render(<CompactPatientBanner patients={patients} />);
 
     // TODO: Restore these tests once we improve the patient banner test stubs
     // expect(
@@ -106,22 +102,37 @@ describe('CompactPatientBanner', () => {
       },
     ];
 
-    render(
-      <PatientSearchContext.Provider value={{}}>
-        <CompactPatientBanner patients={multiplePatients} />
-      </PatientSearchContext.Provider>,
-    );
+    render(<CompactPatientBanner patients={multiplePatients} />);
 
     expect(screen.getAllByText('Patient Photo')).toHaveLength(2);
   });
 
   it('renders empty state when patients array is empty', () => {
-    render(
-      <PatientSearchContext.Provider value={{}}>
-        <CompactPatientBanner patients={[]} />
-      </PatientSearchContext.Provider>,
-    );
+    render(<CompactPatientBanner patients={[]} />);
 
     expect(screen.queryByText('Patient Photo')).not.toBeInTheDocument();
+  });
+
+  it('selects the patient in place, then runs the click side effect, when a select action is given', async () => {
+    const user = userEvent.setup();
+    const calls: Array<string> = [];
+    const nonNavigationSelectPatientAction = vi.fn(() => calls.push('select'));
+    const patientClickSideEffect = vi.fn(() => calls.push('sideEffect'));
+
+    render(
+      <CompactPatientBanner
+        patients={patients}
+        nonNavigationSelectPatientAction={nonNavigationSelectPatientAction}
+        patientClickSideEffect={patientClickSideEffect}
+      />,
+    );
+
+    await user.click(screen.getByRole('button'));
+
+    expect(nonNavigationSelectPatientAction).toHaveBeenCalledWith(
+      patients[0].uuid,
+      expect.objectContaining({ id: patients[0].uuid }),
+    );
+    expect(calls).toEqual(['select', 'sideEffect']);
   });
 });

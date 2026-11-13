@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
 import { type PatientSearchResponse } from '../types';
-import CompactPatientBanner, { type CompactPatientBannerHandle } from './compact-patient-banner.component';
+import CompactPatientBanner, {
+  type CompactPatientBannerHandle,
+  type CompactPatientSelectionProps,
+} from './compact-patient-banner.component';
 import Loader from './loader.component';
 import styles from './patient-search.scss';
 
-interface PatientSearchProps extends PatientSearchResponse {
+interface PatientSearchProps extends PatientSearchResponse, CompactPatientSelectionProps {
   query: string;
 }
 
@@ -21,6 +24,8 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
       isLoadingMinSearchCharacters = false,
       isValidating,
       minSearchCharacters = 0,
+      nonNavigationSelectPatientAction,
+      patientClickSideEffect,
       query,
       setPage,
       totalResults,
@@ -97,6 +102,8 @@ const PatientSearch = forwardRef<CompactPatientBannerHandle, PatientSearchProps>
               hasMore={hasMore}
               isValidating={isValidating}
               fetchMore={fetchMore}
+              nonNavigationSelectPatientAction={nonNavigationSelectPatientAction}
+              patientClickSideEffect={patientClickSideEffect}
             />
           </div>
         </div>

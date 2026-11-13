@@ -4,7 +4,6 @@ import { navigate, interpolateString, useConfig, useDebounce, showSnackbar } fro
 import { type PatientSearchConfig } from '../config-schema';
 import { type CompactPatientBannerHandle } from './compact-patient-banner.component';
 import { useRecentlyViewedPatients, useInfinitePatientSearch, useRestPatients } from '../patient-search.resource';
-import { PatientSearchContextProvider } from '../patient-search-context';
 import useArrowNavigation from '../hooks/useArrowNavigation';
 import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
@@ -175,41 +174,42 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const handleSearchTermChange = (searchTerm: string) => setSearchTerm(searchTerm ?? '');
 
   return (
-    <PatientSearchContextProvider
-      value={{
-        patientClickSideEffect: addViewedPatientAndCloseSearchResults,
-      }}>
-      <div className={styles.patientSearchBar} ref={searchContainerRef}>
-        <PatientSearchBar
-          isCompact
-          initialSearchTerm={initialSearchTerm ?? ''}
-          onChange={handleSearchTermChange}
-          onSubmit={handleSubmit}
-          onClear={handleClear}
-          ref={searchInputRef}
-        />
-        {!isSearchPage && hasSearchTerm && (
-          <div
-            className={styles.floatingSearchResultsContainer}
-            data-testid="floatingSearchResultsContainer"
-            data-tutorial-target="floating-search-results-container">
-            <PatientSearch query={debouncedSearchTerm} ref={bannerRef} {...patientSearchResponse} />
-          </div>
-        )}
-        {!isSearchPage && !hasSearchTerm && showRecentlySearchedPatients && (
-          <div
-            className={styles.floatingSearchResultsContainer}
-            data-testid="floatingSearchResultsContainer"
-            data-tutorial-target="floating-search-results-container">
-            <RecentlySearchedPatients
-              ref={bannerRef}
-              {...recentPatientSearchResponse}
-              isLoading={recentPatientSearchResponse.isLoading || isLoadingPatients}
-            />
-          </div>
-        )}
-      </div>
-    </PatientSearchContextProvider>
+    <div className={styles.patientSearchBar} ref={searchContainerRef}>
+      <PatientSearchBar
+        isCompact
+        initialSearchTerm={initialSearchTerm ?? ''}
+        onChange={handleSearchTermChange}
+        onSubmit={handleSubmit}
+        onClear={handleClear}
+        ref={searchInputRef}
+      />
+      {!isSearchPage && hasSearchTerm && (
+        <div
+          className={styles.floatingSearchResultsContainer}
+          data-testid="floatingSearchResultsContainer"
+          data-tutorial-target="floating-search-results-container">
+          <PatientSearch
+            query={debouncedSearchTerm}
+            ref={bannerRef}
+            patientClickSideEffect={addViewedPatientAndCloseSearchResults}
+            {...patientSearchResponse}
+          />
+        </div>
+      )}
+      {!isSearchPage && !hasSearchTerm && showRecentlySearchedPatients && (
+        <div
+          className={styles.floatingSearchResultsContainer}
+          data-testid="floatingSearchResultsContainer"
+          data-tutorial-target="floating-search-results-container">
+          <RecentlySearchedPatients
+            ref={bannerRef}
+            patientClickSideEffect={addViewedPatientAndCloseSearchResults}
+            {...recentPatientSearchResponse}
+            isLoading={recentPatientSearchResponse.isLoading || isLoadingPatients}
+          />
+        </div>
+      )}
+    </div>
   );
 };
 

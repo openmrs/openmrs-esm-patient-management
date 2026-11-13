@@ -13,12 +13,11 @@ import {
   useConfig,
   useLayoutType,
   useVisit,
-  navigate,
   type Visit,
 } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../../../config-schema';
 import { type SearchedPatient } from '../../../types';
-import { usePatientSearchContext, usePatientSearchContext2 } from '../../../patient-search-context';
+import { usePatientSearchContext2 } from '../../../patient-search-context';
 import { mapToFhirPatient } from '../../../utils/fhir-mapper';
 import { searchResultSwrConfig } from '../../../utils/swr-config';
 import styles from './patient-banner.scss';
@@ -44,17 +43,14 @@ const PatientBanner = React.memo(
     const layout = useLayoutType();
     const isTablet = layout === 'tablet';
     const { activeVisit } = useVisit(patientUuid, activeVisitRepresentation);
-    const { nonNavigationSelectPatientAction } = usePatientSearchContext() ?? {};
-    // if context2 is present, we use the new workspace v2 APIs,
-    // else, default to the old ones
     const context2 = usePatientSearchContext2();
     const {
       onPatientSelected,
       onVisitStarted,
+      selectPatientButton,
+      launchStartVisitWorkspace,
       launchChildWorkspace,
       closeWorkspace,
-      startVisitWorkspaceName,
-      selectPatientButton,
     } = context2 ?? {};
 
     const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
@@ -97,38 +93,27 @@ const PatientBanner = React.memo(
                 <PatientBannerActionsMenu
                   actionsSlotName="patient-search-actions-slot"
                   additionalActionsSlotState={{
-                    selectPatientAction: onPatientSelected ?? nonNavigationSelectPatientAction,
+                    selectPatientAction: onPatientSelected,
                     launchPatientChart: true,
                   }}
                   patient={fhirMappedPatient}
                   patientUuid={patientUuid}
                 />
               ) : null}
-              {!isDeceased &&
-                !activeVisit &&
-                (context2 ? (
-                  <ExtensionSlot
-                    name="start-visit-button-slot2"
-                    state={{
-                      patientUuid,
-                      patient: fhirMappedPatient,
-                      launchChildWorkspace,
-                      startVisitWorkspaceName,
-                      onVisitStarted: onVisitStarted
-                        ? (visit: Visit) =>
-                            onVisitStarted(patientUuid, fhirMappedPatient, visit, launchChildWorkspace, closeWorkspace)
-                        : undefined,
-                    }}
-                  />
-                ) : (
-                  <ExtensionSlot
-                    name="start-visit-button-slot"
-                    state={{
-                      patientUuid,
-                      patient: fhirMappedPatient,
-                    }}
-                  />
-                ))}
+              {!isDeceased && !activeVisit && context2 && (
+                <ExtensionSlot
+                  name="start-visit-button-slot2"
+                  state={{
+                    patientUuid,
+                    patient: fhirMappedPatient,
+                    launchStartVisitWorkspace,
+                    onVisitStarted: onVisitStarted
+                      ? (visit: Visit) =>
+                          onVisitStarted(patientUuid, fhirMappedPatient, visit, launchChildWorkspace, closeWorkspace)
+                      : undefined,
+                  }}
+                />
+              )}
               {!isDeceased && context2 && selectPatientButton && (
                 <Button
                   disabled={selectPatientButton.requiresActiveVisit && !activeVisit}
@@ -160,71 +145,45 @@ const PatientBanner = React.memo(
 PatientBanner.displayName = 'PatientBanner';
 
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
-  const { nonNavigationSelectPatientAction, patientClickSideEffect } = usePatientSearchContext() ?? {};
   const context2 = usePatientSearchContext2();
-  const { onPatientSelected, closeWorkspace, launchChildWorkspace } = context2 ?? {};
+  const { onPatientSelected, selectPatientButton, onBeforeNavigateToPatient, launchChildWorkspace, closeWorkspace } =
+    context2 ?? {};
   const config = useConfig<PatientSearchConfig>();
   const patientUuid = patient.id;
 
-  const handleClick = useCallback(() => {
-    nonNavigationSelectPatientAction(patientUuid, patient);
-    patientClickSideEffect?.(patientUuid, patient);
-  }, [nonNavigationSelectPatientAction, patientClickSideEffect, patientUuid, patient]);
-
   const handleBeforeNavigate = useCallback(() => {
-    patientClickSideEffect?.(patientUuid, patient);
-  }, [patientClickSideEffect, patientUuid, patient]);
+    onBeforeNavigateToPatient?.(patientUuid, patient);
+  }, [onBeforeNavigateToPatient, patientUuid, patient]);
 
-  if (context2) {
-    if (context2.selectPatientButton) {
-      // Selecting a patient happens through a dedicated button on the card instead
-      return (
-        <div className={styles.patientBanner} key={patientUuid}>
-          {children}
-        </div>
-      );
-    }
+  if (selectPatientButton) {
+    // Selecting a patient happens through a dedicated button on the card instead
     return (
-      <button
-        className={classNames(styles.patientBannerButton, styles.patientBanner, {
-          [styles.patientAvatarButton]: nonNavigationSelectPatientAction,
-        })}
-        key={patientUuid}
-        onClick={() => {
-          if (onPatientSelected) {
-            onPatientSelected(patient.id, patient, launchChildWorkspace, closeWorkspace);
-          } else {
-            navigate({
-              to: config.search.patientChartUrl,
-              templateParams: { patientUuid },
-            });
-          }
-        }}>
+      <div className={styles.patientBanner} key={patientUuid}>
         {children}
-      </button>
-    );
-  } else if (nonNavigationSelectPatientAction) {
-    return (
-      <button
-        className={classNames(styles.patientBannerButton, styles.patientBanner, {
-          [styles.patientAvatarButton]: nonNavigationSelectPatientAction,
-        })}
-        key={patientUuid}
-        onClick={handleClick}>
-        {children}
-      </button>
-    );
-  } else {
-    return (
-      <ConfigurableLink
-        className={styles.patientBanner}
-        onBeforeNavigate={handleBeforeNavigate}
-        to={config.search.patientChartUrl}
-        templateParams={{ patientUuid: patientUuid }}>
-        {children}
-      </ConfigurableLink>
+      </div>
     );
   }
+
+  if (onPatientSelected) {
+    return (
+      <button
+        className={classNames(styles.patientBannerButton, styles.patientBanner)}
+        key={patientUuid}
+        onClick={() => onPatientSelected(patient.id, patient, launchChildWorkspace, closeWorkspace)}>
+        {children}
+      </button>
+    );
+  }
+
+  return (
+    <ConfigurableLink
+      className={styles.patientBanner}
+      onBeforeNavigate={handleBeforeNavigate}
+      to={config.search.patientChartUrl}
+      templateParams={{ patientUuid: patientUuid }}>
+      {children}
+    </ConfigurableLink>
+  );
 };
 
 export const PatientBannerSkeleton = () => {

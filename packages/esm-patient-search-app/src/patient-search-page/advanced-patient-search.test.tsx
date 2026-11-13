@@ -12,7 +12,7 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
 import { type PatientSearchResponse } from '../types';
 import { mockAdvancedSearchResults } from '__mocks__';
-import { PatientSearchContext } from '../patient-search-context';
+import { PatientSearchContext2, type PatientSearchContext2Props } from '../patient-search-context';
 import { useInfinitePatientSearch } from '../patient-search.resource';
 import {
   useAttributeConceptAnswers,
@@ -50,9 +50,8 @@ vi.mock('react-router-dom', async () => ({
   ]),
 }));
 
-const mockPatientActionContextValue = {
-  nonNavigationSelectPatientAction: vi.fn(),
-  selectPatientAction: vi.fn(),
+const mockPatientSearchContext: PatientSearchContext2Props = {
+  launchStartVisitWorkspace: vi.fn(),
 };
 
 const mockSearchResults: PatientSearchResponse = {
@@ -69,7 +68,7 @@ const mockSearchResults: PatientSearchResponse = {
 };
 
 const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <PatientSearchContext.Provider value={mockPatientActionContextValue}>{children}</PatientSearchContext.Provider>
+  <PatientSearchContext2.Provider value={mockPatientSearchContext}>{children}</PatientSearchContext2.Provider>
 );
 
 describe('AdvancedPatientSearchComponent', () => {
@@ -81,6 +80,7 @@ describe('AdvancedPatientSearchComponent', () => {
       ...getDefaultsFromConfigSchema(configSchema),
       search: {
         disableTabletSearchOnKeyUp: false,
+        patientChartUrl: '${openmrsSpaBase}/patient/${patientUuid}/chart',
         showRecentlySearchedPatients: false,
         searchFilterFields: {
           gender: {

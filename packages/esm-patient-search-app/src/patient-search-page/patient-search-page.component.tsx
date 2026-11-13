@@ -1,12 +1,20 @@
 import React, { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { PatientSearchContextProvider } from '../patient-search-context';
+import {
+  launchStartVisitWorkspaceOutsideWorkspace,
+  PatientSearchContext2,
+  type PatientSearchContext2Props,
+} from '../patient-search-context';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-page.scss';
 
 interface PatientSearchPageComponentProps {}
+
+const searchPageContext2: PatientSearchContext2Props = {
+  launchStartVisitWorkspace: launchStartVisitWorkspaceOutsideWorkspace,
+};
 
 const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = () => {
   const [searchParams] = useSearchParams();
@@ -30,9 +38,9 @@ const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ()
   return (
     <div className={styles.patientSearchPage}>
       <div className={styles.patientSearchComponent}>
-        <PatientSearchContextProvider value={{}}>
+        <PatientSearchContext2.Provider value={searchPageContext2}>
           <AdvancedPatientSearchComponent inTabletOrOverlay={isTablet} query={searchQuery} stickyPagination />
-        </PatientSearchContextProvider>
+        </PatientSearchContext2.Provider>
       </div>
     </div>
   );
