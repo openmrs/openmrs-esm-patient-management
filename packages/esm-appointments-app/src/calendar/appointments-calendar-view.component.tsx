@@ -45,13 +45,23 @@ const AppointmentsCalendarView: React.FC = () => {
     setViewMode('daily');
   }, []);
 
+  const dailyIsoDate = viewMode === 'daily' ? calendarSelectedDate.format('YYYY-MM-DD') : null;
+  const {
+    appointments: dailyAppointments,
+    isLoading: isLoadingDaily,
+    error: dailyError,
+  } = useAppointmentsByDate(dailyIsoDate);
+
   const appointmentsCount = useMemo(() => {
+    if (viewMode === 'daily') {
+      return isLoadingDaily || dailyError ? null : dailyAppointments.length;
+    }
     if (isLoading || error) {
       return null;
     }
     const services = calendarEvents?.flatMap((event) => event.services ?? []) ?? [];
     return services.reduce((total, service) => total + (service.count ?? 0), 0);
-  }, [calendarEvents, isLoading, error]);
+  }, [viewMode, dailyAppointments.length, isLoadingDaily, dailyError, calendarEvents, isLoading, error]);
 
   const legendServices = useMemo(() => {
     const legendMap = new Map<string, { uuid: string; name: string }>();
