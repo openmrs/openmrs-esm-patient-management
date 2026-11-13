@@ -1,0 +1,6 @@
+{
+  "contactAdministrator": "Please try using the left navigation menu links. If the issue persists, contact your system administrator.",
+  "dashboardNotFound": "The dashboard you are looking for does not exist.",
+  "dashboardNotFoundDescription": "The page you requested could not be found. It may have been moved, deleted, or the configured dashboard does not exist.",
+  "pageNotFound": "Page not found"
+}
