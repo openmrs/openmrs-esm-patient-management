@@ -5,16 +5,6 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentSummary } from '../types';
 import { omrsDateFormat } from '../constants';
 
-export const useMonthlyCalendarDistribution = (
-  serviceUuid: string,
-  distributionType: 'month' | 'week',
-  appointmentDate: Date,
-) => {
-  const appointmentSummary = useMonthlyAppointmentSummary(appointmentDate, serviceUuid);
-
-  return distributionType === 'month' ? appointmentSummary : appointmentSummary.slice(0, 6);
-};
-
 export const useMonthlyAppointmentSummary = (
   fromDate: Date,
   serviceUuid: string,
