@@ -62,7 +62,7 @@ describe('VisitDetail', () => {
         encounters: [
           {
             uuid: '123e4567-e89b-12d3-a456-426614174000',
-            encounterDateTime: '2023-07-30T12:34:56Z',
+            encounterDatetime: '2023-07-30T12:34:56Z',
             encounterType: { display: 'Encounter Type', uuid: '98765432-e89b-12d3-a456-426614174001' },
             encounterProviders: [],
             obs: [],
