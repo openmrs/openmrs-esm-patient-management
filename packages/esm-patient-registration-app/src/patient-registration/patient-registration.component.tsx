@@ -23,6 +23,9 @@ import { SectionWrapper } from './section/section-wrapper.component';
 import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
+import { useNameTemplate } from './field/name/name-template.resource';
+import { withNameTemplateFields } from './field/name/name-template';
+import { unidentifiedPatientAttributeTypeUuid } from './field/name/name-field.component';
 import BeforeSavePrompt from './before-save-prompt.component';
 import styles from './patient-registration.scss';
 
@@ -55,6 +58,18 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
 
   const location = currentSession?.sessionLocation?.uuid;
   const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
+
+  // The name template's fields are part of the initial values, so they are kept when the form is reinitialised
+  const { nameTemplate } = useNameTemplate(config.fieldConfigurations.name.nameTemplate);
+  const formInitialValues = useMemo(
+    () =>
+      withNameTemplateFields(initialFormValues, nameTemplate, {
+        // Defaults are for a new, identified patient; they must not change the saved name of a patient being edited
+        applyDefaults:
+          !uuidOfPatientToEdit && initialFormValues.attributes?.[unidentifiedPatientAttributeTypeUuid] !== 'true',
+      }),
+    [initialFormValues, nameTemplate, uuidOfPatientToEdit],
+  );
   const showDummyDataInput = useMemo(
     () => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode,
     [inEditMode],
@@ -179,7 +194,7 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
   return (
     <Formik
       enableReinitialize
-      initialValues={initialFormValues}
+      initialValues={formInitialValues}
       onSubmit={onFormSubmit}
       validationSchema={validationSchema}>
       {(props) => (

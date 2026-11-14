@@ -1,6 +1,6 @@
 import { type OpenmrsResource } from '@openmrs/esm-framework';
 
-interface NameValue {
+interface NameValue extends Partial<Record<ExtraNameProperty, string>> {
   uuid: string;
   preferred: boolean;
   givenName: string;
@@ -134,7 +134,53 @@ export interface RelationshipValue {
   clientId?: string;
 }
 
-export interface FormValues {
+/** The parts of a person name, as named by the OpenMRS PersonName and name templates. */
+export const nameProperties = [
+  'prefix',
+  'givenName',
+  'middleName',
+  'familyNamePrefix',
+  'familyName',
+  'familyName2',
+  'familyNameSuffix',
+  'degree',
+] as const;
+
+export type NameProperty = (typeof nameProperties)[number];
+
+/** The name parts that only a name template can show; the default name fields show given, middle and family name. */
+export type ExtraNameProperty = Exclude<NameProperty, 'givenName' | 'middleName' | 'familyName'>;
+
+export const extraNameProperties: ReadonlyArray<ExtraNameProperty> = [
+  'prefix',
+  'familyNamePrefix',
+  'familyName2',
+  'familyNameSuffix',
+  'degree',
+];
+
+export interface NameTemplate {
+  displayName: string | null;
+  codeName: string | null;
+  country: string | null;
+  lines: Array<
+    Array<{
+      isToken: 'IS_NOT_NAME_TOKEN' | 'IS_NAME_TOKEN';
+      displayText: string;
+      codeName?: string;
+      displaySize?: string;
+    }>
+  > | null;
+  lineByLineFormat: Array<string> | null;
+  nameMappings: Record<string, string> | null;
+  sizeMappings: Record<string, string> | null;
+  elementDefaults: Record<string, string> | null;
+  elementRegex: Record<string, string> | null;
+  elementRegexFormats: Record<string, string> | null;
+  requiredElements: Array<string> | null;
+}
+
+export interface FormValues extends Partial<Record<ExtraNameProperty, string>> {
   additionalFamilyName: string;
   additionalGivenName: string;
   additionalMiddleName: string;

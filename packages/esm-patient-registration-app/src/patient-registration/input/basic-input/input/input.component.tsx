@@ -9,10 +9,12 @@ interface InputProps extends TextInputProps {
   checkWarning?(value: string): string;
   /** Omits the "(optional)" suffix from the label of a field that is not natively required. */
   hideOptionalLabel?: boolean;
+  /** A Formik field-level validator; it returns the error message for an invalid value. */
+  validate?(value: string): string | undefined;
 }
 
-export const Input: React.FC<InputProps> = ({ checkWarning, hideOptionalLabel, ...props }) => {
-  const [field, meta] = useField(props.name);
+export const Input: React.FC<InputProps> = ({ checkWarning, hideOptionalLabel, validate, ...props }) => {
+  const [field, meta] = useField({ name: props.name, validate });
   const { t } = useTranslation();
 
   /*

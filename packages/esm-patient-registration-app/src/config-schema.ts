@@ -45,6 +45,7 @@ export interface RegistrationConfig {
       required?: boolean;
     };
     name: {
+      nameTemplate: string;
       displayMiddleName: boolean;
       allowUnidentifiedPatients: boolean;
       defaultUnknownGivenName: string;
@@ -254,9 +255,16 @@ export const esmPatientRegistrationSchema = {
       },
     },
     name: {
+      nameTemplate: {
+        _type: Type.String,
+        _default: '',
+        _description:
+          "The code name of the name template that sets which name fields to show and in what order, e.g. 'short', 'long' or 'latinamerica'. Field labels come from the template, translated by the backend. Needs webservices.rest 2.49.0 or later. When empty, the form shows the first, middle and family name fields, and `displayMiddleName` and `displayReverseFieldOrder` apply.",
+      },
       displayMiddleName: {
         _type: Type.Boolean,
         _default: true,
+        _description: 'Whether to display the middle name field. Applies only when no `nameTemplate` is set.',
       },
       allowUnidentifiedPatients: {
         _type: Type.Boolean,
@@ -281,7 +289,8 @@ export const esmPatientRegistrationSchema = {
       displayReverseFieldOrder: {
         _type: Type.Boolean,
         _default: false,
-        _description: "Whether to display the name fields in the order 'Family name' -> 'Middle name' -> 'First name'",
+        _description:
+          "Whether to display the name fields in the order 'Family name' -> 'Middle name' -> 'First name'. Applies only when no `nameTemplate` is set.",
       },
     },
     gender: {

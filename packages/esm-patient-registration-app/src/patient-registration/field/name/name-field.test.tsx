@@ -3,14 +3,15 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
 import { render, screen, waitFor } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
-import { NameField, unidentifiedPatientAttributeTypeUuid } from './name-field.component';
-import { type FormValues } from '../../patient-registration.types';
+import { getNameTemplateLayout, NameField, unidentifiedPatientAttributeTypeUuid } from './name-field.component';
+import { type FormValues, type NameTemplate } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 /**
  * Helper to render NameField with Formik render props for state-dependent tests.
@@ -277,5 +278,174 @@ describe('NameField', () => {
 
       expect(familyNameIndex).toBeLessThan(firstNameIndex);
     });
+  });
+});
+
+const nameToken = (codeName: string, displayText: string) => ({
+  isToken: 'IS_NAME_TOKEN' as const,
+  displayText,
+  codeName,
+  displaySize: '30',
+});
+
+// As returned by GET /nametemplate/latinamerica, with labels translated by the backend
+const latinAmericaNameTemplate: NameTemplate = {
+  displayName: 'Formato de Nombres en Latino America',
+  codeName: 'latinamerica',
+  country: null,
+  lines: [
+    [{ isToken: 'IS_NOT_NAME_TOKEN', displayText: '' }, nameToken('givenName', 'Primer nombre')],
+    [{ isToken: 'IS_NOT_NAME_TOKEN', displayText: '' }, nameToken('middleName', 'Segundo nombre')],
+    [{ isToken: 'IS_NOT_NAME_TOKEN', displayText: '' }, nameToken('familyName', 'Primer apellido')],
+    [{ isToken: 'IS_NOT_NAME_TOKEN', displayText: '' }, nameToken('familyName2', 'Segundo apellido')],
+  ],
+  lineByLineFormat: ['givenName', 'middleName', 'familyName', 'familyName2'],
+  nameMappings: null,
+  sizeMappings: null,
+  elementDefaults: null,
+  elementRegex: null,
+  elementRegexFormats: null,
+  requiredElements: null,
+};
+
+describe('NameField with a name template', () => {
+  // Each test uses its own template code name, so the SWR cache is not shared between tests
+  const useNameTemplateConfig = (nameTemplate: string) =>
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      fieldConfigurations: {
+        name: {
+          nameTemplate,
+          displayCapturePhoto: false,
+          allowUnidentifiedPatients: true,
+          defaultUnknownGivenName: 'UNKNOWN',
+          defaultUnknownFamilyName: 'UNKNOWN',
+          displayMiddleName: false,
+          displayReverseFieldOrder: true,
+        },
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+
+  const respondWithTemplate = (template: Partial<NameTemplate>) =>
+    mockOpenmrsFetch.mockResolvedValue({ data: { ...latinAmericaNameTemplate, ...template } } as never);
+
+  it('fetches the configured template and shows its fields in order, with its labels', async () => {
+    useNameTemplateConfig('latinamerica');
+    respondWithTemplate({});
+
+    renderNameFieldWithFormik();
+
+    await screen.findByLabelText('Segundo apellido (optional)');
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/nametemplate/latinamerica');
+    // The template sets the order and shows the middle name, even though displayMiddleName and
+    // displayReverseFieldOrder say otherwise
+    expect(screen.getAllByRole('textbox').map((input) => input.id)).toEqual([
+      'givenName',
+      'middleName',
+      'familyName',
+      'familyName2',
+    ]);
+    expect(screen.getByLabelText('Primer nombre')).toBeRequired();
+    expect(screen.getByLabelText('Primer apellido')).toBeRequired();
+    expect(screen.getByLabelText('Segundo nombre (optional)')).not.toBeRequired();
+  });
+
+  it('saves what the user types into a template-only field', async () => {
+    const user = userEvent.setup();
+    useNameTemplateConfig('latinamerica-typing');
+    respondWithTemplate({});
+
+    const { getFormValues } = renderNameFieldWithFormik();
+    await user.type(await screen.findByLabelText('Segundo apellido (optional)'), 'Pérez');
+
+    expect(getFormValues().familyName2).toBe('Pérez');
+  });
+
+  it('requires the name parts the template marks as required, with a message', async () => {
+    const user = userEvent.setup();
+    useNameTemplateConfig('latinamerica-required');
+    respondWithTemplate({ requiredElements: ['familyName2'] });
+
+    renderNameFieldWithFormik();
+    const secondFamilyName = await screen.findByLabelText('Segundo apellido');
+    expect(secondFamilyName).toBeRequired();
+
+    // Leaving the field empty validates it
+    await user.click(secondFamilyName);
+    await user.tab();
+
+    expect(await screen.findByText('Segundo apellido is required')).toBeInTheDocument();
+  });
+
+  it('waits for the template before the patient can be marked as unknown', async () => {
+    useNameTemplateConfig('latinamerica-delayed');
+    let respond: (value: unknown) => void;
+    mockOpenmrsFetch.mockReturnValue(new Promise((resolve) => (respond = resolve)) as never);
+
+    renderNameFieldWithFormik();
+
+    expect(screen.getByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'No' })).not.toBeInTheDocument();
+
+    respond({ data: latinAmericaNameTemplate });
+
+    expect(await screen.findByRole('tab', { name: 'No' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Segundo apellido (optional)')).toBeInTheDocument();
+  });
+
+  it('clears every template field when the patient is marked as unknown', async () => {
+    const user = userEvent.setup();
+    useNameTemplateConfig('latinamerica-unknown');
+    respondWithTemplate({});
+
+    const { getFormValues } = renderNameFieldWithFormik({ familyName2: 'Pérez' });
+    await screen.findByLabelText('Segundo apellido (optional)');
+    await user.click(screen.getByRole('tab', { name: 'No' }));
+
+    expect(getFormValues().familyName2).toBe('');
+    expect(getFormValues().givenName).toBe('UNKNOWN');
+    expect(screen.queryByLabelText('Segundo apellido (optional)')).not.toBeInTheDocument();
+  });
+
+  it('shows the default name fields when the template cannot be loaded', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    useNameTemplateConfig('missing-template');
+    mockOpenmrsFetch.mockRejectedValue(new Error('Not found'));
+
+    renderNameFieldWithFormik();
+
+    await waitFor(() => expect(consoleError).toHaveBeenCalled());
+    // The default fields, with displayMiddleName and displayReverseFieldOrder applied
+    expect(screen.getAllByRole('textbox').map((input) => input.id)).toEqual(['familyName', 'givenName']);
+    consoleError.mockRestore();
+  });
+});
+
+describe('getNameTemplateLayout', () => {
+  const getDefaultLabel = (name: string) => `Default ${name}`;
+
+  it('skips name parts it does not know and repeated ones', () => {
+    const layout = getNameTemplateLayout(
+      {
+        ...latinAmericaNameTemplate,
+        lines: [[nameToken('givenName', 'Given'), nameToken('nickname', 'Nickname'), nameToken('givenName', 'Again')]],
+      },
+      getDefaultLabel,
+    );
+
+    expect(layout.map(({ name }) => name)).toEqual(['givenName', 'familyName']);
+  });
+
+  it('adds the given and family names when the template leaves them out, since the backend requires them', () => {
+    const layout = getNameTemplateLayout(
+      { ...latinAmericaNameTemplate, lines: [[nameToken('familyName2', 'Second family name')]] },
+      getDefaultLabel,
+    );
+
+    expect(layout).toEqual([
+      { name: 'familyName2', label: 'Second family name', required: false },
+      { name: 'givenName', label: 'Default givenName', required: true },
+      { name: 'familyName', label: 'Default familyName', required: true },
+    ]);
   });
 });
