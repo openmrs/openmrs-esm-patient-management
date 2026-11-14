@@ -113,8 +113,6 @@ export interface Identifier {
   };
 }
 
-export type Identifer = Identifier;
-
 export interface NewVisitPayload {
   uuid?: string;
   location: string;
