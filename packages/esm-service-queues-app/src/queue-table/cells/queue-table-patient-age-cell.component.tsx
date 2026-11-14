@@ -1,13 +1,11 @@
 import React from 'react';
-import dayjs from 'dayjs';
+import { age } from '@openmrs/esm-framework';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
 export const QueueTablePatientAgeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
-  const birthdate = dayjs(queueEntry.patient.person.birthdate);
-  const todaydate = dayjs();
-  const age = todaydate.diff(birthdate, 'years');
+  const birthdate = queueEntry.patient.person?.birthdate;
 
-  return <span>{age}</span>;
+  return <span>{birthdate ? age(birthdate) : null}</span>;
 };
 
 export const queueTablePatientAgeColumn: QueueTableColumnFunction = (key, header) => ({
