@@ -34,7 +34,7 @@
   "errorCreatingList": "Ошибка при создании листа",
   "errorDeletingList": "Ошибка при удалении листа пациентов",
   "errorRemovingPatientFromList": "Не удалось удалить пациента из листа",
-  "errorSelectedListNotLoaded": "The selected list could not be loaded. Close this window and try again.",
+  "errorSelectedListNotLoaded": "Не получилось загрузить выбранный лист. Закройте это окно и попробуйте еще раз.",
   "errorUpdatingList": "Ошибка при обновлении листа",
   "filterByLocation": "Фильтр по местоположению",
   "identifier": "Идентификатор",
