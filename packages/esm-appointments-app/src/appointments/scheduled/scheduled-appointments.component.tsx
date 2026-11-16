@@ -17,11 +17,7 @@ const ScheduledAppointments: React.FC<{}> = () => {
   const { appointmentServiceTypes } = useAppointmentsStore();
   const selectedDate = useSelectedDate();
 
-  const { appointmentList: appointmentsForSelectedDate, isLoading, error } = useAppointmentList(selectedDate);
-
-  // A refresh that fails should not take away appointments that have already loaded, so the failure
-  // is only reported while there is nothing to show
-  const loadError = appointmentsForSelectedDate.length === 0 ? error : undefined;
+  const { appointmentList: appointmentsForSelectedDate, isLoading, loadError } = useAppointmentList(selectedDate);
 
   const appointmentForSelectedDateFilteredByServiceTypes =
     appointmentServiceTypes.length > 0

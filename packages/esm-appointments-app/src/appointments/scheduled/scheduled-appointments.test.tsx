@@ -27,6 +27,7 @@ function mockAppointmentList(response: Partial<ReturnType<typeof useAppointmentL
   mockUseAppointmentList.mockReturnValue({
     appointmentList: [],
     error: undefined,
+    loadError: undefined,
     isLoading: false,
     isValidating: false,
     mutate: vi.fn(),
@@ -43,7 +44,7 @@ describe('ScheduledAppointments', () => {
   });
 
   it('shows an error state instead of an empty table when the appointments fail to load', () => {
-    mockAppointmentList({ error: requestError });
+    mockAppointmentList({ error: requestError, loadError: requestError });
 
     render(<ScheduledAppointments />);
 
@@ -56,7 +57,7 @@ describe('ScheduledAppointments', () => {
   });
 
   it('keeps showing the error state while the failed request is being retried', () => {
-    mockAppointmentList({ error: requestError, isLoading: true });
+    mockAppointmentList({ error: requestError, loadError: requestError, isLoading: true });
 
     render(<ScheduledAppointments />);
 
@@ -77,6 +78,19 @@ describe('ScheduledAppointments', () => {
         appointmentForSelectedDateFilteredByServiceTypes: loadedAppointments,
         error: undefined,
       }),
+    );
+  });
+
+  it('keeps showing a day with no appointments as empty when a later refresh fails', () => {
+    mockAppointmentList({ appointmentList: [], error: requestError });
+
+    render(<ScheduledAppointments />);
+
+    expect(screen.getByText(/no appointments to display/i)).toBeInTheDocument();
+    expect(screen.queryByText(/error state/i)).not.toBeInTheDocument();
+    expect(mockUseDefineAppContext).toHaveBeenLastCalledWith(
+      'appointments',
+      expect.objectContaining({ error: undefined }),
     );
   });
 });

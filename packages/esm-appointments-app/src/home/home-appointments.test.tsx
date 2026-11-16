@@ -22,6 +22,7 @@ function mockAppointmentList(response: Partial<ReturnType<typeof useAppointmentL
   mockUseAppointmentList.mockReturnValue({
     appointmentList: [],
     error: undefined,
+    loadError: undefined,
     isLoading: false,
     isValidating: false,
     mutate: vi.fn(),
@@ -38,7 +39,7 @@ describe('HomeAppointments', () => {
   });
 
   it("shows an error state instead of an empty table when today's appointments fail to load", () => {
-    mockAppointmentList({ error: requestError });
+    mockAppointmentList({ error: requestError, loadError: requestError });
 
     render(<HomeAppointments />);
 
@@ -52,6 +53,15 @@ describe('HomeAppointments', () => {
     render(<HomeAppointments />);
 
     expect(screen.getByRole('link', { name: /john wilson/i })).toBeInTheDocument();
+    expect(screen.queryByText(/error state/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps showing a day with no appointments as empty when a later refresh fails', () => {
+    mockAppointmentList({ appointmentList: [], error: requestError });
+
+    render(<HomeAppointments />);
+
+    expect(screen.getByText(/no appointments to display/i)).toBeInTheDocument();
     expect(screen.queryByText(/error state/i)).not.toBeInTheDocument();
   });
 });
