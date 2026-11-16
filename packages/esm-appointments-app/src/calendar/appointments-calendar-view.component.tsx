@@ -21,9 +21,6 @@ const AppointmentsCalendarView: React.FC = () => {
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
   const { calendarEvents, isLoading, error } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
-  // A refresh that fails should not take away counts that have already loaded, so the failure
-  // is only shown while there is nothing to display
-  const loadError = calendarEvents.length === 0 ? error : undefined;
   const { serviceTypes } = useAppointmentServices();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
@@ -70,17 +67,17 @@ const AppointmentsCalendarView: React.FC = () => {
         onNext={handleNext}
       />
       {/* Without these two states, a failed or pending request looks like a month with no appointments */}
-      {viewMode === 'monthly' && loadError && (
+      {viewMode === 'monthly' && error && (
         <div className={styles.calendarViewContainer}>
-          <ErrorState error={loadError} headerTitle={t('appointments', 'Appointments')} />
+          <ErrorState error={error} headerTitle={t('appointments', 'Appointments')} />
         </div>
       )}
-      {viewMode === 'monthly' && !loadError && isLoading && (
+      {viewMode === 'monthly' && !error && isLoading && (
         <div className={styles.calendarViewContainer}>
           <InlineLoading description={t('loadingAppointments', 'Loading appointments…')} />
         </div>
       )}
-      {viewMode === 'monthly' && !loadError && !isLoading && (
+      {viewMode === 'monthly' && !error && !isLoading && (
         <MonthlyCalendarView
           events={calendarEvents}
           calendarSelectedDate={calendarSelectedDate}

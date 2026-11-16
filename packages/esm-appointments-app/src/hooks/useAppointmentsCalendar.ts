@@ -43,7 +43,10 @@ export const useAppointmentsCalendar = (forDate: string | null, period: string) 
       });
       return acc;
     }, []) ?? [];
-  return { isLoading, calendarEvents: results, error };
+
+  // Once a month's counts have loaded, even when there are none, a refresh that fails leaves them on screen,
+  // so the error is only reported while nothing has loaded
+  return { isLoading, calendarEvents: results, error: data ? undefined : error };
 };
 
 function evaluateAppointmentCalendarDates(forDate: string | null, period: string) {
