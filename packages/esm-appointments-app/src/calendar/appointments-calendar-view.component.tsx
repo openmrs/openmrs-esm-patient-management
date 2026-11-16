@@ -6,6 +6,7 @@ import { useAppointmentServices } from '../hooks/useAppointmentService';
 import AppointmentsHeader from '../header/appointments-header.component';
 import { useSelectedDate } from '../hooks/useSelectedDate';
 import { type CalendarViewMode } from '../types';
+import { addCalendarMonths, getCalendarFormat } from './calendar-utils';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import DailyCalendarView from './daily/daily-calendar-view.component';
@@ -22,15 +23,17 @@ const AppointmentsCalendarView: React.FC = () => {
   const { serviceTypes } = useAppointmentServices();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
+  const { calendar } = getCalendarFormat();
+
   const handlePrev = useCallback(() => {
-    if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.subtract(1, 'month'));
+    if (viewMode === 'monthly') setCalendarSelectedDate((d) => addCalendarMonths(d, -1, calendar));
     else setCalendarSelectedDate((d) => d.subtract(1, 'day'));
-  }, [viewMode]);
+  }, [viewMode, calendar]);
 
   const handleNext = useCallback(() => {
-    if (viewMode === 'monthly') setCalendarSelectedDate((d) => d.add(1, 'month'));
+    if (viewMode === 'monthly') setCalendarSelectedDate((d) => addCalendarMonths(d, 1, calendar));
     else setCalendarSelectedDate((d) => d.add(1, 'day'));
-  }, [viewMode]);
+  }, [viewMode, calendar]);
 
   const handleViewModeChange = useCallback((mode: CalendarViewMode) => {
     setViewMode(mode);

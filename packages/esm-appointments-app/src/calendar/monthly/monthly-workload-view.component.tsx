@@ -5,8 +5,8 @@ import { Popover, PopoverContent } from '@carbon/react';
 import { Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { isSameMonth } from '../../helpers';
 import { type DailyAppointmentsCountByService } from '../../types';
+import { formatInCalendar, getCalendarDayOfMonth, getCalendarFormat, isSameCalendarMonth } from '../calendar-utils';
 import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
@@ -35,8 +35,13 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const cellRef = useRef<HTMLDivElement | null>(null);
 
+  const { locale, calendar } = getCalendarFormat();
+
   const isToday = useMemo(() => dateTime.isSame(dayjs(), 'day'), [dateTime]);
-  const isCurrentMonth = useMemo(() => isSameMonth(dateTime, calendarSelectedDate), [dateTime, calendarSelectedDate]);
+  const isCurrentMonth = useMemo(
+    () => isSameCalendarMonth(dateTime, calendarSelectedDate, calendar),
+    [dateTime, calendarSelectedDate, calendar],
+  );
 
   const popoverAlign = useMemo(() => {
     const isBelowFirstRow = index !== undefined ? index >= 7 : dateTime.date() > 7;
@@ -49,11 +54,16 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({
 
   const dateFormatted = useMemo(
     () => ({
-      dayNumber: dateTime.format('D'),
-      popoverDate: dateTime.format('ddd, MMM D'),
+      dayNumber: getCalendarDayOfMonth(dateTime, calendar),
+      popoverDate: formatInCalendar(
+        dateTime.toDate(),
+        { weekday: 'short', month: 'short', day: 'numeric' },
+        locale,
+        calendar,
+      ),
       isoDate: dateTime.format('YYYY-MM-DD'),
     }),
-    [dateTime],
+    [dateTime, locale, calendar],
   );
 
   const currentData = useMemo(() => {

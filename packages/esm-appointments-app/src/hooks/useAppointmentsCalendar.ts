@@ -1,6 +1,7 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
+import { getCalendarFormat, getCalendarMonthRange } from '../calendar/calendar-utils';
 import { omrsDateFormat } from '../constants';
 import { type DailyAppointmentsCountByService } from '../types';
 
@@ -58,8 +59,10 @@ function evaluateAppointmentCalendarDates(forDate: string | null, period: string
     };
   }
 
+  // The month in the calendar the user's locale uses, which need not line up with a Gregorian month
+  const { start, end } = getCalendarMonthRange(dayjs(forDate), getCalendarFormat().calendar);
   return {
-    startDate: dayjs(forDate).startOf('month').format(omrsDateFormat),
-    endDate: dayjs(forDate).endOf('month').format(omrsDateFormat),
+    startDate: start.startOf('day').format(omrsDateFormat),
+    endDate: end.endOf('day').format(omrsDateFormat),
   };
 }

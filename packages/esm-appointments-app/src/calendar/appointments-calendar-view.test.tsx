@@ -1,11 +1,17 @@
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { render, screen, within } from '@testing-library/react';
+import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
+import { getDefaultCalendar } from '@openmrs/esm-framework';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
+
+vi.mock('@openmrs/esm-framework', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  getDefaultCalendar: vi.fn(),
+}));
 
 vi.mock('../hooks/useAppointmentsCalendar', () => ({
   useAppointmentsCalendar: vi.fn().mockReturnValue({ calendarEvents: [], isLoading: false, error: null }),
@@ -23,6 +29,7 @@ vi.mock('../hooks/useAppointmentService', () => ({
   }),
 }));
 
+const mockGetDefaultCalendar = vi.mocked(getDefaultCalendar);
 const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
 
 function renderCalendar() {
@@ -186,5 +193,40 @@ describe('Appointment calendar view', () => {
     expect(cellSwatch).toBeInTheDocument();
     expect(legendSwatch.style.backgroundColor).toBeTruthy();
     expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
+  });
+
+  describe('when the locale uses the Ethiopic calendar', () => {
+    beforeEach(() => {
+      mockGetDefaultCalendar.mockReturnValue('ethiopic');
+    });
+
+    it('shows the Ethiopic month and its days, and moves by Ethiopic months', async () => {
+      const user = userEvent.setup();
+      render(
+        <MemoryRouter initialEntries={['/2026-06-15']}>
+          <Routes>
+            <Route path="/:date" element={<AppointmentsCalendarView />} />
+          </Routes>
+        </MemoryRouter>,
+      );
+
+      // 15 June 2026 is Sene 8, 2018 in the Ethiopic calendar. Sene 2018 runs from 8 June to 7 July 2026.
+      expect(screen.getByText('Sene 2018')).toBeInTheDocument();
+      expect(within(screen.getByTestId('workload-cell-2026-06-08')).getByTestId('current-month-day')).toHaveTextContent(
+        '1',
+      );
+      expect(within(screen.getByTestId('workload-cell-2026-07-07')).getByTestId('current-month-day')).toHaveTextContent(
+        '30',
+      );
+      expect(within(screen.getByTestId('workload-cell-2026-06-07')).getByTestId('other-month-day')).toHaveTextContent(
+        '30',
+      );
+
+      await user.click(screen.getByRole('button', { name: /next/i }));
+
+      // Hamle 8, 2018
+      expect(latestRequestedDate().format('YYYY-MM-DD')).toBe('2026-07-15');
+      expect(screen.getByText('Hamle 2018')).toBeInTheDocument();
+    });
   });
 });
