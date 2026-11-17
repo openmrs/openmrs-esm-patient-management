@@ -560,6 +560,43 @@ describe('IdentifierInput component', () => {
             expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('10001V');
           });
         });
+
+        it('keeps the selected source when the identifier type has more than one source', async () => {
+          const user = userEvent.setup();
+          const setFieldValue = vi.fn();
+          const automaticOnlySource = {
+            uuid: 'automatic-only-source-uuid',
+            name: 'Automatic only',
+            autoGenerationOption: { manualEntryEnabled: false, automaticGenerationEnabled: true },
+          } as IdentifierSource;
+          const manualEntrySource = {
+            uuid: 'manual-entry-source-uuid',
+            name: 'Manual entry',
+            autoGenerationOption: { manualEntryEnabled: true, automaticGenerationEnabled: true },
+          } as IdentifierSource;
+
+          renderIdentifierInput(
+            { ...openmrsID, autoGeneration: true, selectedSource: manualEntrySource },
+            fieldName,
+            {},
+            { setFieldValue },
+            {
+              ...mockResourcesContextValue,
+              identifierTypes: mockIdentifierTypes.map((type) =>
+                type.fieldName === fieldName
+                  ? { ...type, identifierSources: [automaticOnlySource, manualEntrySource] }
+                  : type,
+              ),
+            },
+          );
+
+          await user.click(screen.getByTestId('edit-button'));
+
+          expect(setFieldValue).toHaveBeenCalledWith(
+            `identifiers.${fieldName}`,
+            expect.objectContaining({ selectedSource: manualEntrySource, autoGeneration: true, identifierValue: '' }),
+          );
+        });
       });
     });
   });
