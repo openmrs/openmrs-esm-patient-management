@@ -115,6 +115,7 @@ function renderIdentifierInput(
   fieldName: string = 'openMrsId',
   initialValues: Record<string, any> = {},
   contextValues: Partial<PatientRegistrationContextProps> = {},
+  resources: Resources = mockResourcesContextValue,
 ) {
   return renderWithContext(
     <Formik initialValues={initialValues} onSubmit={vi.fn()}>
@@ -125,7 +126,7 @@ function renderIdentifierInput(
       </Form>
     </Formik>,
     ResourcesContextProvider,
-    mockResourcesContextValue,
+    resources,
   );
 }
 
@@ -436,6 +437,74 @@ describe('IdentifierInput component', () => {
           } as IdentifierSource,
         });
         expect(screen.getByText('Edit')).toBeInTheDocument();
+      });
+
+      describe('required identifier', () => {
+        const manualEntrySource = {
+          ...openmrsID.selectedSource,
+          autoGenerationOption: { manualEntryEnabled: true, automaticGenerationEnabled: true },
+        } as IdentifierSource;
+        const savedIdentifier = {
+          ...openmrsID,
+          required: true,
+          autoGeneration: false,
+          selectedSource: null,
+          initialValue: '1002UU9',
+          identifierValue: '1002UU9',
+        } as PatientIdentifierValue;
+
+        it('shows the edit button for a new identifier', () => {
+          renderIdentifierInput({
+            ...openmrsID,
+            required: true,
+            autoGeneration: true,
+            selectedSource: manualEntrySource,
+          });
+          expect(screen.getByTestId('edit-button')).toBeInTheDocument();
+        });
+
+        it('does not mark the input as natively required for a new identifier, as an empty value is generated', async () => {
+          const user = userEvent.setup();
+          renderIdentifierInput({
+            ...openmrsID,
+            required: true,
+            autoGeneration: true,
+            selectedSource: manualEntrySource,
+          });
+
+          await user.click(screen.getByTestId('edit-button'));
+
+          expect(await screen.findByRole('textbox', { name: openmrsID.identifierName })).not.toBeRequired();
+        });
+
+        it('shows the edit button for a saved identifier when editing a patient', () => {
+          renderIdentifierInput(savedIdentifier, fieldName, {}, { inEditMode: true });
+          expect(screen.getByTestId('edit-button')).toBeInTheDocument();
+        });
+
+        it("hides the edit button for a saved identifier when the identifier type's source does not allow manual entry", () => {
+          renderIdentifierInput(
+            savedIdentifier,
+            fieldName,
+            {},
+            { inEditMode: true },
+            {
+              ...mockResourcesContextValue,
+              identifierTypes: mockIdentifierTypes.map((type) =>
+                type.fieldName === fieldName
+                  ? {
+                      ...type,
+                      identifierSources: type.identifierSources.map((source) => ({
+                        ...source,
+                        autoGenerationOption: { ...source.autoGenerationOption, manualEntryEnabled: false },
+                      })),
+                    }
+                  : type,
+              ),
+            },
+          );
+          expect(screen.queryByTestId('edit-button')).not.toBeInTheDocument();
+        });
       });
 
       describe('Edit button interaction', () => {

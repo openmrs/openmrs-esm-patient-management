@@ -67,7 +67,9 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   );
   const { autoGeneration, initialValue, identifierValue, identifierName, preferred, required, selectedSource } =
     patientIdentifier;
-  const manualEntryEnabled = selectedSource?.autoGenerationOption?.manualEntryEnabled;
+  // A saved identifier is loaded without its source, so fall back to the identifier type's source (as handleEdit does)
+  const manualEntryEnabled = (selectedSource ?? identifierType?.identifierSources?.[0])?.autoGenerationOption
+    ?.manualEntryEnabled;
   const [hideInputField, setHideInputField] = useState(autoGeneration || initialValue === identifierValue);
   const name = `identifiers.${fieldName}.identifierValue`;
   const [identifierField, identifierFieldMeta] = useField(name);
@@ -191,7 +193,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   // A preferred identifier needs a value (see the validation schema), so it is not labelled as optional.
   const valueRequired = required || (allowPreferredSelection && preferred && !autoGeneration);
 
-  const showEditButton = !required && hideInputField && (!!initialValue || manualEntryEnabled);
+  const showEditButton = hideInputField && ((!required && !!initialValue) || manualEntryEnabled);
   const showResetButton =
     (!!initialValue && initialValue !== identifierValue) || (!hideInputField && manualEntryEnabled);
   return (
@@ -203,7 +205,8 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
               id={name}
               labelText={identifierName}
               name={name}
-              required={required}
+              // A new auto-generated identifier left empty is generated on save, so the browser must not block it
+              required={required && !(autoGeneration && !initialValue)}
               hideOptionalLabel={valueRequired}
               invalid={errors[name] && touched[name]}
               invalidText={errors[name] && t(errors[name])}
