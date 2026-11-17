@@ -23,7 +23,7 @@
     "@openmrs/eslint-config": "^2.0.0",
     "@openmrs/esm-framework": "next",
     "@openmrs/prettier-config": "^1.0.0",
-    "@playwright/test": "^1.53.2",
+    "@playwright/test": "^1.65.1",
     "@swc/core": "^1.2.165",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
