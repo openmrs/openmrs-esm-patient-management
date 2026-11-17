@@ -103,7 +103,7 @@ export interface Resource {
   };
 }
 
-export interface Identifer {
+export interface Identifier {
   identifier: string;
   display?: string;
   uuid: string;
