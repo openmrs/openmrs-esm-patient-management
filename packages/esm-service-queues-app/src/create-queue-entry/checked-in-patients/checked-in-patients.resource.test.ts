@@ -67,4 +67,25 @@ describe('mapActiveVisitPatientToFhir', () => {
   it('returns an empty identifier list when the patient has no identifiers', () => {
     expect(mapActiveVisitPatientToFhir(patient({ identifiers: undefined })).identifier).toEqual([]);
   });
+
+  it('passes an exact birthdate through unchanged', () => {
+    const result = mapActiveVisitPatientToFhir(
+      patient({ person: { age: 36, birthdate: '1990-03-15T00:00:00.000+0000', birthdateEstimated: false } }),
+    );
+    expect(result.birthDate).toBe('1990-03-15T00:00:00.000+0000');
+  });
+
+  it('maps an estimated birthdate to the year for a patient older than 5', () => {
+    const result = mapActiveVisitPatientToFhir(
+      patient({ person: { age: 40, birthdate: '1986-10-26T00:00:00.000+0000', birthdateEstimated: true } }),
+    );
+    expect(result.birthDate).toBe('1986');
+  });
+
+  it('maps an estimated birthdate to the year and month for a patient aged 5 or under', () => {
+    const result = mapActiveVisitPatientToFhir(
+      patient({ person: { age: 5, birthdate: '2021-08-14T00:00:00.000+0000', birthdateEstimated: true } }),
+    );
+    expect(result.birthDate).toBe('2021-08');
+  });
 });
