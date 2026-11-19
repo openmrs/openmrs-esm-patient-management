@@ -179,7 +179,7 @@ const ListDetails = () => {
                 setPageCount(page);
                 setCurrentPageSize(pageSize);
               },
-              pageSize: 10,
+              pageSize: currentPageSize,
               totalItems: listDetails?.size,
               pagesUnknown: true,
               lastPage: patients?.length < currentPageSize || currentPage * currentPageSize === listDetails?.size,
