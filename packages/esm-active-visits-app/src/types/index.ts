@@ -172,6 +172,7 @@ export interface ActiveVisit {
   name: string;
   patientUuid: string;
   visitStartTime: string;
+  visitStartDatetime: string;
   visitType: string;
   visitUuid: string;
   observations?: Record<string, Observation[]>;
