@@ -12,11 +12,12 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
+  openmrsFetch,
   showSnackbar,
   useConfig,
   usePatient,
 } from '@openmrs/esm-framework';
-import type { AddressTemplate, Encounter, FormValues } from './patient-registration.types';
+import type { AddressTemplate, Encounter, FormValues, NameTemplate } from './patient-registration.types';
 import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient, renderWithContext } from 'tools';
 import { saveEncounter, savePatient } from './patient-registration.resource';
@@ -324,6 +325,51 @@ describe('Registering a new patient', () => {
       ...mockOpenmrsConfig,
     });
     mockSavePatient.mockResolvedValue({ data: { uuid: 'new-pt-uuid' }, ok: true } as any);
+  });
+
+  it('keeps the name template fields and their defaults when the form is reinitialised as data loads', async () => {
+    const defaultConfig = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+    mockUseConfig.mockReturnValue({
+      ...defaultConfig,
+      ...mockOpenmrsConfig,
+      fieldConfigurations: {
+        ...defaultConfig.fieldConfigurations,
+        ...mockOpenmrsConfig.fieldConfigurations,
+        name: { ...defaultConfig.fieldConfigurations.name, nameTemplate: 'reinitialised-template' },
+      },
+    } as RegistrationConfig);
+    const nameTemplate: Partial<NameTemplate> = {
+      codeName: 'reinitialised-template',
+      lines: [
+        [{ isToken: 'IS_NAME_TOKEN', displayText: 'Given', codeName: 'givenName' }],
+        [{ isToken: 'IS_NAME_TOKEN', displayText: 'Family', codeName: 'familyName' }],
+        [{ isToken: 'IS_NAME_TOKEN', displayText: 'Second family name', codeName: 'familyName2' }],
+      ],
+      elementDefaults: { familyName2: 'Default' },
+    };
+    vi.mocked(openmrsFetch).mockImplementation(((url: string) =>
+      Promise.resolve({
+        data: url.includes('/nametemplate/') ? nameTemplate : { results: [] },
+      })) as unknown as typeof openmrsFetch);
+    const [initialFormValues, setInitialFormValues] = mockUseInitialFormValues(undefined, undefined);
+    mockUseInitialFormValues.mockReturnValue([initialFormValues, setInitialFormValues]);
+
+    const renderForm = () => (
+      <ResourcesContextProvider value={mockResourcesContextValue}>
+        <PatientRegistration savePatientForm={vi.fn()} />
+      </ResourcesContextProvider>
+    );
+    const { rerender } = render(renderForm());
+    expect(await screen.findByLabelText('Second family name (optional)')).toHaveValue('Default');
+
+    // The initial values change after the template has loaded, as when more patient data finishes loading
+    mockUseInitialFormValues.mockReturnValue([
+      { ...initialFormValues, telephoneNumber: '0712345678' },
+      setInitialFormValues,
+    ]);
+    rerender(renderForm());
+
+    await waitFor(() => expect(screen.getByLabelText('Second family name (optional)')).toHaveValue('Default'));
   });
 
   it('should render all the required fields and sections', async () => {
