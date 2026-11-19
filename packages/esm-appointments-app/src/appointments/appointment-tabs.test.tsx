@@ -12,8 +12,13 @@ describe('AppointmentTabs', () => {
   it.skip(`renders tabs showing different appointment lists`, async () => {
     mockOpenmrsFetch.mockResolvedValue({ ...mockAppointmentsData } as unknown as FetchResponse);
 
-    renderWithSwr(<AppointmentTabs appointmentServiceTypes={['service-type-uuid']} />);
-
+    renderWithSwr(
+      <AppointmentTabs
+        {...({ appointmentServiceTypes: ['service-type-uuid'] } as unknown as React.ComponentProps<
+          typeof AppointmentTabs
+        >)}
+      />,
+    );
     await waitForLoadingToFinish();
 
     const scheduledAppointmentsTab = screen.getByRole('tab', { name: /^scheduled$/i });

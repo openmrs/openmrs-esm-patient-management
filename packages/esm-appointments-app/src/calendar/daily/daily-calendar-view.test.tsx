@@ -1,6 +1,7 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import dayjs from 'dayjs';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
@@ -139,5 +140,31 @@ describe('DailyCalendarView', () => {
 
     await screen.findByText('John Wilson');
     await screen.findByText('Jane Smith');
+  });
+
+  it('renders collapsible empty range bars and toggles hours on expand/collapse', async () => {
+    const user = userEvent.setup();
+    mockOpenmrsFetch.mockResolvedValue({
+      data: [
+        mockAppointment({
+          startDateTime: new Date('2026-06-09T09:00:00').getTime(),
+        }),
+      ],
+    } as FetchResponse);
+
+    renderWithSwr(<DailyCalendarView {...defaultProps} />);
+
+    await screen.findByText('12 AM – 9 AM');
+    expect(screen.queryByText('1 AM')).not.toBeInTheDocument();
+
+    const expandButtons = screen.getAllByRole('button', { name: /expand/i });
+    await user.click(expandButtons[0]);
+
+    expect(screen.getByText('1 AM')).toBeInTheDocument();
+
+    const collapseButton = screen.getByRole('button', { name: /collapse/i });
+    await user.click(collapseButton);
+
+    expect(screen.queryByText('1 AM')).not.toBeInTheDocument();
   });
 });
