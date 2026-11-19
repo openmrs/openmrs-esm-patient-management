@@ -112,9 +112,11 @@ export function getValidationSchema(
             required: Yup.bool(),
             preferred: Yup.bool(),
             autoGeneration: Yup.bool(),
-            identifierValue: Yup.string().when(['required', 'preferred', 'autoGeneration'], {
-              is: (required: boolean, preferred: boolean, autoGeneration: boolean) =>
-                required ||
+            initialValue: Yup.string(),
+            identifierValue: Yup.string().when(['required', 'preferred', 'autoGeneration', 'initialValue'], {
+              // A new auto-generated identifier left empty is generated on save
+              is: (required: boolean, preferred: boolean, autoGeneration: boolean, initialValue: string) =>
+                (required && !(autoGeneration && !initialValue)) ||
                 (config.fieldConfigurations?.identifier?.allowPreferredSelection && preferred && !autoGeneration),
               then: Yup.string().required(t('identifierValueRequired', 'Identifier value is required')),
               otherwise: Yup.string().notRequired(),

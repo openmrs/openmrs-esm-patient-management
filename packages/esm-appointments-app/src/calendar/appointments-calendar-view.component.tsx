@@ -3,6 +3,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { ErrorState } from '@openmrs/esm-framework';
+import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import AppointmentsHeader from '../header/appointments-header.component';
@@ -34,6 +35,10 @@ const AppointmentsCalendarView: React.FC = () => {
     else setCalendarSelectedDate((d) => d.add(1, 'day'));
   }, [viewMode]);
 
+  const handleToday = useCallback(() => {
+    setCalendarSelectedDate(dayjs());
+  }, []);
+
   const handleViewModeChange = useCallback((mode: CalendarViewMode) => {
     setViewMode(mode);
   }, []);
@@ -42,6 +47,24 @@ const AppointmentsCalendarView: React.FC = () => {
     setCalendarSelectedDate(dayjs(isoDate));
     setViewMode('daily');
   }, []);
+
+  const dailyIsoDate = viewMode === 'daily' ? calendarSelectedDate.format('YYYY-MM-DD') : null;
+  const {
+    appointments: dailyAppointments,
+    isLoading: isLoadingDaily,
+    error: dailyError,
+  } = useAppointmentsByDate(dailyIsoDate);
+
+  const appointmentsCount = useMemo(() => {
+    if (viewMode === 'daily') {
+      return isLoadingDaily || dailyError ? null : dailyAppointments.length;
+    }
+    if (isLoading || error) {
+      return null;
+    }
+    const services = calendarEvents?.flatMap((event) => event.services ?? []) ?? [];
+    return services.reduce((total, service) => total + (service.count ?? 0), 0);
+  }, [viewMode, dailyAppointments.length, isLoadingDaily, dailyError, calendarEvents, isLoading, error]);
 
   const legendServices = useMemo(() => {
     const legendMap = new Map<string, { uuid: string; name: string }>();
@@ -59,35 +82,39 @@ const AppointmentsCalendarView: React.FC = () => {
   return (
     <div data-testid="appointments-calendar" className={styles.backgroundColor}>
       <AppointmentsHeader title={t('calendar', 'Calendar')} isCalendarView />
-      <CalendarHeader
-        viewMode={viewMode}
-        calendarSelectedDate={calendarSelectedDate}
-        onViewModeChange={handleViewModeChange}
-        onPrev={handlePrev}
-        onNext={handleNext}
-      />
-      {/* Without these two states, a failed or pending request looks like a month with no appointments */}
-      {viewMode === 'monthly' && error && (
-        <div className={styles.calendarViewContainer}>
-          <ErrorState error={error} headerTitle={t('appointments', 'Appointments')} />
-        </div>
-      )}
-      {viewMode === 'monthly' && !error && isLoading && (
-        <div className={styles.calendarViewContainer}>
-          <InlineLoading description={t('loadingAppointments', 'Loading appointments…')} />
-        </div>
-      )}
-      {viewMode === 'monthly' && !error && !isLoading && (
-        <MonthlyCalendarView
-          events={calendarEvents}
+      <div className={styles.calendarContent}>
+        <CalendarHeader
+          viewMode={viewMode}
           calendarSelectedDate={calendarSelectedDate}
-          onSelectDate={handleSelectDate}
-          serviceColorMap={serviceColorMap}
+          appointmentsCount={appointmentsCount}
+          onViewModeChange={handleViewModeChange}
+          onToday={handleToday}
+          onPrev={handlePrev}
+          onNext={handleNext}
         />
-      )}
-      {viewMode === 'daily' && (
-        <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />
-      )}
+        {/* Without these two states, a failed or pending request looks like a month with no appointments */}
+        {viewMode === 'monthly' && error && (
+          <div className={styles.calendarViewContainer}>
+            <ErrorState error={error} headerTitle={t('appointments', 'Appointments')} />
+          </div>
+        )}
+        {viewMode === 'monthly' && !error && isLoading && (
+          <div className={styles.calendarViewContainer}>
+            <InlineLoading description={t('loadingAppointments', 'Loading appointments…')} />
+          </div>
+        )}
+        {viewMode === 'monthly' && !error && !isLoading && (
+          <MonthlyCalendarView
+            events={calendarEvents}
+            calendarSelectedDate={calendarSelectedDate}
+            onSelectDate={handleSelectDate}
+            serviceColorMap={serviceColorMap}
+          />
+        )}
+        {viewMode === 'daily' && (
+          <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />
+        )}
+      </div>
       <ServicesLegend services={legendServices} serviceColorMap={serviceColorMap} />
     </div>
   );
