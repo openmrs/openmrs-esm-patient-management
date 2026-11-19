@@ -17,7 +17,7 @@ const ScheduledAppointments: React.FC<{}> = () => {
   const { appointmentServiceTypes } = useAppointmentsStore();
   const selectedDate = useSelectedDate();
 
-  const { appointmentList: appointmentsForSelectedDate, isLoading, error } = useAppointmentList(selectedDate);
+  const { appointmentList: appointmentsForSelectedDate, isLoading, loadError } = useAppointmentList(selectedDate);
 
   const appointmentForSelectedDateFilteredByServiceTypes =
     appointmentServiceTypes.length > 0
@@ -27,7 +27,7 @@ const ScheduledAppointments: React.FC<{}> = () => {
   useDefineAppContext<AppointmentsAppContext>('appointments', {
     appointmentForSelectedDateFilteredByServiceTypes,
     isLoading,
-    error,
+    error: loadError,
   });
   const formattedDate = formatDate(parseDate(selectedDate), { mode: 'standard', time: false });
 
@@ -35,6 +35,7 @@ const ScheduledAppointments: React.FC<{}> = () => {
     <div className={styles.container}>
       <AppointmentsTable
         appointments={appointmentForSelectedDateFilteredByServiceTypes}
+        error={loadError}
         isLoading={isLoading}
         tableHeading={t('appointmentsForDate', 'Appointments for: {{date}}', { date: formattedDate })}
       />

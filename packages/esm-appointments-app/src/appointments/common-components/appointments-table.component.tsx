@@ -30,6 +30,7 @@ import {
 import { Calendar, Download } from '@carbon/react/icons';
 import {
   ConfigurableLink,
+  ErrorState,
   formatDate,
   formatDatetime,
   isDesktop,
@@ -53,11 +54,13 @@ import styles from './appointments-table.scss';
 
 interface AppointmentsTableProps {
   appointments: Array<Appointment>;
+  /** Set this when the appointments could not be loaded. An error state is then shown in place of the table. */
+  error?: Error;
   isLoading: boolean;
   tableHeading: string;
 }
 
-const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isLoading, tableHeading }) => {
+const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, error, isLoading, tableHeading }) => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
@@ -147,6 +150,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
       }),
     [results, customPatientChartUrl, patientIdentifierType, responsiveSize, t, activeVisitsByPatientUuid, mutateVisits],
   );
+
+  // Checked before isLoading so that the error stays put while the failed request is retried
+  if (error) {
+    return <ErrorState error={error} headerTitle={tableHeading} />;
+  }
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;

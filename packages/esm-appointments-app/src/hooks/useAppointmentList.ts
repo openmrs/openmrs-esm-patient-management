@@ -7,7 +7,14 @@ import { buildAppointmentsUrl } from '../helpers';
 export const useAppointmentList = (date: string) => {
   const searchUrl = buildAppointmentsUrl(date);
   const { data, ...rest } = useSWR<AppointmentsFetchResponse, Error>(searchUrl, openmrsFetch);
-  return { appointmentList: data?.data ?? [], ...rest };
+
+  return {
+    appointmentList: data?.data ?? [],
+    // The error to show in place of the list. Once the list for this date has loaded, even an empty one,
+    // a refresh that fails leaves it on screen, so that failure is not reported here.
+    loadError: data ? undefined : rest.error,
+    ...rest,
+  };
 };
 
 /**
