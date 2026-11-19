@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Field } from 'formik';
-import { Layer, Select, SelectItem } from '@carbon/react';
+import { Field, getIn } from 'formik';
+import { Layer, RadioButton, RadioButtonGroup, Select, SelectItem } from '@carbon/react';
 import { reportError } from '@openmrs/esm-framework';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
 import { useConceptAnswers } from '../field.resource';
@@ -15,6 +15,7 @@ export interface CodedPersonAttributeFieldProps {
   label?: string;
   customConceptAnswers: Array<{ uuid: string; label?: string }>;
   required: boolean;
+  displayStyle?: 'dropdown' | 'radio';
 }
 
 export function CodedPersonAttributeField({
@@ -24,6 +25,7 @@ export function CodedPersonAttributeField({
   label,
   customConceptAnswers,
   required,
+  displayStyle,
 }: CodedPersonAttributeFieldProps) {
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
     customConceptAnswers.length ? '' : answerConceptSetUuid,
@@ -32,6 +34,15 @@ export function CodedPersonAttributeField({
   const { t } = useTranslation();
   const fieldName = `attributes.${personAttributeType.uuid}`;
   const [error, setError] = useState(false);
+
+  const validate = useCallback(
+    (value: string) => {
+      if (required && !value) {
+        return t('attributeFieldRequired', 'This field is required');
+      }
+    },
+    [required, t],
+  );
 
   useEffect(() => {
     if (!answerConceptSetUuid && !customConceptAnswers.length) {
@@ -93,15 +104,46 @@ export function CodedPersonAttributeField({
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
         <Layer>
-          <Field name={fieldName}>
-            {({ field, form: { touched, errors }, meta }) => {
+          <Field name={fieldName} validate={validate}>
+            {({ field, form: { touched, errors, submitCount, setFieldValue, setFieldTouched }, meta }) => {
+              const fieldError = (meta.error || getIn(errors, fieldName)) as string | undefined;
+              const isFieldTouched = meta.touched || Boolean(getIn(touched, fieldName)) || submitCount > 0;
+              const isInvalid = Boolean(isFieldTouched && fieldError);
+              const errorMessage = fieldError;
+
+              if (displayStyle === 'radio') {
+                return (
+                  <RadioButtonGroup
+                    name={fieldName}
+                    legendText={label ?? personAttributeType?.display}
+                    orientation="horizontal"
+                    invalid={isInvalid}
+                    invalidText={errorMessage ? t(errorMessage, errorMessage) : undefined}
+                    required={required}
+                    valueSelected={field.value}
+                    onChange={(value) => {
+                      setFieldValue(fieldName, value);
+                      setFieldTouched(fieldName, true, false);
+                    }}>
+                    {answers.map((answer) => (
+                      <RadioButton
+                        key={answer.uuid}
+                        id={`${id}-${answer.uuid}`}
+                        labelText={answer.label}
+                        value={answer.uuid}
+                      />
+                    ))}
+                  </RadioButtonGroup>
+                );
+              }
               return (
                 <>
                   <Select
                     id={id}
                     name={`person-attribute-${personAttributeType.uuid}`}
                     labelText={label ?? personAttributeType?.display}
-                    invalid={errors[fieldName] && touched[fieldName]}
+                    invalid={isInvalid}
+                    invalidText={errorMessage ? t(errorMessage, errorMessage) : undefined}
                     required={required}
                     {...field}>
                     <SelectItem value={''} text={t('selectAnOption', 'Select an option')} />

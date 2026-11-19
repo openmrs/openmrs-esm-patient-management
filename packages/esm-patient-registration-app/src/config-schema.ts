@@ -1,15 +1,29 @@
 import { Type, validator, validators } from '@openmrs/esm-framework';
 import _default from 'yup/lib/locale';
 
+export interface HideIfCondition {
+  fieldId: string;
+  value?: string;
+  notEquals?: string;
+}
+
+export interface HideIfAgeCondition {
+  operator: '<' | '>' | '<=' | '>=' | '==';
+  value: number;
+}
+
 export interface SectionDefinition {
   id: string;
   name?: string;
   fields: Array<string>;
+  hideIf?: HideIfCondition;
+  hideIfAge?: HideIfAgeCondition;
 }
 
 export interface FieldDefinition {
   id: string;
   type: string;
+  displayStyle?: 'dropdown' | 'radio';
   label?: string;
   uuid: string;
   placeholder?: string;
@@ -23,6 +37,8 @@ export interface FieldDefinition {
   locationTag?: string;
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<CustomConceptAnswer>;
+  hideIf?: HideIfCondition;
+  hideIfAge?: HideIfAgeCondition;
 }
 
 export interface CustomConceptAnswer {
@@ -114,6 +130,23 @@ export const builtInFields = [
   'dateAndTimeOfDeath',
 ] as const;
 
+const hideIfAgeOperators = ['<', '>', '<=', '>=', '=='];
+
+const hideIfValidator = validator(
+  (hideIf: HideIfCondition | null) =>
+    hideIf == null ||
+    (typeof hideIf.fieldId === 'string' &&
+      hideIf.fieldId.trim() !== '' &&
+      (hideIf.value !== undefined || hideIf.notEquals !== undefined)),
+  'hideIf must have a non-empty `fieldId` and either `value` or `notEquals`.',
+);
+
+const hideIfAgeValidator = validator(
+  (hideIfAge: HideIfAgeCondition | null) =>
+    hideIfAge == null || (hideIfAgeOperators.includes(hideIfAge.operator) && typeof hideIfAge.value === 'number'),
+  `hideIfAge must have an \`operator\` (one of ${hideIfAgeOperators.join(', ')}) and a numeric \`value\`.`,
+);
+
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
@@ -148,6 +181,20 @@ export const esmPatientRegistrationSchema = {
         _elements: {
           _type: Type.String,
         },
+      },
+      hideIf: {
+        _type: Type.Object,
+        _default: null,
+        _description:
+          'Skip logic: hide this section when a field has a certain value. Takes a `fieldId` (a field definition id, or one of gender, dob, phone, causeOfDeath or dateAndTimeOfDeath) and either `value` (hide when equal) or `notEquals` (hide when not equal, including when empty).',
+        _validators: [hideIfValidator],
+      },
+      hideIfAge: {
+        _type: Type.Object,
+        _default: null,
+        _description:
+          'Skip logic: hide this section based on the patient\'s age in years. Takes an `operator` (`<`, `>`, `<=`, `>=` or `==`) and a numeric `value`, e.g. { "operator": "<", "value": 18 } hides it for patients under 18.',
+        _validators: [hideIfAgeValidator],
       },
     },
   },
@@ -237,6 +284,26 @@ export const esmPatientRegistrationSchema = {
             _description: 'The custom label for the answer concept.',
           },
         },
+      },
+      hideIf: {
+        _type: Type.Object,
+        _default: null,
+        _description:
+          'Skip logic: hide this field when another field has a certain value. Takes a `fieldId` (a field definition id, or one of gender, dob, phone, causeOfDeath or dateAndTimeOfDeath) and either `value` (hide when equal) or `notEquals` (hide when not equal, including when empty).',
+        _validators: [hideIfValidator],
+      },
+      hideIfAge: {
+        _type: Type.Object,
+        _default: null,
+        _description:
+          'Skip logic: hide this field based on the patient\'s age in years. Takes an `operator` (`<`, `>`, `<=`, `>=` or `==`) and a numeric `value`, e.g. { "operator": "<", "value": 18 } hides it for patients under 18.',
+        _validators: [hideIfAgeValidator],
+      },
+      displayStyle: {
+        _type: Type.String,
+        _default: 'dropdown',
+        _description: 'How to render coded person attributes. Can be "dropdown" or "radio".',
+        _validators: [validators.oneOf(['dropdown', 'radio'])],
       },
     },
     // Do not add fields here. If you want to add a field in code, add it to built-in fields above.
