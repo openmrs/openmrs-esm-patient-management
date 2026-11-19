@@ -63,7 +63,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
                   name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
                   role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
                 },
-                time: formatTime(parseDate(obs.obsDatetime)),
+                time: obs.obsDatetime ? formatTime(parseDate(obs.obsDatetime)) : '--',
               });
             }
           }
