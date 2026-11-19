@@ -8,18 +8,20 @@ import { type RegistrationConfig } from '../config-schema';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
 import { isDateFormat } from './field/person-attributes/person-attributes.resource';
 import {
-  type Encounter,
   type FormValues,
   type PatientIdentifierResponse,
   type PatientUuidMapType,
   type PersonAttributeResponse,
+  type RegistrationEncounterResponse,
 } from './patient-registration.types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
+  getRegistrationEncounterObs,
   latestFirstEncounter,
+  REGISTRATION_ENCOUNTER_REPRESENTATION,
 } from './patient-registration-utils';
 
 interface DeathInfoResults {
@@ -167,6 +169,7 @@ export function usePatientUuidMap(
   const fallbackRef = useRef(fallback);
   const [patientUuidMap, setPatientUuidMap] = useState(fallbackRef.current);
   const { data: attributes } = useInitialPersonAttributes(patientUuid);
+  const { registrationEncounter } = useInitialEncounters(patientUuid, patientToEdit);
 
   useEffect(() => {
     if (patientToEdit) {
@@ -185,6 +188,15 @@ export function usePatientUuidMap(
       }));
     }
   }, [attributes]);
+
+  useEffect(() => {
+    if (registrationEncounter) {
+      setPatientUuidMap((prevMap) => ({
+        ...prevMap,
+        registrationEncounter,
+      }));
+    }
+  }, [registrationEncounter]);
 
   return [patientUuidMap, setPatientUuidMap];
 }
@@ -232,20 +244,23 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
 
 function useInitialEncounters(patientUuid: string, patientToEdit: fhir.Patient) {
   const { registrationObs } = useConfig<RegistrationConfig>();
-  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<Encounter> }>>(
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<RegistrationEncounterResponse> }>>(
     patientToEdit && registrationObs.encounterTypeUuid
-      ? `${restBaseUrl}/encounter?patient=${patientUuid}&v=custom:(encounterDatetime,obs:(concept:ref,value:ref))&encounterType=${registrationObs.encounterTypeUuid}`
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&v=${REGISTRATION_ENCOUNTER_REPRESENTATION}&encounterType=${registrationObs.encounterTypeUuid}`
       : null,
     openmrsFetch,
   );
-  const obs = data?.data.results.sort(latestFirstEncounter)?.at(0)?.obs;
-  const encounters = obs
-    ?.map(({ concept, value }) => ({
-      [(concept as OpenmrsResource).uuid]: typeof value === 'object' ? value?.uuid : value,
-    }))
-    .reduce((accu, curr) => Object.assign(accu, curr), {});
 
-  return { data: encounters, isLoading, error };
+  return useMemo(() => {
+    // Copy before sorting, so the SWR cache is not mutated
+    const latestEncounter = [...(data?.data.results ?? [])].sort(latestFirstEncounter).at(0);
+    if (!latestEncounter) {
+      return { data: undefined, registrationEncounter: undefined, isLoading, error };
+    }
+
+    const { obsValues, registrationEncounter } = getRegistrationEncounterObs(latestEncounter);
+    return { data: obsValues, registrationEncounter, isLoading, error };
+  }, [data, isLoading, error]);
 }
 
 function useInitialPersonAttributes(personUuid: string) {
