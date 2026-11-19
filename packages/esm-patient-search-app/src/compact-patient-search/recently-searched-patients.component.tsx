@@ -2,13 +2,31 @@ import React, { forwardRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, Layer, Tile } from '@carbon/react';
 import { EmptyCardIllustration } from '@openmrs/esm-framework';
-import CompactPatientBanner, { type CompactPatientBannerHandle } from './compact-patient-banner.component';
+import CompactPatientBanner, {
+  type CompactPatientBannerHandle,
+  type CompactPatientSelectionProps,
+} from './compact-patient-banner.component';
 import Loader from './loader.component';
 import type { PatientSearchResponse } from '../types';
 import styles from './patient-search.scss';
 
-const RecentlySearchedPatients = forwardRef<CompactPatientBannerHandle, PatientSearchResponse>(
-  ({ data: searchResults, fetchError, hasMore, isLoading, isValidating, setPage }, ref) => {
+const RecentlySearchedPatients = forwardRef<
+  CompactPatientBannerHandle,
+  PatientSearchResponse & CompactPatientSelectionProps
+>(
+  (
+    {
+      data: searchResults,
+      fetchError,
+      hasMore,
+      isLoading,
+      isValidating,
+      setPage,
+      nonNavigationSelectPatientAction,
+      patientClickSideEffect,
+    },
+    ref,
+  ) => {
     const { t } = useTranslation();
 
     const fetchMore = useCallback(() => setPage((page) => page + 1), [setPage]);
@@ -67,6 +85,8 @@ const RecentlySearchedPatients = forwardRef<CompactPatientBannerHandle, PatientS
               isValidating={isValidating}
               fetchMore={fetchMore}
               virtualize={false}
+              nonNavigationSelectPatientAction={nonNavigationSelectPatientAction}
+              patientClickSideEffect={patientClickSideEffect}
             />
           </div>
         </div>

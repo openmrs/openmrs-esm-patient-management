@@ -107,8 +107,8 @@ const CreateQueueEntryWorkspace: React.FC<
                 name="start-visit-button-slot2"
                 state={{
                   patientUuid: patient.id,
-                  launchChildWorkspace,
-                  startVisitWorkspaceName,
+                  launchStartVisitWorkspace: (workspaceProps?: object) =>
+                    launchChildWorkspace(startVisitWorkspaceName, workspaceProps),
                 }}
               />
             </Stack>

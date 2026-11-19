@@ -23,8 +23,9 @@ test.beforeEach(async ({ api, patient }) => {
   queueEntry = await addQueueEntry(api, patient.uuid, activeVisit.uuid);
 });
 
-// Void what we created, newest first — the `patient` fixture cannot delete a patient that still has visits.
-// Each is guarded so that a setup failure part-way through still tears down whatever did get created.
+// Void what we created, newest first, so that the test leaves none of it behind. (The `patient` fixture deletes the
+// patient itself, visits and all.) Each is guarded so that a setup failure part-way through still tears down
+// whatever did get created.
 test.afterEach(async ({ api }) => {
   for (const path of [
     queueEntry?.uuid && `queue-entry/${queueEntry.uuid}`,

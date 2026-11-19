@@ -1,22 +1,25 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useConfig, useDebounce } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContextProvider, type PatientSearchContextProps } from '../patient-search-context';
+import {
+  launchStartVisitWorkspaceOutsideWorkspace,
+  PatientSearchContext2,
+  type PatientSearchContext2Props,
+  type PatientSelectionCallback,
+} from '../patient-search-context';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
 
-export interface PatientSearchWorkspaceProps extends PatientSearchContextProps {
+export interface PatientSearchWorkspaceProps {
   initialQuery?: string;
+  /** Called just before following a result's link to the patient chart. */
+  patientClickSideEffect?: PatientSelectionCallback;
 }
 
 /**
  * Renders the patient search bar and results inside PatientSearchOverlay.
  */
-const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
-  initialQuery,
-  nonNavigationSelectPatientAction,
-  patientClickSideEffect,
-}) => {
+const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({ initialQuery, patientClickSideEffect }) => {
   const {
     search: { disableTabletSearchOnKeyUp },
   } = useConfig<PatientSearchConfig>();
@@ -30,16 +33,16 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
     setSearchTerm(value);
   }, []);
 
-  const contextValue: PatientSearchContextProps = useMemo(
+  const contextValue: PatientSearchContext2Props = useMemo(
     () => ({
-      nonNavigationSelectPatientAction,
-      patientClickSideEffect,
+      launchStartVisitWorkspace: launchStartVisitWorkspaceOutsideWorkspace,
+      onBeforeNavigateToPatient: patientClickSideEffect,
     }),
-    [nonNavigationSelectPatientAction, patientClickSideEffect],
+    [patientClickSideEffect],
   );
 
   return (
-    <PatientSearchContextProvider value={contextValue}>
+    <PatientSearchContext2.Provider value={contextValue}>
       <PatientSearchBar
         initialSearchTerm={initialQuery}
         onChange={(value) => !disableTabletSearchOnKeyUp && onSearchTermChange(value)}
@@ -47,7 +50,7 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({
         onSubmit={onSearchTermChange}
       />
       {showSearchResults && <AdvancedPatientSearchComponent query={debouncedSearchTerm} inTabletOrOverlay />}
-    </PatientSearchContextProvider>
+    </PatientSearchContext2.Provider>
   );
 };
 

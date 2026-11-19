@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useConfig, useDebounce, Workspace2, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
 import { PatientSearchContext2, type SelectPatientButtonConfig } from '../patient-search-context';
@@ -75,17 +75,29 @@ const PatientSearchWorkspace2: React.FC<
 
   const handleClearSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
+  const context2 = useMemo(
+    () => ({
+      onPatientSelected,
+      onVisitStarted,
+      launchStartVisitWorkspace: (workspaceProps?: object) =>
+        launchChildWorkspace(startVisitWorkspaceName, workspaceProps),
+      launchChildWorkspace,
+      closeWorkspace,
+      selectPatientButton,
+    }),
+    [
+      onPatientSelected,
+      onVisitStarted,
+      launchChildWorkspace,
+      closeWorkspace,
+      startVisitWorkspaceName,
+      selectPatientButton,
+    ],
+  );
+
   return (
     <Workspace2 title={workspaceTitle}>
-      <PatientSearchContext2.Provider
-        value={{
-          onPatientSelected,
-          onVisitStarted,
-          launchChildWorkspace,
-          closeWorkspace,
-          startVisitWorkspaceName,
-          selectPatientButton,
-        }}>
+      <PatientSearchContext2.Provider value={context2}>
         <PatientSearchBar
           initialSearchTerm={initialQuery}
           onChange={(value) => !disableTabletSearchOnKeyUp && setSearchTerm(value)}
