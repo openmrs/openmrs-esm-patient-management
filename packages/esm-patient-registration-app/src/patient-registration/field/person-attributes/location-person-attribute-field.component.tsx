@@ -4,6 +4,7 @@ import { ComboBox, InlineLoading, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { Field, useField } from 'formik';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { requiredAttributeValidator } from './required-attribute';
 import { useLocations } from './location-person-attribute-field.resource';
 import styles from './../field.scss';
 
@@ -114,8 +115,8 @@ export function LocationPersonAttributeField({
         enterPressedWithSearchText.current = false;
       }}>
       <Layer>
-        <Field name={fieldName}>
-          {({ form: { touched, errors } }) => {
+        <Field name={fieldName} validate={requiredAttributeValidator(required, t('fieldRequired', 'Required'))}>
+          {({ meta }) => {
             return (
               <ComboBox
                 id={id}
@@ -129,7 +130,8 @@ export function LocationPersonAttributeField({
                 onChange={handleSelect}
                 selectedItem={selectedItem}
                 downshiftActions={downshiftActions}
-                invalid={errors[fieldName] && touched[fieldName]}
+                invalid={!!(meta.touched && meta.error)}
+                invalidText={meta.error}
                 typeahead
               />
             );
