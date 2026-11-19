@@ -1,9 +1,11 @@
 import React from 'react';
-import { vi, describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { SWRConfig } from 'swr';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
@@ -27,6 +29,7 @@ vi.mock('../hooks/useAppointmentService', () => ({
 
 const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
 const mockUseAppointmentsByDate = vi.mocked(useAppointmentsByDate);
+const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
 function renderCalendar() {
   return render(
@@ -289,5 +292,108 @@ describe('Appointment calendar view', () => {
     expect(cellSwatch).toBeInTheDocument();
     expect(legendSwatch.style.backgroundColor).toBeTruthy();
     expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
+  });
+
+  it('shows a loading indicator instead of an empty month while the monthly counts are loading', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({ calendarEvents: [], isLoading: true, error: null });
+
+    renderCalendar();
+
+    expect(screen.getByText(/loading appointments/i)).toBeInTheDocument();
+    expect(screen.queryByText(/0 appointment\(s\)/i)).not.toBeInTheDocument();
+  });
+
+  it('shows an error state instead of an empty month when the monthly counts fail to load', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [],
+      isLoading: false,
+      error: new Error('Internal Server Error'),
+    });
+
+    renderCalendar();
+
+    expect(screen.getByText(/error state/i)).toBeInTheDocument();
+    expect(screen.queryByText(/0 appointment\(s\)/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps the daily view available when the monthly counts fail to load', async () => {
+    const user = userEvent.setup();
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [],
+      isLoading: false,
+      error: new Error('Internal Server Error'),
+    });
+    mockUseAppointmentsByDate.mockReturnValue({ appointments: [], isLoading: false, error: undefined });
+
+    renderCalendar();
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+
+    expect(screen.queryByText(/error state/i)).not.toBeInTheDocument();
+    expect(screen.getByText('No appointments scheduled')).toBeInTheDocument();
+  });
+
+  // These run the real useAppointmentsCalendar hook, because whether a failed request is an error to show
+  // depends on what SWR already holds for the month
+  describe('when the monthly counts are requested', () => {
+    const today = dayjs().format('YYYY-MM-DD');
+    const outpatientUuid = 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90';
+    const outpatientSummary = {
+      appointmentService: { name: 'Outpatient', uuid: outpatientUuid },
+      appointmentCountMap: { [today]: { allAppointmentsCount: 5 } },
+    };
+    const onError = vi.fn();
+
+    function renderCalendarWithRealHook() {
+      return render(
+        <SWRConfig value={{ dedupingInterval: 0, provider: () => new Map(), shouldRetryOnError: false, onError }}>
+          <BrowserRouter>
+            <AppointmentsCalendarView />
+          </BrowserRouter>
+        </SWRConfig>,
+      );
+    }
+
+    beforeEach(async () => {
+      const actual = await vi.importActual<{ useAppointmentsCalendar: typeof useAppointmentsCalendar }>(
+        '../hooks/useAppointmentsCalendar',
+      );
+      mockUseAppointmentsCalendar.mockImplementation(actual.useAppointmentsCalendar);
+      mockOpenmrsFetch.mockReset();
+    });
+
+    afterEach(() => {
+      mockUseAppointmentsCalendar.mockReturnValue({ calendarEvents: [], isLoading: false, error: null });
+    });
+
+    it('shows the error state when the first request for a month fails', async () => {
+      mockOpenmrsFetch.mockRejectedValueOnce(new Error('Internal Server Error'));
+
+      renderCalendarWithRealHook();
+
+      expect(await screen.findByText(/error state/i)).toBeInTheDocument();
+    });
+
+    it.each([
+      ['a month with appointments', [outpatientSummary], `service-area-${outpatientUuid}`],
+      ['a month with no appointments', [], `workload-cell-${today}`],
+    ])('keeps showing %s that has already loaded when a later refresh fails', async (_, summary, dayCellTestId) => {
+      const user = userEvent.setup();
+      mockOpenmrsFetch
+        .mockResolvedValueOnce({ data: summary } as unknown as FetchResponse)
+        .mockResolvedValueOnce({ data: [] } as unknown as FetchResponse)
+        .mockRejectedValueOnce(new Error('Internal Server Error'));
+
+      renderCalendarWithRealHook();
+      expect(await screen.findByTestId(dayCellTestId)).toBeInTheDocument();
+
+      // Leave the month and come back to it, which refreshes its counts. That request fails.
+      await user.click(screen.getByRole('button', { name: /next/i }));
+      await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2));
+      await user.click(screen.getByRole('button', { name: /previous/i }));
+      await waitFor(() => expect(onError).toHaveBeenCalledTimes(1));
+
+      expect(screen.getByTestId(dayCellTestId)).toBeInTheDocument();
+      expect(screen.queryByText(/error state/i)).not.toBeInTheDocument();
+    });
   });
 });

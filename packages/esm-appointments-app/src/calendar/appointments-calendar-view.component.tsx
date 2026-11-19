@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { InlineLoading } from '@carbon/react';
+import { ErrorState } from '@openmrs/esm-framework';
 import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
@@ -90,7 +92,18 @@ const AppointmentsCalendarView: React.FC = () => {
           onPrev={handlePrev}
           onNext={handleNext}
         />
-        {viewMode === 'monthly' && (
+        {/* Without these two states, a failed or pending request looks like a month with no appointments */}
+        {viewMode === 'monthly' && error && (
+          <div className={styles.calendarViewContainer}>
+            <ErrorState error={error} headerTitle={t('appointments', 'Appointments')} />
+          </div>
+        )}
+        {viewMode === 'monthly' && !error && isLoading && (
+          <div className={styles.calendarViewContainer}>
+            <InlineLoading description={t('loadingAppointments', 'Loading appointments…')} />
+          </div>
+        )}
+        {viewMode === 'monthly' && !error && !isLoading && (
           <MonthlyCalendarView
             events={calendarEvents}
             calendarSelectedDate={calendarSelectedDate}
