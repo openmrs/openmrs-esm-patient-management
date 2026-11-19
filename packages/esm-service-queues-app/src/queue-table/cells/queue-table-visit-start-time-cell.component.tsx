@@ -4,11 +4,12 @@ import { formatDatetime } from '@openmrs/esm-framework';
 
 export const queueTableVisitStartTimeColumn: QueueTableColumnFunction = (key, header) => {
   function getVisitStartTime(queueEntry: QueueEntry) {
-    return formatDatetime(new Date(queueEntry.visit?.startDatetime));
+    const startDatetime = queueEntry.visit?.startDatetime;
+    return startDatetime ? formatDatetime(new Date(startDatetime)) : null;
   }
 
   const QueueTableVisitStartTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
-    return <span>{getVisitStartTime(queueEntry)}</span>;
+    return <span>{getVisitStartTime(queueEntry) ?? '--'}</span>;
   };
 
   return {
