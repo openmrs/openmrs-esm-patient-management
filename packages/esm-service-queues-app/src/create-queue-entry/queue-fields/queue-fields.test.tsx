@@ -23,6 +23,7 @@ import {
 import { postQueueEntry } from './queue-fields.resource';
 import { useQueues } from '../../hooks/useQueues';
 import { useQueueEntries } from '../../hooks/useQueueEntries';
+import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useServiceQueuesStore } from '../../store/store';
 import QueueFields from './queue-fields.component';
 
@@ -56,6 +57,7 @@ vi.mock('./queue-fields.resource', () => {
 const mockUseQueues = vi.mocked(useQueues);
 const mockUseServiceQueuesStore = vi.mocked(useServiceQueuesStore);
 const mockUseQueueEntries = vi.mocked(useQueueEntries);
+const mockUseQueueLocations = vi.mocked(useQueueLocations);
 const mockPostQueueEntry = vi.mocked(postQueueEntry).mockResolvedValue({} as FetchResponse);
 
 describe('QueueFields', () => {
@@ -66,6 +68,7 @@ describe('QueueFields', () => {
     mockUseQueues.mockReturnValue({ queues: mockQueues } as any);
     mockUseQueueEntries.mockReturnValue({ queueEntries: [] } as any);
     mockUseServiceQueuesStore.mockReturnValue({} as any);
+    mockUseQueueLocations.mockReturnValue({ queueLocations: [{ id: '1', name: 'Location 1' }] } as any);
   });
 
   it('renders the form fields and returns the set values', async () => {
@@ -228,6 +231,26 @@ describe('QueueFields', () => {
     render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
 
     expect(screen.getByTitle(/select a queue location/i)).toHaveValue('1');
+  });
+
+  it('waits for a queue location instead of using a session location that has no queues', () => {
+    // The session location from mockSession is not one of the queue locations
+    mockUseQueues.mockImplementation((location) => ({ queues: location === '1' ? mockQueues : [] }) as any);
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
+
+    expect(screen.getByTitle(/select a queue location/i)).toHaveValue('');
+    expect(screen.queryByRole('group', { name: /service/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/no services configured/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps a prefilled location when the queue locations cannot be loaded', () => {
+    mockUseServiceQueuesStore.mockReturnValue({ selectedQueueLocationUuid: '1' } as any);
+    mockUseQueueLocations.mockReturnValue({ queueLocations: [], isLoading: false, error: new Error('boom') } as any);
+
+    render(<QueueFields patientUuid={mockVisitAlice.patient.uuid} setOnSubmit={vi.fn()} />);
+
+    expect(screen.getByRole('group', { name: /service/i })).toBeInTheDocument();
   });
 
   it('falls back to the session location if the store has no selected location', () => {

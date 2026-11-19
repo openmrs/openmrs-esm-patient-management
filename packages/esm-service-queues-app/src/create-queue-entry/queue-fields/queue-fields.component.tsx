@@ -51,7 +51,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   const { t } = useTranslation();
   const schema = useMemo(() => createQueueServiceSchema(t), [t]);
   const { sessionLocation } = useSession();
-  const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
+  const { queueLocations, isLoading: isLoadingQueueLocations, error: queueLocationsError } = useQueueLocations();
 
   // A patient cannot be added to a queue they are already in, so those queues are left out below
   const {
@@ -89,6 +89,11 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
   const queueLocation = watch('queueLocation');
   const queueService = watch('queueService');
   const priority = watch('priority');
+  // The default can be the session location, which may not be a queue location, so treat it as unset until it is
+  // one. If the queue locations failed to load there is nothing to check it against, so keep the default.
+  const isKnownQueueLocation = queueLocationsError
+    ? Boolean(queueLocation)
+    : queueLocations.some((location) => location.id === queueLocation);
 
   const { queues, isLoading: isLoadingQueues } = useQueues(queueLocation);
   const memoizedQueues = useMemo(
@@ -200,6 +205,12 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
     }
   }, [queueLocation, setValue, clearErrors]);
 
+  useEffect(() => {
+    if (!isLoadingQueueLocations && queueLocation && !isKnownQueueLocation) {
+      setValue('queueLocation', '', { shouldValidate: false });
+    }
+  }, [isLoadingQueueLocations, queueLocation, isKnownQueueLocation, setValue]);
+
   return (
     /*
      * Do not style this component directly. It is used in multiple contexts:
@@ -245,7 +256,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
         </FormGroup>
       </ResponsiveWrapper>
 
-      {queueLocation && (
+      {isKnownQueueLocation && (
         <FormGroup legendText={t('service', 'Service')}>
           <Controller
             name="queueService"
@@ -301,7 +312,7 @@ const QueueFields = React.memo(({ patientUuid, setOnSubmit, defaultInitialServic
       {/* Status section of the form would go here; historical version of this code can be found at
       https://github.com/openmrs/openmrs-esm-patient-management/blame/6c31e5ff2579fc89c2fd0d12c13510a1f2e913e0/packages/esm-service-queues-app/src/patient-search/visit-form-queue-fields/visit-form-queue-fields.component.tsx#L115 */}
 
-      {queueLocation && queueService && (
+      {isKnownQueueLocation && queueService && (
         <FormGroup legendText={t('priority', 'Priority')}>
           <Controller
             name="priority"
