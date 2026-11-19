@@ -1,6 +1,9 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@carbon/react';
+import { ArrowLeft } from '@carbon/react/icons';
 import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
@@ -16,6 +19,7 @@ import styles from './appointments-calendar-view-view.scss';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
@@ -80,6 +84,16 @@ const AppointmentsCalendarView: React.FC = () => {
   return (
     <div data-testid="appointments-calendar" className={styles.backgroundColor}>
       <AppointmentsHeader title={t('calendar', 'Calendar')} isCalendarView />
+      <div className={styles.backRow}>
+        <Button
+          kind="ghost"
+          size="sm"
+          renderIcon={ArrowLeft}
+          onClick={() => navigate('/')}
+          className={styles.backButton}>
+          <span>{t('back', 'Back')}</span>
+        </Button>
+      </div>
       <div className={styles.calendarContent}>
         <CalendarHeader
           viewMode={viewMode}

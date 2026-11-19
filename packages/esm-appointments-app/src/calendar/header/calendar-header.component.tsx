@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
-import { ArrowLeft, ChevronLeft, ChevronRight } from '@carbon/react/icons';
+import { ChevronLeft, ChevronRight } from '@carbon/react/icons';
 import { type CalendarViewMode } from '../../types';
 import { getCalendarFormat } from '../calendar-utils';
 import styles from './calendar-header.scss';
@@ -28,7 +27,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onNext,
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { locale, calendar } = getCalendarFormat();
 
   const dateLabel = useMemo(() => {
@@ -71,56 +69,44 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
 
   return (
     <div className={styles.calendarHeaderContainer}>
-      <div className={styles.backRow}>
-        <Button
-          kind="ghost"
-          size="sm"
-          renderIcon={ArrowLeft}
-          onClick={() => navigate('/')}
-          className={styles.backButton}>
-          <span>{t('back', 'Back')}</span>
-        </Button>
-      </div>
-      <div className={styles.controlsRow}>
-        <div className={styles.navigationSection}>
-          <div className={styles.navGroup}>
-            <Button kind="tertiary" size="sm" onClick={onToday}>
-              {t('today', 'Today')}
-            </Button>
-            <div className={styles.navButtonGroup}>
-              <Button
-                hasIconOnly
-                kind="ghost"
-                size="sm"
-                renderIcon={ChevronLeft}
-                iconDescription={t('previous', 'Previous')}
-                onClick={onPrev}
-              />
-              <span className={styles.navDivider} />
-              <Button
-                hasIconOnly
-                kind="ghost"
-                size="sm"
-                renderIcon={ChevronRight}
-                iconDescription={t('next', 'Next')}
-                onClick={onNext}
-              />
-            </div>
-            <span className={styles.dateLabel}>{dateLabel}</span>
-            {appointmentsCountLabel !== null && (
-              <span className={styles.appointmentsCount}>{appointmentsCountLabel}</span>
-            )}
+      <div className={styles.navigationSection}>
+        <div className={styles.navGroup}>
+          <Button kind="tertiary" size="sm" onClick={onToday}>
+            {t('today', 'Today')}
+          </Button>
+          <div className={styles.navButtonGroup}>
+            <Button
+              hasIconOnly
+              kind="ghost"
+              size="sm"
+              renderIcon={ChevronLeft}
+              iconDescription={t('previous', 'Previous')}
+              onClick={onPrev}
+            />
+            <span className={styles.navDivider} />
+            <Button
+              hasIconOnly
+              kind="ghost"
+              size="sm"
+              renderIcon={ChevronRight}
+              iconDescription={t('next', 'Next')}
+              onClick={onNext}
+            />
           </div>
+          <span className={styles.dateLabel}>{dateLabel}</span>
+          {appointmentsCountLabel !== null && (
+            <span className={styles.appointmentsCount}>{appointmentsCountLabel}</span>
+          )}
         </div>
-        <div className={styles.switcherSection}>
-          <ContentSwitcher
-            selectedIndex={viewModeIndex}
-            size="sm"
-            onChange={({ index }) => onViewModeChange(VIEW_MODES[index as number])}>
-            <Switch name="monthly" text={t('monthly', 'Monthly')} />
-            <Switch name="daily" text={t('daily', 'Daily')} />
-          </ContentSwitcher>
-        </div>
+      </div>
+      <div className={styles.switcherSection}>
+        <ContentSwitcher
+          selectedIndex={viewModeIndex}
+          size="sm"
+          onChange={({ index }) => onViewModeChange(VIEW_MODES[index as number])}>
+          <Switch name="monthly" text={t('monthly', 'Monthly')} />
+          <Switch name="daily" text={t('daily', 'Daily')} />
+        </ContentSwitcher>
       </div>
     </div>
   );
