@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { openmrsFetch, restBaseUrl, useOpenmrsFetchAll } from '@openmrs/esm-framework';
 import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
@@ -46,10 +46,17 @@ export function useQueueEntries(
   }
 
   const apiUrl = `${queueEntryBaseUrl}?${searchParam.toString()}`;
-  const { data, ...rest } = useOpenmrsFetchAll<QueueEntry>(shouldFetch ? apiUrl : null);
+  const { data, mutate, ...rest } = useOpenmrsFetchAll<QueueEntry>(shouldFetch ? apiUrl : null);
+
+  useEffect(() => {
+    const handleQueueEntryUpdated = () => mutate();
+    window.addEventListener('queue-entry-updated', handleQueueEntryUpdated);
+    return () => window.removeEventListener('queue-entry-updated', handleQueueEntryUpdated);
+  }, [mutate]);
 
   return {
     queueEntries: data ?? [],
+    mutate,
     ...rest,
   };
 }
