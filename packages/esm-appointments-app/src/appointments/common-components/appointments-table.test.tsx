@@ -103,6 +103,43 @@ describe('AppointmentsTable', () => {
     expect(screen.getByRole('link', { name: /john wilson/i })).toHaveAttribute('href', 'url-to-patient-chart');
   });
 
+  it('does not show the appointment type column unless it is configured', () => {
+    renderAppointmentsTable({ appointments: mockAppointments });
+
+    expect(screen.queryByRole('columnheader', { name: /appointmentType/i })).not.toBeInTheDocument();
+    expect(screen.queryByText('WalkIn')).not.toBeInTheDocument();
+  });
+
+  it('shows the type of each appointment when the appointment type column is configured', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentsTableColumns: ['patientName', 'serviceType', 'appointmentType'],
+      customPatientChartUrl: 'url-to-patient-chart',
+      checkInButton: { enabled: false, customUrl: null },
+      checkOutButton: { enabled: false, customUrl: null },
+    });
+
+    renderAppointmentsTable({ appointments: mockAppointments });
+
+    expect(screen.getByRole('columnheader', { name: /appointmentType/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /john wilson outpatient walkin/i })).toBeInTheDocument();
+  });
+
+  it('shows a placeholder for an appointment that has no type', () => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      appointmentsTableColumns: ['patientName', 'appointmentType'],
+      customPatientChartUrl: 'url-to-patient-chart',
+      checkInButton: { enabled: false, customUrl: null },
+      checkOutButton: { enabled: false, customUrl: null },
+    });
+    const [appointment] = mockAppointments;
+
+    renderAppointmentsTable({ appointments: [{ ...appointment, appointmentKind: undefined }] });
+
+    expect(screen.getByRole('row', { name: /john wilson --/i })).toBeInTheDocument();
+  });
+
   it('updates the search string when the search input changes', async () => {
     const user = userEvent.setup();
 
