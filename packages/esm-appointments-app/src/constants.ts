@@ -75,6 +75,8 @@ export const appointmentColumnTypes = Object.freeze([
   'actions',
   // t('visitStartTime', 'Visit start time')
   'visitStartTime',
+  // t('appointmentType', 'Appointment type')
+  'appointmentType',
 ]);
 
 // Appointment statuses and their translations

@@ -118,6 +118,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
           serviceType: appointment.service.name,
           location: appointment.location?.name,
           provider: appointment.providers?.[0]?.name ?? '--',
+          appointmentType: appointment.appointmentKind ? t(appointment.appointmentKind) : '--',
           status: t(appointment.status),
           actions: (
             <div className={styles.actionsCell}>
