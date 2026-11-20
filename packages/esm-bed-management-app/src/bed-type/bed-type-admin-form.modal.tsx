@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
@@ -16,7 +16,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { getCoreTranslation, type Location } from '@openmrs/esm-framework';
-import type { BedType, BedTypeData } from '../types';
+import type { BedTypeData } from '../types';
 
 const BedTypeAdministrationSchema = z.object({
   name: z.string().max(255),
@@ -25,16 +25,10 @@ const BedTypeAdministrationSchema = z.object({
 });
 
 interface BedAdministrationFormProps {
-  allLocations: Location[];
-  availableBedTypes: Array<BedType>;
   handleSubmission?: (formData: BedTypeData) => void;
   headerTitle: string;
   initialData: BedTypeData;
   closeModal: () => void;
-}
-
-interface ErrorType {
-  message: string;
 }
 
 const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
@@ -70,8 +64,9 @@ const BedTypeAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     }
   };
 
-  const onError = (error: { [key: string]: ErrorType }) => {
-    setFormStateError(Object.entries(error)[0][1].message);
+  const onError = (errors: FieldErrors<BedTypeData>) => {
+    const firstError = Object.values(errors)[0];
+    setFormStateError(firstError?.message ?? 'Validation failed');
     setShowErrorNotification(true);
   };
 
