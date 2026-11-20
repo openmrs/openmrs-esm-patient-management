@@ -3,7 +3,7 @@ import { vi, describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
@@ -33,6 +33,17 @@ function renderCalendar() {
     <BrowserRouter>
       <AppointmentsCalendarView />
     </BrowserRouter>,
+  );
+}
+
+function renderInCalendarRoute() {
+  return render(
+    <MemoryRouter initialEntries={['/calendar']}>
+      <Routes>
+        <Route path="/calendar" element={<AppointmentsCalendarView />} />
+        <Route path="/" element={<div>Appointments dashboard</div>} />
+      </Routes>
+    </MemoryRouter>,
   );
 }
 
@@ -289,5 +300,21 @@ describe('Appointment calendar view', () => {
     expect(cellSwatch).toBeInTheDocument();
     expect(legendSwatch.style.backgroundColor).toBeTruthy();
     expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
+  });
+
+  describe('back button', () => {
+    it('renders a Back button', () => {
+      renderInCalendarRoute();
+      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+    });
+
+    it('navigates to the appointments dashboard instead of going back in history', async () => {
+      const user = userEvent.setup();
+      renderInCalendarRoute();
+
+      await user.click(screen.getByRole('button', { name: /back/i }));
+
+      expect(await screen.findByText('Appointments dashboard')).toBeInTheDocument();
+    });
   });
 });
