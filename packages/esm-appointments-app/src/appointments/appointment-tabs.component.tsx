@@ -45,7 +45,7 @@ const AppointmentTabs: React.FC<{}> = () => {
       {tabsToShow.length > 1 ? (
         <div className={styles.tabs}>
           <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange}>
-            <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
+            <TabList style={{ paddingLeft: '1rem' }} aria-label={t('appointmentTabs', 'Appointment tabs')} contained>
               {tabsToShow.map((tab) => (
                 <Tab key={tab.label} className={styles.tab}>
                   {tab.label}

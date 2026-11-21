@@ -33,7 +33,7 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup
           </Button>
         </div>
       ) : (
-        <Header className={styles.tabletOverlayHeader} aria-label="Close overlay">
+        <Header className={styles.tabletOverlayHeader} aria-label={header}>
           <Button
             className={styles.closeButton}
             hasIconOnly
