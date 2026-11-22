@@ -36,4 +36,20 @@ describe('usePatientListMembers', () => {
 
     expect(mockUseOpenmrsFetchAll).toHaveBeenCalledWith(null);
   });
+
+  it('stops loading when a page fails, even though the last loaded page has a next link', () => {
+    // `useOpenmrsFetchAll` keeps `isLoading` true after a later page fails, because the last page
+    // that loaded still links to the next one.
+    mockUseOpenmrsFetchAll.mockReturnValue({
+      data: undefined,
+      error: new Error('Second page failed'),
+      isLoading: true,
+      mutate: vi.fn(),
+    } as unknown as ReturnType<typeof useOpenmrsFetchAll>);
+
+    const { result } = renderHook(() => usePatientListMembers('list-uuid'));
+
+    expect(result.current.isLoadingListMembers).toBe(false);
+    expect(result.current.error).toEqual(new Error('Second page failed'));
+  });
 });

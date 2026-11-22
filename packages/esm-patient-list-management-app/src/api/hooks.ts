@@ -146,7 +146,9 @@ export function usePatientListMembers(patientListUuid: string, v: string = 'full
 
   return {
     listMembers: data ?? [],
-    isLoadingListMembers: isLoading,
+    // After a failed page, `useOpenmrsFetchAll` keeps reporting that it is loading, because the last
+    // page it loaded still has a next link. Stop loading on an error so the page can show it.
+    isLoadingListMembers: isLoading && !error,
     error: error,
     mutateListMembers: mutate,
   };

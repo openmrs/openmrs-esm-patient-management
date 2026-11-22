@@ -10,6 +10,7 @@ import {
   showSnackbar,
   CustomOverflowMenu,
   CustomOverflowMenuItem,
+  ErrorState,
   launchWorkspace2,
   showModal,
 } from '@openmrs/esm-framework';
@@ -34,7 +35,12 @@ const ListDetails = () => {
   const patientListUuid = params.patientListUuid;
 
   const { listDetails, mutateListDetails } = usePatientListDetails(patientListUuid);
-  const { listMembers, isLoadingListMembers, mutateListMembers } = usePatientListMembers(patientListUuid);
+  const {
+    listMembers,
+    isLoadingListMembers,
+    error: listMembersError,
+    mutateListMembers,
+  } = usePatientListMembers(patientListUuid);
 
   const patients: Array<ListDetails> = useMemo(
     () =>
@@ -156,15 +162,19 @@ const ListDetails = () => {
       </section>
       <section>
         <div className={styles.tableContainer}>
-          <ListDetailsTable
-            cohortUuid={patientListUuid}
-            columns={headers}
-            isFetching={!listMembers}
-            isLoading={isLoadingListMembers}
-            mutateListDetails={mutateListDetails}
-            mutateListMembers={mutateListMembers}
-            patients={patients}
-          />
+          {listMembersError ? (
+            <ErrorState error={listMembersError} headerTitle={t('listMembers', 'List members')} />
+          ) : (
+            <ListDetailsTable
+              cohortUuid={patientListUuid}
+              columns={headers}
+              isFetching={!listMembers}
+              isLoading={isLoadingListMembers}
+              mutateListDetails={mutateListDetails}
+              mutateListMembers={mutateListMembers}
+              patients={patients}
+            />
+          )}
         </div>
       </section>
     </main>
