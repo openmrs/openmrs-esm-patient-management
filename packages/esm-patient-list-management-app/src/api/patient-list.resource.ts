@@ -95,37 +95,31 @@ interface PagedCohortResponse<T> extends CohortResponse<T> {
 /**
  * Loads every page of a cohort module list. The REST API returns 50 results per page by default,
  * with a `next` link while more remain.
+ *
+ * The `next` link is only used to tell whether more results remain. Later pages are requested by
+ * adding `startIndex` to the same relative URL, so that, like the first page, they go through
+ * `openmrsFetch` to the configured API base rather than to the host the server put in the link.
  */
 async function fetchAllPages<T>(url: string, ac: AbortController): Promise<Array<T>> {
   const results: Array<T> = [];
-  let nextUrl: string | null = url;
 
-  while (nextUrl) {
-    const { data } = await openmrsFetch<PagedCohortResponse<T>>(nextUrl, { signal: ac.signal });
+  while (true) {
+    const pageUrl = results.length ? `${url}&startIndex=${results.length}` : url;
+    const { data } = await openmrsFetch<PagedCohortResponse<T>>(pageUrl, { signal: ac.signal });
 
     if (data?.error) {
       throw data.error;
     }
 
-    results.push(...(data?.results ?? []));
-    nextUrl = getNextPageUrl(data?.links);
+    const page = data?.results ?? [];
+    results.push(...page);
+
+    const hasNextPage = data?.links?.some((link) => link.rel === 'next');
+    // Stop on an empty page too, so a `next` link without results can't loop forever.
+    if (!hasNextPage || page.length === 0) {
+      return results;
+    }
   }
-
-  return results;
-}
-
-function getNextPageUrl(links: PagedCohortResponse<unknown>['links']): string | null {
-  const uri = links?.find((link) => link.rel === 'next')?.uri;
-  if (!uri) {
-    return null;
-  }
-
-  // The server builds `next` links from its own host and protocol, which differ from the browser's
-  // when it sits behind a proxy, so request the next page from the current origin.
-  const nextUrl = new URL(uri);
-  nextUrl.host = window.location.host;
-  nextUrl.protocol = window.location.protocol;
-  return nextUrl.toString();
 }
 
 export async function getAllPatientLists(

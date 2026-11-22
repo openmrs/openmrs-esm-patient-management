@@ -17,7 +17,7 @@ const lists = Array.from({ length: 51 }, (_, index) => {
   return { uuid: `list-${number}`, name: `Test list ${number}`, description: '', size: 0, attributes: [] };
 });
 
-// The server builds `next` links from its own host, which differs from the browser's behind a proxy.
+// The server builds `next` links from its own host, which can differ from the configured API base.
 const nextLink = (path: string) => [
   { rel: 'next', uri: `https://backend.example.org/openmrs/ws/rest/v1/cohortm/${path}` },
 ];
@@ -72,15 +72,23 @@ describe('patient list resource', () => {
       expect(result.at(-1)).toEqual(expect.objectContaining({ id: 'list-51', display: 'Test list 51' }));
     });
 
-    it('requests later pages from the current origin', async () => {
+    it('requests later pages through the configured API base, not the host in the next link', async () => {
       mockServer();
 
       await getAllPatientLists({}, systemListCohortTypeUuid);
 
-      const secondPageUrl = new URL(mockOpenmrsFetch.mock.calls[1][0] as string);
-      expect(secondPageUrl.host).toBe(window.location.host);
-      expect(secondPageUrl.protocol).toBe(window.location.protocol);
-      expect(secondPageUrl.searchParams.get('startIndex')).toBe('50');
+      const [firstPageUrl, secondPageUrl] = mockOpenmrsFetch.mock.calls.map(([url]) => url as string);
+      expect(secondPageUrl).toBe(`${firstPageUrl}&startIndex=50`);
+      expect(secondPageUrl).not.toContain('backend.example.org');
+    });
+
+    it('stops when a page is empty, even if the response has a next link', async () => {
+      mockOpenmrsFetch.mockImplementation(() =>
+        respondWith({ results: [], links: nextLink('cohort?v=default&startIndex=50') }),
+      );
+
+      await expect(getAllPatientLists({}, systemListCohortTypeUuid)).resolves.toEqual([]);
+      expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1);
     });
 
     it('rejects instead of returning a partial list when a later page fails', async () => {
