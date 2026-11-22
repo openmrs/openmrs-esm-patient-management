@@ -2,7 +2,8 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
-import { type DailyAppointmentsCountByService } from '../types';
+import { type AppointmentsCalendarFilters, type DailyAppointmentsCountByService } from '../types';
+import { buildAppointmentsFilterQuery } from '../helpers/functions';
 
 interface AppointmentCountMapEntry {
   allAppointmentsCount: number;
@@ -16,9 +17,13 @@ interface AppointmentSummaryResponse {
   appointmentCountMap: Map<string, AppointmentCountMapEntry>;
 }
 
-export const useAppointmentsCalendar = (forDate: string | null, period: string) => {
+export const useAppointmentsCalendar = (
+  forDate: string | null,
+  period: string,
+  filters?: AppointmentsCalendarFilters,
+) => {
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
-  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}${buildAppointmentsFilterQuery(filters)}`;
 
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentSummaryResponse> }>(
     startDate && endDate ? url : null,
