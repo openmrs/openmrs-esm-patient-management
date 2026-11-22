@@ -88,6 +88,46 @@ async function deleteData(url: string, data = {}, ac = new AbortController()) {
   return response.data;
 }
 
+interface PagedCohortResponse<T> extends CohortResponse<T> {
+  links?: Array<{ rel: string; uri: string }>;
+}
+
+/**
+ * Loads every page of a cohort module list. The REST API returns 50 results per page by default,
+ * with a `next` link while more remain.
+ */
+async function fetchAllPages<T>(url: string, ac: AbortController): Promise<Array<T>> {
+  const results: Array<T> = [];
+  let nextUrl: string | null = url;
+
+  while (nextUrl) {
+    const { data } = await openmrsFetch<PagedCohortResponse<T>>(nextUrl, { signal: ac.signal });
+
+    if (data?.error) {
+      throw data.error;
+    }
+
+    results.push(...(data?.results ?? []));
+    nextUrl = getNextPageUrl(data?.links);
+  }
+
+  return results;
+}
+
+function getNextPageUrl(links: PagedCohortResponse<unknown>['links']): string | null {
+  const uri = links?.find((link) => link.rel === 'next')?.uri;
+  if (!uri) {
+    return null;
+  }
+
+  // The server builds `next` links from its own host and protocol, which differ from the browser's
+  // when it sits behind a proxy, so request the next page from the current origin.
+  const nextUrl = new URL(uri);
+  nextUrl.host = window.location.host;
+  nextUrl.protocol = window.location.protocol;
+  return nextUrl.toString();
+}
+
 export async function getAllPatientLists(
   filter: PatientListFilter = {},
   systemListCohortTypeUUID,
@@ -110,15 +150,7 @@ export async function getAllPatientLists(
   }
 
   const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-  const {
-    data: { results, error },
-  } = await openmrsFetch<CohortResponse<OpenmrsCohort>>(`${cohortUrl}/cohort?${params}`, {
-    signal: ac.signal,
-  });
-
-  if (error) {
-    throw error;
-  }
+  const results = await fetchAllPages<OpenmrsCohort>(`${cohortUrl}/cohort?${params}`, ac);
 
   return results.map((cohort) => ({
     id: cohort.uuid,
@@ -187,18 +219,10 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
 }
 
 export async function getPatientListIdsForPatient(patientUuid: string, ac = new AbortController()) {
-  const {
-    data: { results, error },
-  } = await openmrsFetch<CohortResponse<OpenmrsCohortRef>>(
+  const results = await fetchAllPages<OpenmrsCohortRef>(
     `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
-    {
-      signal: ac.signal,
-    },
+    ac,
   );
-
-  if (error) {
-    throw error;
-  }
 
   return results.map((ref) => ref.cohort.uuid);
 }
