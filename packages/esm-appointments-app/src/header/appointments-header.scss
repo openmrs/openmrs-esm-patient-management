@@ -30,6 +30,13 @@
   }
 }
 
+.calendarControls {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: layout.$spacing-03;
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .date-and-location {
