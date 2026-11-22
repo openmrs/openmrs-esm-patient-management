@@ -3,7 +3,7 @@ import { Tag, InlineLoading } from '@carbon/react';
 import { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { formatAMPM } from '../../helpers/functions';
-import { type Appointment } from '../../types';
+import { type Appointment, type AppointmentsCalendarFilters } from '../../types';
 import { useAppointmentsByDate } from '../../hooks/useAppointmentsByDate';
 import { STATUS_TAG_TYPES, DEFAULT_STATUS_TAG_TYPE, CALENDAR_HOURS, formatHourLabel } from '../utils/calendar-colors';
 import styles from './daily-calendar-view.scss';
@@ -11,12 +11,13 @@ import styles from './daily-calendar-view.scss';
 interface DailyCalendarViewProps {
   calendarSelectedDate: Dayjs;
   serviceColorMap?: Map<string, string>;
+  filters?: AppointmentsCalendarFilters;
 }
 
-const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedDate, serviceColorMap }) => {
+const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({ calendarSelectedDate, serviceColorMap, filters }) => {
   const { t } = useTranslation();
   const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
-  const { appointments, isLoading } = useAppointmentsByDate(isoDate);
+  const { appointments, isLoading } = useAppointmentsByDate(isoDate, filters);
 
   const hourSlots = useMemo(
     () =>
