@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -32,17 +32,9 @@ const ListDetails = () => {
   const { t } = useTranslation();
   const params = useParams();
   const patientListUuid = params.patientListUuid;
-  const [currentPage, setPageCount] = useState(1);
-  const [currentPageSize, setCurrentPageSize] = useState(10);
-  const [searchString] = useState('');
 
   const { listDetails, mutateListDetails } = usePatientListDetails(patientListUuid);
-  const { listMembers, isLoadingListMembers, mutateListMembers } = usePatientListMembers(
-    patientListUuid,
-    searchString,
-    (currentPage - 1) * currentPageSize,
-    currentPageSize,
-  );
+  const { listMembers, isLoadingListMembers, mutateListMembers } = usePatientListMembers(patientListUuid);
 
   const patients: Array<ListDetails> = useMemo(
     () =>
@@ -172,18 +164,6 @@ const ListDetails = () => {
             mutateListDetails={mutateListDetails}
             mutateListMembers={mutateListMembers}
             patients={patients}
-            pagination={{
-              usePagination: listDetails?.size > currentPageSize,
-              currentPage,
-              onChange: ({ page, pageSize }) => {
-                setPageCount(page);
-                setCurrentPageSize(pageSize);
-              },
-              pageSize: 10,
-              totalItems: listDetails?.size,
-              pagesUnknown: true,
-              lastPage: patients?.length < currentPageSize || currentPage * currentPageSize === listDetails?.size,
-            }}
           />
         </div>
       </section>

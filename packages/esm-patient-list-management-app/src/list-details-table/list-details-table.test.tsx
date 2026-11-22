@@ -64,23 +64,11 @@ describe('ListDetailsTable', () => {
     },
   ];
 
-  const mockOnChange = vi.fn();
-
-  let pagination = {
-    usePagination: true,
-    currentPage: 1,
-    onChange: mockOnChange,
-    pageSize: 10,
-    totalItems: 100,
-    pagesUnknown: false,
-  };
-
   it('renders table with patient data', () => {
     render(
       <ListDetailsTable
         patients={patients}
         columns={columns}
-        pagination={pagination}
         isLoading={false}
         autoFocus={false}
         isFetching={true}
@@ -97,7 +85,6 @@ describe('ListDetailsTable', () => {
       <ListDetailsTable
         patients={patients}
         columns={columns}
-        pagination={pagination}
         isLoading={true}
         autoFocus={false}
         isFetching={false}
@@ -120,7 +107,6 @@ describe('ListDetailsTable', () => {
         isLoading={false}
         mutateListDetails={vi.fn()}
         mutateListMembers={vi.fn()}
-        pagination={pagination}
         patients={patients}
       />,
     );
@@ -134,7 +120,6 @@ describe('ListDetailsTable', () => {
       <ListDetailsTable
         patients={patients}
         columns={columns}
-        pagination={pagination}
         isLoading={false}
         autoFocus={false}
         isFetching={false}
@@ -171,7 +156,6 @@ describe('ListDetailsTable', () => {
       <ListDetailsTable
         patients={patients}
         columns={columns}
-        pagination={pagination}
         isLoading={false}
         autoFocus={false}
         isFetching={false}
@@ -210,5 +194,105 @@ describe('ListDetailsTable', () => {
     expect(mockMutateListDetails).toHaveBeenCalled();
 
     expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
+  describe('with more patients than fit on one page', () => {
+    // 15 patients: 10 on the first page and 5 on the second at the default page size.
+    const manyPatients = Array.from({ length: 15 }, (_, index) => {
+      const number = String(index + 1).padStart(2, '0');
+      return {
+        name: `Patient ${number}`,
+        identifier: `ID-${number}`,
+        sex: index % 2 ? 'F' : 'M',
+        startDate: '2023-08-10',
+        membershipUuid: `membership-${number}`,
+        uuid: `patient-${number}`,
+      };
+    });
+
+    const nameColumns = [
+      { key: 'name', header: 'Name' },
+      { key: 'identifier', header: 'Identifier' },
+    ];
+
+    function renderTable() {
+      return render(
+        <ListDetailsTable
+          cohortUuid="test-cohort"
+          columns={nameColumns}
+          isLoading={false}
+          mutateListDetails={vi.fn()}
+          mutateListMembers={vi.fn()}
+          patients={manyPatients}
+        />,
+      );
+    }
+
+    const bodyRows = () => screen.getAllByRole('row').slice(1);
+
+    it('shows the first page and the real item range', () => {
+      renderTable();
+
+      expect(bodyRows()).toHaveLength(10);
+      expect(screen.getByText('Patient 01')).toBeInTheDocument();
+      expect(screen.queryByText('Patient 11')).not.toBeInTheDocument();
+      expect(screen.getByText(/1–10 of 15 items/)).toBeInTheDocument();
+    });
+
+    it('shows the rest of the patients on the next page', async () => {
+      const user = userEvent.setup();
+      renderTable();
+
+      await user.click(screen.getByRole('button', { name: 'Next page' }));
+
+      expect(bodyRows()).toHaveLength(5);
+      expect(screen.getByText('Patient 15')).toBeInTheDocument();
+      expect(screen.getByText(/11–15 of 15 items/)).toBeInTheDocument();
+    });
+
+    it('finds a patient who is on another page when searching', async () => {
+      const user = userEvent.setup();
+      renderTable();
+
+      await user.type(screen.getByPlaceholderText('Search this list'), 'Patient 15');
+
+      expect(await screen.findByText('Patient 15')).toBeInTheDocument();
+      expect(screen.queryByText('No matching patients to display')).not.toBeInTheDocument();
+    });
+
+    it('goes back to the first page when the search changes', async () => {
+      const user = userEvent.setup();
+      renderTable();
+
+      await user.click(screen.getByRole('button', { name: 'Next page' }));
+      expect(screen.getByText(/11–15 of 15 items/)).toBeInTheDocument();
+
+      // Every patient matches, so the results still span two pages, and the first one is shown.
+      await user.type(screen.getByPlaceholderText('Search this list'), 'Patient');
+
+      expect(await screen.findByText(/1–10 of 15 items/)).toBeInTheDocument();
+      expect(bodyRows()).toHaveLength(10);
+    });
+
+    it('keeps the pagination, including the page size selector, when the page size is larger than the list', async () => {
+      const user = userEvent.setup();
+      renderTable();
+
+      await user.selectOptions(screen.getByRole('combobox', { name: /items per page/i }), '20');
+
+      expect(bodyRows()).toHaveLength(15);
+      expect(screen.getByRole('combobox', { name: /items per page/i })).toBeInTheDocument();
+
+      await user.selectOptions(screen.getByRole('combobox', { name: /items per page/i }), '10');
+
+      expect(bodyRows()).toHaveLength(10);
+    });
+
+    it('labels the previous and next page buttons correctly', () => {
+      renderTable();
+
+      expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Next page' })).toBeEnabled();
+    });
   });
 });

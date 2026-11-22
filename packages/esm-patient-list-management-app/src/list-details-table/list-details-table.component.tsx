@@ -137,19 +137,12 @@ interface ListDetailsTableProps {
   isLoading: boolean;
   mutateListDetails: () => void;
   mutateListMembers: () => void;
-  pagination: {
-    usePagination: boolean;
-    currentPage: number;
-    onChange(props: any): any;
-    pageSize: number;
-    totalItems: number;
-    pagesUnknown?: boolean;
-    lastPage?: boolean;
-  };
   patients;
   cohortUuid: string;
   style?: CSSProperties;
 }
+
+const pageSizes = [10, 20, 30, 40, 50];
 
 interface PatientTableColumn {
   key: string;
@@ -166,7 +159,6 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   isLoading,
   mutateListDetails,
   mutateListMembers,
-  pagination,
   patients,
   cohortUuid,
 }) => {
@@ -179,6 +171,8 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(pageSizes[0]);
 
   const filteredPatients = useMemo(() => {
     if (!debouncedSearchTerm) {
@@ -194,6 +188,11 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           .map((result) => result.original)
       : patients;
   }, [debouncedSearchTerm, patients]);
+
+  // The search runs over every member of the list, and the matches are then paged here. Keep the
+  // page in range when the matches shrink, for example after a search or after removing a patient.
+  const lastPage = Math.max(1, Math.ceil((filteredPatients?.length ?? 0) / pageSize));
+  const page = Math.min(currentPage, lastPage);
 
   const tableRows = useMemo(
     () =>
@@ -340,7 +339,10 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                   className={styles.searchOverrides}
                   id={`${id}-search`}
                   labelText=""
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   placeholder={t('searchThisList', 'Search this list')}
                   size={responsiveSize}
                 />
@@ -395,7 +397,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map((row) => {
+                    {rows.slice((page - 1) * pageSize, page * pageSize).map((row) => {
                       const currentPatient = patients.find((patient) => patient.identifier === row.id);
 
                       return (
@@ -437,18 +439,19 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
               </Layer>
             </div>
           )}
-          {pagination.usePagination && (
+          {patients.length > pageSizes[0] && filteredPatients.length > 0 && (
             <Pagination
-              backwardText={t('nextPage', 'Next page')}
+              backwardText={t('previousPage', 'Previous page')}
               className={styles.paginationOverride}
-              forwardText={t('previousPage', 'Previous page')}
-              isLastPage={pagination.lastPage}
-              onChange={pagination.onChange}
-              page={pagination.currentPage}
-              pageSize={pagination.pageSize}
-              pageSizes={[10, 20, 30, 40, 50]}
-              pagesUnknown={pagination?.pagesUnknown}
-              totalItems={pagination.totalItems}
+              forwardText={t('nextPage', 'Next page')}
+              onChange={({ page, pageSize }) => {
+                setCurrentPage(page);
+                setPageSize(pageSize);
+              }}
+              page={page}
+              pageSize={pageSize}
+              pageSizes={pageSizes}
+              totalItems={filteredPatients.length}
             />
           )}
         </div>

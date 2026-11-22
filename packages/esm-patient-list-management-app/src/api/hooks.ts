@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
+import { openmrsFetch, type FetchResponse, useConfig, useOpenmrsFetchAll, useSession } from '@openmrs/esm-framework';
 import {
   cohortUrl,
   getAllPatientLists,
@@ -135,20 +135,17 @@ export function usePatientListDetails(patientListUuid: string) {
   };
 }
 
-export function usePatientListMembers(
-  patientListUuid: string,
-  searchQuery: string = '',
-  startIndex: number = 0,
-  pageSize: number = 10,
-  v: string = 'full',
-) {
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<CohortResponse<OpenmrsCohortMember>>, Error>(
-    `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}&q=${searchQuery}`,
-    openmrsFetch,
+/**
+ * Loads every member of a patient list. The list page searches and pages the members in the browser,
+ * so it needs all of them, not only the page being shown.
+ */
+export function usePatientListMembers(patientListUuid: string, v: string = 'full') {
+  const { data, error, isLoading, mutate } = useOpenmrsFetchAll<OpenmrsCohortMember>(
+    patientListUuid ? `${cohortUrl}/cohortmember?cohort=${patientListUuid}&v=${v}` : null,
   );
 
   return {
-    listMembers: data?.data?.results ?? [],
+    listMembers: data ?? [],
     isLoadingListMembers: isLoading,
     error: error,
     mutateListMembers: mutate,
