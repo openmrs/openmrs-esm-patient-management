@@ -159,6 +159,27 @@ describe('useAppointmentsByDate', () => {
     expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2);
   });
 
+  it('adds one providerUuids param per selected provider', async () => {
+    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+
+    renderHook(() => useAppointmentsByDate('2026-06-09', { providerUuids: ['provider-a', 'provider-b'] }), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    const url = mockOpenmrsFetch.mock.calls[0][0] as string;
+    expect(url).toContain('&providerUuids=provider-a&providerUuids=provider-b');
+  });
+
+  it('omits the providerUuids param when the selection is empty', async () => {
+    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+
+    renderHook(() => useAppointmentsByDate('2026-06-09', { providerUuids: [] }), { wrapper });
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    expect(mockOpenmrsFetch.mock.calls[0][0]).not.toContain('providerUuids');
+  });
+
   it('URL-encodes the date parameter', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
 
