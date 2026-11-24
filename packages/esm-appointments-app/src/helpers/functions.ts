@@ -11,6 +11,7 @@ import { appointmentsFormWorkspace, omrsDateFormat } from '../constants';
 export const buildAppointmentsFilterQuery = (filters?: AppointmentsCalendarFilters): string => {
   const params = new URLSearchParams();
   filters?.providerUuids?.forEach((uuid) => params.append('providerUuids', uuid));
+  filters?.serviceUuids?.forEach((uuid) => params.append('serviceUuids', uuid));
   const query = params.toString();
   return query ? `&${query}` : '';
 };
