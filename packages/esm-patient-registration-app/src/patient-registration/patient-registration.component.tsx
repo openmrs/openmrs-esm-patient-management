@@ -4,7 +4,7 @@ import { Button, InlineLoading, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Form, Formik, type FormikHelpers, type FormikErrors } from 'formik';
+import { Form, Formik, type FormikHelpers, type FormikErrors, validateYupSchema, yupToFormErrors } from 'formik';
 import {
   createErrorHandler,
   interpolateUrl,
@@ -200,7 +200,13 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
       enableReinitialize
       initialValues={initialFormValues}
       onSubmit={onFormSubmit}
-      validationSchema={validationSchema}>
+      // Validate the values that get saved, so fields hidden by skip logic can't block submission
+      validate={(values) =>
+        validateYupSchema(sanitizeFormValuesForSkipLogic(values, config, initialFormValues), validationSchema).then(
+          () => ({}),
+          (error) => yupToFormErrors(error),
+        )
+      }>
       {(props) => {
         const contextValue = createContextValue(props);
 
