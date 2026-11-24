@@ -21,6 +21,8 @@ interface AppointmentHeaderProps {
   onProviderFilterChange?: (selectedUuids: Array<string>) => void;
   selectedServiceUuids?: Array<string>;
   onServiceFilterChange?: (selectedUuids: Array<string>) => void;
+  selectedLocationUuids?: Array<string>;
+  onLocationFilterChange?: (selectedUuids: Array<string>) => void;
 }
 
 const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
@@ -31,6 +33,8 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
   onProviderFilterChange,
   selectedServiceUuids,
   onServiceFilterChange,
+  selectedLocationUuids,
+  onLocationFilterChange,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
