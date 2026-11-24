@@ -59,7 +59,7 @@ function latestRequestedDate() {
 
 describe('Appointment calendar view', () => {
   beforeEach(() => {
-    appointmentsStore.setState({ calendarProviderUuids: [] });
+    appointmentsStore.setState({ calendarProviderUuids: [], calendarServiceUuids: [] });
   });
 
   it('renders the calendar view with Prev and Next controls', () => {
@@ -315,7 +315,8 @@ describe('Appointment calendar view', () => {
     renderCalendar();
 
     expect(screen.getByText('All providers')).toBeInTheDocument();
-    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({ providerUuids: [] });
+    expect(screen.getByText('All services')).toBeInTheDocument();
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({ providerUuids: [], serviceUuids: [] });
   });
 
   it('passes the selected provider to the monthly and daily requests', async () => {
@@ -328,12 +329,14 @@ describe('Appointment calendar view', () => {
     expect(screen.getByText('1 provider(s)')).toBeInTheDocument();
     expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
       providerUuids: ['f9badd80-ab76-11e2-9e96-0800200c9a66'],
+      serviceUuids: [],
     });
 
     await user.click(screen.getByRole('tab', { name: /daily/i }));
 
     expect(mockUseAppointmentsByDate.mock.calls.at(-1)?.[1]).toEqual({
       providerUuids: ['f9badd80-ab76-11e2-9e96-0800200c9a66'],
+      serviceUuids: [],
     });
   });
 
@@ -345,6 +348,7 @@ describe('Appointment calendar view', () => {
     expect(screen.getByText('1 provider(s)')).toBeInTheDocument();
     expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
       providerUuids: ['f9badd80-ab76-11e2-9e96-0800200c9a66'],
+      serviceUuids: [],
     });
   });
 });
