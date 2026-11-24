@@ -5,6 +5,7 @@ interface AppointmentsStore {
   appointmentServiceTypes: Array<string>;
   selectedAppointmentStatuses: Array<AppointmentStatus>;
   calendarProviderUuids: Array<string>;
+  calendarServiceUuids: Array<string>;
 }
 
 export const appointmentsStore = createGlobalStore<AppointmentsStore>(
@@ -13,6 +14,7 @@ export const appointmentsStore = createGlobalStore<AppointmentsStore>(
     appointmentServiceTypes: [],
     selectedAppointmentStatuses: [],
     calendarProviderUuids: [],
+    calendarServiceUuids: [],
   },
   'sessionStorage',
 );
@@ -26,6 +28,9 @@ export const storeActions = {
   },
   setCalendarProviderUuids(_, calendarProviderUuids: Array<string>) {
     return { calendarProviderUuids };
+  },
+  setCalendarServiceUuids(_, calendarServiceUuids: Array<string>) {
+    return { calendarServiceUuids };
   },
 } satisfies Actions<AppointmentsStore>;
 
