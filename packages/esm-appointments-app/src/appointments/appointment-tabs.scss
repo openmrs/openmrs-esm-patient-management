@@ -1,4 +1,3 @@
-@use '@carbon/colors';
 @use '@carbon/layout';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
@@ -21,23 +20,4 @@
 .tabPanel {
   padding: 0;
   margin: layout.$spacing-05;
-}
-
-.calendarButton {
-  float: right;
-  position: absolute;
-  right: 0;
-  height: layout.$spacing-09;
-  min-height: 0;
-}
-
-.downloadButton {
-  margin: layout.$spacing-05;
-  & > button {
-    border: 1px solid colors.$blue-60;
-  }
-}
-.downloadLink {
-  text-decoration: none;
-  color: inherit;
 }
