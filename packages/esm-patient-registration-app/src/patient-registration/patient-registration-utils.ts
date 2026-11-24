@@ -137,7 +137,7 @@ export function getAgeInYears(values: FormValues): number | undefined {
       return age;
     }
   }
-  return values?.yearsEstimated ?? undefined;
+  return values?.yearsEstimated || undefined;
 }
 
 // Where the value of each built-in field lives in the form values. Composite built-ins
