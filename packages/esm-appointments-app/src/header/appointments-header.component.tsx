@@ -18,6 +18,8 @@ interface AppointmentHeaderProps {
   isCalendarView?: boolean;
   selectedProviderUuids?: Array<string>;
   onProviderFilterChange?: (selectedUuids: Array<string>) => void;
+  selectedServiceUuids?: Array<string>;
+  onServiceFilterChange?: (selectedUuids: Array<string>) => void;
 }
 
 const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
@@ -26,6 +28,8 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
   isCalendarView,
   selectedProviderUuids,
   onProviderFilterChange,
+  selectedServiceUuids,
+  onServiceFilterChange,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
