@@ -2,7 +2,6 @@ import { AppointmentKind, AppointmentStatus } from './types';
 
 export const basePath = '/appointments';
 export const spaHomePage = `${window.spaBase}/home`;
-export const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
 export const appointmentLocationTagName = 'Appointment Location';
 
 export const moduleName = '@openmrs/esm-appointments-app';
