@@ -172,5 +172,17 @@ describe('setIdentifierSource utility', () => {
       const result = setIdentifierSource(identifierSource, 'auto-generated', 'initial-value');
       expect(result.identifierValue).toBe('initial-value');
     });
+
+    it('starts a new identifier with an empty value, not auto-generated, when manual entry is enabled', () => {
+      const identifierSource = {
+        autoGenerationOption: {
+          automaticGenerationEnabled: true,
+          manualEntryEnabled: true,
+        },
+      } as IdentifierSource;
+      const result = setIdentifierSource(identifierSource, undefined, '');
+      expect(result.identifierValue).toBeFalsy();
+      expect(result.autoGeneration).toBe(true);
+    });
   });
 });
