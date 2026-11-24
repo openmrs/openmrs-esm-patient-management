@@ -33,6 +33,17 @@ describe('CalendarLocationFilter', () => {
     expect(mockUseLocations).toHaveBeenCalledWith('Appointment Location');
   });
 
+  it('calls onChange with the selected location uuids', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<CalendarLocationFilter selectedLocationUuids={[]} onChange={onChange} />);
+
+    await user.click(screen.getByRole('combobox', { name: /^location$/i }));
+    await user.click(screen.getByRole('option', { name: /Outpatient Clinic/i }));
+
+    expect(onChange).toHaveBeenLastCalledWith([outpatientClinic.uuid]);
+  });
+
   it('shows the number of selected locations in the trigger label', () => {
     render(
       <CalendarLocationFilter selectedLocationUuids={[outpatientClinic.uuid, mobileClinic.uuid]} onChange={vi.fn()} />,
@@ -40,5 +51,23 @@ describe('CalendarLocationFilter', () => {
 
     expect(screen.getByText('2 location(s)')).toBeInTheDocument();
     expect(screen.queryByText('All locations')).not.toBeInTheDocument();
+  });
+
+  it('calls onChange with an empty list when the selection is cleared', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<CalendarLocationFilter selectedLocationUuids={[outpatientClinic.uuid]} onChange={onChange} />);
+
+    await user.click(screen.getByRole('button', { name: /clear all selected items/i }));
+
+    expect(onChange).toHaveBeenLastCalledWith([]);
+  });
+
+  it('renders an empty list while locations have not loaded', () => {
+    mockUseLocations.mockReturnValue([]);
+
+    render(<CalendarLocationFilter selectedLocationUuids={[]} onChange={vi.fn()} />);
+
+    expect(screen.getByText('All locations')).toBeInTheDocument();
   });
 });
