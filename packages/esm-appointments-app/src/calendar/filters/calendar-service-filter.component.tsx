@@ -2,17 +2,31 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MultiSelect } from '@carbon/react';
 import { useAppointmentServices } from '../../hooks/useAppointmentService';
+import { buildServiceColorMap } from '../utils/calendar-colors';
 import styles from './calendar-filters.scss';
 
 interface ServiceFilterItem {
   id: string;
   label: string;
+  color: string;
 }
 
 interface CalendarServiceFilterProps {
   selectedServiceUuids: Array<string>;
   onChange: (selectedUuids: Array<string>) => void;
 }
+
+/** Option row: the service's calendar colour as a swatch, then its name. */
+const ServiceFilterOption: React.FC<ServiceFilterItem> = ({ id, label, color }) => (
+  <span className={styles.serviceOption}>
+    <span
+      className={styles.serviceSwatch}
+      style={{ backgroundColor: color }}
+      data-testid={`service-filter-swatch-${id}`}
+    />
+    <span>{label}</span>
+  </span>
+);
 
 /**
  * Multi-select used in the calendar header to filter appointments by service.
@@ -23,10 +37,14 @@ const CalendarServiceFilter: React.FC<CalendarServiceFilterProps> = ({ selectedS
   const { t } = useTranslation();
   const { serviceTypes, isLoading } = useAppointmentServices();
 
-  const items = useMemo<Array<ServiceFilterItem>>(
-    () => (serviceTypes ?? []).map((service) => ({ id: service.uuid, label: service.name })),
-    [serviceTypes],
-  );
+  const items = useMemo<Array<ServiceFilterItem>>(() => {
+    const colorMap = buildServiceColorMap(serviceTypes ?? []);
+    return (serviceTypes ?? []).map((service) => ({
+      id: service.uuid,
+      label: service.name,
+      color: colorMap.get(service.uuid),
+    }));
+  }, [serviceTypes]);
 
   const selectedItems = useMemo(
     () => items.filter((item) => selectedServiceUuids.includes(item.id)),
@@ -51,6 +69,7 @@ const CalendarServiceFilter: React.FC<CalendarServiceFilterProps> = ({ selectedS
       disabled={isLoading}
       id="calendarServiceFilter"
       items={items}
+      itemToElement={ServiceFilterOption}
       itemToString={(item) => item?.label ?? ''}
       label={label}
       onChange={handleChange}
