@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { type Location, useLocations } from '@openmrs/esm-framework';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
@@ -41,6 +42,7 @@ vi.mock('../hooks/useProviders', () => ({
   }),
 }));
 
+const mockUseLocations = vi.mocked(useLocations);
 const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
 const mockUseAppointmentsByDate = vi.mocked(useAppointmentsByDate);
 
@@ -59,7 +61,10 @@ function latestRequestedDate() {
 
 describe('Appointment calendar view', () => {
   beforeEach(() => {
-    appointmentsStore.setState({ calendarProviderUuids: [], calendarServiceUuids: [] });
+    appointmentsStore.setState({ calendarProviderUuids: [], calendarServiceUuids: [], calendarLocationUuids: [] });
+    mockUseLocations.mockReturnValue([
+      { uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1', display: 'Outpatient Clinic' } as Location,
+    ]);
   });
 
   it('renders the calendar view with Prev and Next controls', () => {
@@ -316,7 +321,12 @@ describe('Appointment calendar view', () => {
 
     expect(screen.getByText('All providers')).toBeInTheDocument();
     expect(screen.getByText('All services')).toBeInTheDocument();
-    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({ providerUuids: [], serviceUuids: [] });
+    expect(screen.getByText('All locations')).toBeInTheDocument();
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
+      providerUuids: [],
+      serviceUuids: [],
+      locationUuids: [],
+    });
   });
 
   it('passes the selected provider to the monthly and daily requests', async () => {
@@ -330,6 +340,7 @@ describe('Appointment calendar view', () => {
     expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
       providerUuids: ['f9badd80-ab76-11e2-9e96-0800200c9a66'],
       serviceUuids: [],
+      locationUuids: [],
     });
 
     await user.click(screen.getByRole('tab', { name: /daily/i }));
@@ -337,6 +348,7 @@ describe('Appointment calendar view', () => {
     expect(mockUseAppointmentsByDate.mock.calls.at(-1)?.[1]).toEqual({
       providerUuids: ['f9badd80-ab76-11e2-9e96-0800200c9a66'],
       serviceUuids: [],
+      locationUuids: [],
     });
   });
 
@@ -349,6 +361,7 @@ describe('Appointment calendar view', () => {
     expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
       providerUuids: ['f9badd80-ab76-11e2-9e96-0800200c9a66'],
       serviceUuids: [],
+      locationUuids: [],
     });
   });
 
@@ -363,6 +376,7 @@ describe('Appointment calendar view', () => {
     expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
       providerUuids: [],
       serviceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'],
+      locationUuids: [],
     });
 
     await user.click(screen.getByRole('tab', { name: /daily/i }));
@@ -370,6 +384,7 @@ describe('Appointment calendar view', () => {
     expect(mockUseAppointmentsByDate.mock.calls.at(-1)?.[1]).toEqual({
       providerUuids: [],
       serviceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'],
+      locationUuids: [],
     });
   });
 
@@ -385,6 +400,7 @@ describe('Appointment calendar view', () => {
     expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
       providerUuids: ['f9badd80-ab76-11e2-9e96-0800200c9a66'],
       serviceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'],
+      locationUuids: [],
     });
   });
 
@@ -397,6 +413,7 @@ describe('Appointment calendar view', () => {
     expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
       providerUuids: [],
       serviceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'],
+      locationUuids: [],
     });
   });
 });
