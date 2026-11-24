@@ -88,6 +88,40 @@ async function deleteData(url: string, data = {}, ac = new AbortController()) {
   return response.data;
 }
 
+interface PagedCohortResponse<T> extends CohortResponse<T> {
+  links?: Array<{ rel: string; uri: string }>;
+}
+
+/**
+ * Loads every page of a cohort module list. The REST API returns 50 results per page by default,
+ * with a `next` link while more remain.
+ *
+ * The `next` link is only used to tell whether more results remain. Later pages are requested by
+ * adding `startIndex` to the same relative URL, so that, like the first page, they go through
+ * `openmrsFetch` to the configured API base rather than to the host the server put in the link.
+ */
+async function fetchAllPages<T>(url: string, ac: AbortController): Promise<Array<T>> {
+  const results: Array<T> = [];
+
+  while (true) {
+    const pageUrl = results.length ? `${url}&startIndex=${results.length}` : url;
+    const { data } = await openmrsFetch<PagedCohortResponse<T>>(pageUrl, { signal: ac.signal });
+
+    if (data?.error) {
+      throw data.error;
+    }
+
+    const page = data?.results ?? [];
+    results.push(...page);
+
+    const hasNextPage = data?.links?.some((link) => link.rel === 'next');
+    // Stop on an empty page too, so a `next` link without results can't loop forever.
+    if (!hasNextPage || page.length === 0) {
+      return results;
+    }
+  }
+}
+
 export async function getAllPatientLists(
   filter: PatientListFilter = {},
   systemListCohortTypeUUID,
@@ -184,6 +218,22 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
   });
 
   return validPatients;
+}
+
+/** Only what the patient list page shows; `v=full` is many times larger. */
+const listMemberRepresentation =
+  'custom:(uuid,startDate,patient:(uuid,identifiers:(identifier),person:(display,gender,attributes:(value,attributeType:(display)))))';
+
+/**
+ * The URL of a list's members. 100 is the most the REST API returns per page by default. A server
+ * with a lower maximum returns smaller pages, which `fetchAllPages` handles.
+ */
+export function getAllPatientListMembersUrl(patientListUuid: string) {
+  return `${cohortUrl}/cohortmember?cohort=${patientListUuid}&v=${listMemberRepresentation}&limit=100`;
+}
+
+export function getAllPatientListMembers(url: string) {
+  return fetchAllPages<OpenmrsCohortMember>(url, new AbortController());
 }
 
 export async function getPatientListIdsForPatient(patientUuid: string, ac = new AbortController()) {

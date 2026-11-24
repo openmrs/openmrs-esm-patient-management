@@ -162,7 +162,7 @@ const ListDetails = () => {
       </section>
       <section>
         <div className={styles.tableContainer}>
-          {listMembersError ? (
+          {listMembersError && !listMembers.length ? (
             <ErrorState error={listMembersError} headerTitle={t('listMembers', 'List members')} />
           ) : (
             <ListDetailsTable

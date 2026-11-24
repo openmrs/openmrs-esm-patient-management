@@ -288,6 +288,34 @@ describe('ListDetailsTable', () => {
       expect(bodyRows()).toHaveLength(10);
     });
 
+    it('sorts the whole list, not only the page being shown', async () => {
+      const user = userEvent.setup();
+      renderTable();
+
+      const sortByIdentifier = screen.getByRole('button', { name: /identifier/i });
+      await user.click(sortByIdentifier);
+      await user.click(sortByIdentifier);
+
+      expect(bodyRows()).toHaveLength(10);
+      expect(bodyRows()[0]).toHaveTextContent('Patient 15');
+    });
+
+    it('does not add a patient who is already in the list on another page', async () => {
+      const user = userEvent.setup();
+      vi.mocked(addPatientToList).mockClear();
+      mockLaunchWorkspace2.mockClear();
+      renderTable();
+
+      await user.click(screen.getByRole('button', { name: /add patient to list/i }));
+      const { onPatientSelected } = mockLaunchWorkspace2.mock.calls[0][1] as any;
+      await onPatientSelected('patient-15', {} as fhir.Patient, vi.fn(), vi.fn());
+
+      expect(addPatientToList).not.toHaveBeenCalled();
+      expect(mockShowSnackbar).toHaveBeenCalledWith(
+        expect.objectContaining({ subtitle: 'This patient is already in the list' }),
+      );
+    });
+
     it('labels the previous and next page buttons correctly', () => {
       renderTable();
 

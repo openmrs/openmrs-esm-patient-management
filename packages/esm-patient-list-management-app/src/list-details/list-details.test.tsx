@@ -131,6 +131,20 @@ describe('ListDetails', () => {
     expect(screen.queryByText(/there are no patients in this list/i)).not.toBeInTheDocument();
   });
 
+  it('keeps showing the members when refreshing them fails', () => {
+    mockUsePatientListMembers.mockReturnValue({
+      listMembers: mockPatientListMembers,
+      isLoadingListMembers: false,
+      error: new Error('Refresh failed'),
+      mutateListMembers: vi.fn().mockResolvedValue([]),
+    });
+
+    render(<ListDetails />);
+
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.queryByText('Error State')).not.toBeInTheDocument();
+  });
+
   it('opens workspace to edit patient list', async () => {
     const user = userEvent.setup();
     render(<ListDetails />);
