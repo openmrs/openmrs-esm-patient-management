@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Field, getIn } from 'formik';
-import { Layer, RadioButton, RadioButtonGroup, Select, SelectItem } from '@carbon/react';
+import { Button, Layer, RadioButton, RadioButtonGroup, Select, SelectItem } from '@carbon/react';
 import { reportError } from '@openmrs/esm-framework';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
 import { useConceptAnswers } from '../field.resource';
@@ -113,27 +113,40 @@ export function CodedPersonAttributeField({
 
               if (displayStyle === 'radio') {
                 return (
-                  <RadioButtonGroup
-                    name={fieldName}
-                    legendText={label ?? personAttributeType?.display}
-                    orientation="horizontal"
-                    invalid={isInvalid}
-                    invalidText={errorMessage ? t(errorMessage, errorMessage) : undefined}
-                    required={required}
-                    valueSelected={field.value}
-                    onChange={(value) => {
-                      setFieldValue(fieldName, value);
-                      setFieldTouched(fieldName, true, false);
-                    }}>
-                    {answers.map((answer) => (
-                      <RadioButton
-                        key={answer.uuid}
-                        id={`${id}-${answer.uuid}`}
-                        labelText={answer.label}
-                        value={answer.uuid}
-                      />
-                    ))}
-                  </RadioButtonGroup>
+                  <>
+                    <RadioButtonGroup
+                      name={fieldName}
+                      legendText={label ?? personAttributeType?.display}
+                      orientation="horizontal"
+                      invalid={isInvalid}
+                      invalidText={errorMessage ? t(errorMessage, errorMessage) : undefined}
+                      required={required}
+                      valueSelected={field.value}
+                      onChange={(value) => {
+                        setFieldValue(fieldName, value);
+                        setFieldTouched(fieldName, true, false);
+                      }}>
+                      {answers.map((answer) => (
+                        <RadioButton
+                          key={answer.uuid}
+                          id={`${id}-${answer.uuid}`}
+                          labelText={answer.label}
+                          value={answer.uuid}
+                        />
+                      ))}
+                    </RadioButtonGroup>
+                    {!required && field.value ? (
+                      <Button
+                        kind="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setFieldValue(fieldName, '');
+                          setFieldTouched(fieldName, true, false);
+                        }}>
+                        {t('clearSelection', 'Clear selection')}
+                      </Button>
+                    ) : null}
+                  </>
                 );
               }
               return (

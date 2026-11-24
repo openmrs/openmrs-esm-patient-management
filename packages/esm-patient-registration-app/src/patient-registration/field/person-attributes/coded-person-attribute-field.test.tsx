@@ -223,6 +223,16 @@ describe('CodedPersonAttributeField', () => {
       expect(getFormValues().attributes[personAttributeType.uuid]).toBe('2');
     });
 
+    it('allows an optional radio answer to be cleared', async () => {
+      const user = userEvent.setup();
+      const { getFormValues } = renderCodedPersonAttributeFieldWithFormik({ displayStyle: 'radio', required: false });
+
+      await user.click(screen.getByRole('radio', { name: 'Option 1' }));
+      await user.click(screen.getByRole('button', { name: /clear selection/i }));
+
+      expect(getFormValues().attributes[personAttributeType.uuid] ?? '').toBe('');
+    });
+
     it('shows validation error when required and submitted without selection', async () => {
       const user = userEvent.setup();
       renderCodedPersonAttributeFieldWithFormik({ displayStyle: 'radio', required: true });

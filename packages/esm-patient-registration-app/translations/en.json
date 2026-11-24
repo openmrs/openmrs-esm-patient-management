@@ -11,6 +11,7 @@
   "birthFieldLabelText": "Birth",
   "cancel": "Cancel",
   "causeOfDeathInputLabel": "Cause of death",
+  "clearSelection": "Clear selection",
   "closeOverlay": "Close overlay",
   "codedPersonAttributeAnswerSetEmpty": "The coded person attribute field '{{codedPersonAttributeFieldId}}' has been defined with an answer concept set UUID '{{answerConceptSetUuid}}' that does not have any concept answers.",
   "codedPersonAttributeAnswerSetInvalid": "The coded person attribute field '{{codedPersonAttributeFieldId}}' has been defined with an invalid answer concept set UUID '{{answerConceptSetUuid}}'.",
