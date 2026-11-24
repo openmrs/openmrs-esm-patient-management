@@ -6,7 +6,6 @@
   "dose": "Dozi",
   "encounterType": "Aina ya Mkutano",
   "endDate": "Tarehe ya kumaliza",
-  "filterActiveVisits": "Filter active visits",
   "filterTable": "Chuja jedwali",
   "indication": "Dalili",
   "medications": "Dawa",
@@ -28,6 +27,5 @@
   "thereIsNoInformationToDisplayHere": "Hakuna taarifa za kuonyeshwa hapa",
   "time": "Wakati",
   "totalVisits": "Ziara Zote Leo",
-  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitSummary": "Muhtasari wa Ziara"
 }
