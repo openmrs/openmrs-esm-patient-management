@@ -41,10 +41,39 @@ describe('CalendarServiceFilter', () => {
     expect(screen.getByRole('option', { name: /Outpatient/i })).toBeInTheDocument();
   });
 
+  it('calls onChange with the selected service uuids', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<CalendarServiceFilter selectedServiceUuids={[]} onChange={onChange} />);
+
+    await user.click(screen.getByRole('combobox', { name: /^service$/i }));
+    await user.click(screen.getByRole('option', { name: /HIV Clinic/i }));
+
+    expect(onChange).toHaveBeenLastCalledWith([hivClinic.uuid]);
+  });
+
   it('shows the number of selected services in the trigger label', () => {
     render(<CalendarServiceFilter selectedServiceUuids={[hivClinic.uuid, outpatient.uuid]} onChange={vi.fn()} />);
 
     expect(screen.getByText('2 service(s)')).toBeInTheDocument();
     expect(screen.queryByText('All services')).not.toBeInTheDocument();
+  });
+
+  it('calls onChange with an empty list when the selection is cleared', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<CalendarServiceFilter selectedServiceUuids={[hivClinic.uuid]} onChange={onChange} />);
+
+    await user.click(screen.getByRole('button', { name: /clear all selected items/i }));
+
+    expect(onChange).toHaveBeenLastCalledWith([]);
+  });
+
+  it('is disabled while the services are loading', () => {
+    mockUseAppointmentServices.mockReturnValue({ serviceTypes: [], isLoading: true, error: undefined });
+
+    render(<CalendarServiceFilter selectedServiceUuids={[]} onChange={vi.fn()} />);
+
+    expect(screen.getByRole('combobox', { name: /^service$/i })).toBeDisabled();
   });
 });
