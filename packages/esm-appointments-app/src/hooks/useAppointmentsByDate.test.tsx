@@ -183,6 +183,17 @@ describe('useAppointmentsByDate', () => {
     expect(url).toContain('&serviceUuids=service-a&serviceUuids=service-b');
   });
 
+  it('adds one locationUuids param per selected location', async () => {
+    mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
+
+    renderHook(() => useAppointmentsByDate('2026-06-09', { locationUuids: ['location-a', 'location-b'] }), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    expect(mockOpenmrsFetch.mock.calls[0][0]).toContain('&locationUuids=location-a&locationUuids=location-b');
+  });
+
   it('sends the service and provider filters together', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: [] } as FetchResponse);
 
