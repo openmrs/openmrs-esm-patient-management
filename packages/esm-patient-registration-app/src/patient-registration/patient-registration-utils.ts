@@ -175,7 +175,10 @@ export function shouldHideElement(
 ): boolean {
   if (element.hideIf) {
     const { fieldId, value, notEquals } = element.hideIf;
-    const currentValue = getFieldValue(fieldId, values, config);
+    const fieldValue = getFieldValue(fieldId, values, config);
+    // Location attributes hold a { uuid, display } object rather than a uuid string
+    const currentValue =
+      fieldValue && typeof fieldValue === 'object' && 'uuid' in fieldValue ? fieldValue.uuid : fieldValue;
     const normalizedCurrentValue = currentValue === undefined || currentValue === null ? '' : String(currentValue);
 
     if (value !== undefined && normalizedCurrentValue === String(value)) {
