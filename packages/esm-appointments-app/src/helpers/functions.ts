@@ -12,6 +12,7 @@ export const buildAppointmentsFilterQuery = (filters?: AppointmentsCalendarFilte
   const params = new URLSearchParams();
   filters?.providerUuids?.forEach((uuid) => params.append('providerUuids', uuid));
   filters?.serviceUuids?.forEach((uuid) => params.append('serviceUuids', uuid));
+  filters?.locationUuids?.forEach((uuid) => params.append('locationUuids', uuid));
   const query = params.toString();
   return query ? `&${query}` : '';
 };
