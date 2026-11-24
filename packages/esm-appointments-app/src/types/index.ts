@@ -154,6 +154,7 @@ export interface Provider {
 export interface AppointmentsCalendarFilters {
   providerUuids?: Array<string>;
   serviceUuids?: Array<string>;
+  locationUuids?: Array<string>;
 }
 
 export enum DurationPeriod {
