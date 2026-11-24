@@ -10,6 +10,7 @@ import { useSelectedDate } from '../hooks/useSelectedDate';
 import { useAppointmentsStore } from '../store';
 import { launchCreateAppointmentForm } from '../helpers/functions';
 import CalendarProviderFilter from '../calendar/filters/calendar-provider-filter.component';
+import CalendarServiceFilter from '../calendar/filters/calendar-service-filter.component';
 import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
@@ -59,6 +60,12 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
       <div className={styles.rightJustifiedItems}>
         {isCalendarView ? (
           <div className={styles.calendarControls}>
+            {onServiceFilterChange && (
+              <CalendarServiceFilter
+                selectedServiceUuids={selectedServiceUuids ?? []}
+                onChange={onServiceFilterChange}
+              />
+            )}
             {onProviderFilterChange && (
               <CalendarProviderFilter
                 selectedProviderUuids={selectedProviderUuids ?? []}
