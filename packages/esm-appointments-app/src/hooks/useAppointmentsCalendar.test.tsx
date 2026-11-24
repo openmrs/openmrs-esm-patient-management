@@ -94,6 +94,22 @@ describe('useAppointmentsCalendar', () => {
     expect(mockOpenmrsFetch.mock.calls[0][0]).not.toContain('locationUuids');
   });
 
+  it('sends all three filters together', async () => {
+    renderHook(
+      () =>
+        useAppointmentsCalendar('2026-06-09', 'monthly', {
+          providerUuids: ['provider-a'],
+          serviceUuids: ['service-a'],
+          locationUuids: ['location-a'],
+        }),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    const url = mockOpenmrsFetch.mock.calls[0][0] as string;
+    expect(url).toContain('&providerUuids=provider-a&serviceUuids=service-a&locationUuids=location-a');
+  });
+
   it('sends the service and provider filters together', async () => {
     renderHook(
       () =>
