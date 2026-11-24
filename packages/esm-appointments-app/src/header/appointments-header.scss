@@ -7,8 +7,11 @@
   background-color: colors.$gray-10;
   border-block: 1px solid $ui-03;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  height: auto;
+  min-height: layout.$spacing-12;
   padding-right: layout.$spacing-03;
 }
 
