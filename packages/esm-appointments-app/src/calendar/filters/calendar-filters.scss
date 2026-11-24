@@ -26,3 +26,17 @@
     word-break: break-word;
   }
 }
+
+.serviceOption {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: layout.$spacing-03;
+}
+
+.serviceSwatch {
+  flex-shrink: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-top: 0.25rem;
+  border-radius: 0.125rem;
+}
