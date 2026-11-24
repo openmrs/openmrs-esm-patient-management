@@ -260,13 +260,15 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
               {/* Registration Form */}
               <div className={styles.infoGrid}>
                 <PatientRegistrationContextProvider value={contextValue}>
-                  {sections.map((section, index) => (
-                    <SectionWrapper
-                      key={`registration-section-${section.id}`}
-                      sectionDefinition={section}
-                      index={index}
-                    />
-                  ))}
+                  {sections
+                    .filter((section) => !contextValue.hiddenElements.sectionIds.has(section.id))
+                    .map((section, index) => (
+                      <SectionWrapper
+                        key={`registration-section-${section.id}`}
+                        sectionDefinition={section}
+                        index={index}
+                      />
+                    ))}
                 </PatientRegistrationContextProvider>
               </div>
             </div>
