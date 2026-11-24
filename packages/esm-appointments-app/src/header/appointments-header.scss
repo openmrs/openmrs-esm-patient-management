@@ -36,8 +36,11 @@
 .calendarControls {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: flex-end;
   gap: layout.$spacing-03;
+  padding-bottom: layout.$spacing-03;
 }
 
 // Overriding styles for RTL support
