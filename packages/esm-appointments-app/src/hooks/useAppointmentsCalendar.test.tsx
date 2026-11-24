@@ -40,6 +40,7 @@ describe('useAppointmentsCalendar', () => {
     expect(url).toContain(`${restBaseUrl}/appointment/appointmentSummary?startDate=2026-06-01`);
     expect(url).toContain('endDate=2026-06-30');
     expect(url).not.toContain('providerUuids');
+    expect(url).not.toContain('serviceUuids');
   });
 
   it('adds one providerUuids param per selected provider', async () => {
@@ -59,6 +60,24 @@ describe('useAppointmentsCalendar', () => {
     await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
     const url = mockOpenmrsFetch.mock.calls[0][0] as string;
     expect(url).not.toContain('providerUuids');
+  });
+
+  it('adds one serviceUuids param per selected service', async () => {
+    renderHook(() => useAppointmentsCalendar('2026-06-09', 'monthly', { serviceUuids: ['service-a', 'service-b'] }), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    const url = mockOpenmrsFetch.mock.calls[0][0] as string;
+    expect(url).toContain('&serviceUuids=service-a&serviceUuids=service-b');
+    expect(url).not.toContain('providerUuids');
+  });
+
+  it('omits the serviceUuids param when the selection is empty', async () => {
+    renderHook(() => useAppointmentsCalendar('2026-06-09', 'daily', { serviceUuids: [] }), { wrapper });
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    expect(mockOpenmrsFetch.mock.calls[0][0]).not.toContain('serviceUuids');
   });
 
   it('re-fetches when the provider filter changes', async () => {
