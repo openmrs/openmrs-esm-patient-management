@@ -26,6 +26,7 @@ const AppointmentsCalendarView: React.FC = () => {
     calendarServiceUuids,
     setCalendarServiceUuids,
     calendarLocationUuids,
+    setCalendarLocationUuids,
   } = useAppointmentsStore();
   const filters = useMemo<AppointmentsCalendarFilters>(
     () => ({
@@ -106,6 +107,8 @@ const AppointmentsCalendarView: React.FC = () => {
         onProviderFilterChange={setCalendarProviderUuids}
         selectedServiceUuids={calendarServiceUuids}
         onServiceFilterChange={setCalendarServiceUuids}
+        selectedLocationUuids={calendarLocationUuids}
+        onLocationFilterChange={setCalendarLocationUuids}
       />
       <div className={styles.calendarContent}>
         <CalendarHeader
