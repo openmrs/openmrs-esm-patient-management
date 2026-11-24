@@ -19,6 +19,10 @@
     margin-bottom: layout.$spacing-02;
   }
 
+  :global(.cds--list-box__menu) {
+    min-width: 15rem;
+  }
+
   :global(.cds--list-box__menu-item),
   :global(.cds--list-box__menu-item__option) {
     height: auto;
