@@ -225,11 +225,11 @@ const listMemberRepresentation =
   'custom:(uuid,startDate,patient:(uuid,identifiers:(identifier),person:(display,gender,attributes:(value,attributeType:(display)))))';
 
 /**
- * The URL of a list's members. 100 is the most the REST API returns per page by default. A server
- * with a lower maximum returns smaller pages, which `fetchAllPages` handles.
+ * The URL of a list's members. It leaves out `limit`, so each page has the server's default size: the
+ * REST API rejects a limit above the server's configured maximum instead of returning a smaller page.
  */
 export function getAllPatientListMembersUrl(patientListUuid: string) {
-  return `${cohortUrl}/cohortmember?cohort=${patientListUuid}&v=${listMemberRepresentation}&limit=100`;
+  return `${cohortUrl}/cohortmember?cohort=${patientListUuid}&v=${listMemberRepresentation}`;
 }
 
 export function getAllPatientListMembers(url: string) {

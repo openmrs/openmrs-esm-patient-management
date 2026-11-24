@@ -15,6 +15,7 @@ const createMembers = (count: number) =>
 
 let members = createMembers(0);
 let failLaterPages = false;
+let maxResultsAbsolute = 100;
 
 const parseUrl = (url: string) => new URL(url, 'https://emr.example.org');
 
@@ -33,12 +34,16 @@ describe('usePatientListMembers', () => {
   beforeEach(() => {
     members = createMembers(150);
     failLaterPages = false;
+    maxResultsAbsolute = 100;
     mockOpenmrsFetch.mockReset();
-    // Page the members like the server does, at no more than 100 per page.
+    // Page the members like the server does: 50 per page by default, rejecting a limit above its maximum.
     mockOpenmrsFetch.mockImplementation((url: string) => {
       const params = parseUrl(url).searchParams;
       const start = Number(params.get('startIndex') ?? 0);
-      const limit = Math.min(Number(params.get('limit') ?? 50), 100);
+      const limit = Number(params.get('limit') ?? 50);
+      if (limit > maxResultsAbsolute) {
+        return Promise.reject(new Error(`Administrator has set absolute limit at ${maxResultsAbsolute}`));
+      }
       if (start > 0 && failLaterPages) {
         return Promise.reject(new Error('Later page failed'));
       }
@@ -63,9 +68,15 @@ describe('usePatientListMembers', () => {
     await waitFor(() => expect(result.current.listMembers).toHaveLength(150));
 
     const params = mockOpenmrsFetch.mock.calls.map(([url]) => parseUrl(url as string).searchParams);
-    expect(params.map((p) => p.get('startIndex'))).toEqual([null, '100']);
-    expect(params.every((p) => p.get('limit') === '100')).toBe(true);
+    expect(params.map((p) => p.get('startIndex'))).toEqual([null, '50', '100']);
     expect(params.every((p) => p.get('cohort') === 'list-uuid')).toBe(true);
+  });
+
+  it('loads the members when the server allows fewer than 100 results per page', async () => {
+    maxResultsAbsolute = 50;
+    const { result } = setup()();
+
+    await waitFor(() => expect(result.current.listMembers).toHaveLength(150));
   });
 
   it('does not fetch until the list is known', () => {
