@@ -351,6 +351,10 @@ export function sanitizeFormValuesForSkipLogic(
     return values;
   }
 
-  const { fieldIds } = getHiddenElements(values, config);
-  return clearHiddenFieldValues(values, fieldIds, config, initialFormValues);
+  const { fieldIds, sectionIds } = getHiddenElements(values, config);
+  const sanitizedValues = clearHiddenFieldValues(values, fieldIds, config, initialFormValues);
+  if (sectionIds.has('relationships')) {
+    sanitizedValues.relationships = initialFormValues?.relationships ?? [];
+  }
+  return sanitizedValues;
 }
