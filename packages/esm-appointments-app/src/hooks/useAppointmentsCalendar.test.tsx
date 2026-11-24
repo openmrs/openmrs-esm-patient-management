@@ -73,11 +73,41 @@ describe('useAppointmentsCalendar', () => {
     expect(url).not.toContain('providerUuids');
   });
 
+  it('sends the service and provider filters together', async () => {
+    renderHook(
+      () =>
+        useAppointmentsCalendar('2026-06-09', 'monthly', {
+          providerUuids: ['provider-a'],
+          serviceUuids: ['service-a'],
+        }),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    const url = mockOpenmrsFetch.mock.calls[0][0] as string;
+    expect(url).toContain('&providerUuids=provider-a&serviceUuids=service-a');
+  });
+
   it('omits the serviceUuids param when the selection is empty', async () => {
     renderHook(() => useAppointmentsCalendar('2026-06-09', 'daily', { serviceUuids: [] }), { wrapper });
 
     await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
     expect(mockOpenmrsFetch.mock.calls[0][0]).not.toContain('serviceUuids');
+  });
+
+  it('re-fetches when the service filter changes', async () => {
+    const { rerender } = renderHook(
+      ({ serviceUuids }: { serviceUuids: Array<string> }) =>
+        useAppointmentsCalendar('2026-06-09', 'monthly', { serviceUuids }),
+      { wrapper, initialProps: { serviceUuids: [] } },
+    );
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+
+    rerender({ serviceUuids: ['service-a'] });
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2));
+    expect(mockOpenmrsFetch.mock.calls[1][0]).toContain('serviceUuids=service-a');
   });
 
   it('re-fetches when the provider filter changes', async () => {
