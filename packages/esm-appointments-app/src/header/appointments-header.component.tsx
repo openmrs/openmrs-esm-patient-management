@@ -11,6 +11,7 @@ import { useAppointmentsStore } from '../store';
 import { launchCreateAppointmentForm } from '../helpers/functions';
 import CalendarProviderFilter from '../calendar/filters/calendar-provider-filter.component';
 import CalendarServiceFilter from '../calendar/filters/calendar-service-filter.component';
+import CalendarLocationFilter from '../calendar/filters/calendar-location-filter.component';
 import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
@@ -74,6 +75,12 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({
               <CalendarProviderFilter
                 selectedProviderUuids={selectedProviderUuids ?? []}
                 onChange={onProviderFilterChange}
+              />
+            )}
+            {onLocationFilterChange && (
+              <CalendarLocationFilter
+                selectedLocationUuids={selectedLocationUuids ?? []}
+                onChange={onLocationFilterChange}
               />
             )}
             <Button kind="primary" renderIcon={Add} size="sm" onClick={() => launchCreateAppointmentForm(t)}>
