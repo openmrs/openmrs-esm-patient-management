@@ -416,4 +416,56 @@ describe('Appointment calendar view', () => {
       locationUuids: [],
     });
   });
+
+  it('passes the selected location to the monthly and daily requests', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+
+    await user.click(screen.getByRole('combobox', { name: /^location$/i }));
+    await user.click(screen.getByRole('option', { name: /Outpatient Clinic/i }));
+
+    expect(screen.getByText('1 location(s)')).toBeInTheDocument();
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
+      providerUuids: [],
+      serviceUuids: [],
+      locationUuids: ['44c3efb0-2583-4c80-a79e-1f756a03c0a1'],
+    });
+
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+
+    expect(mockUseAppointmentsByDate.mock.calls.at(-1)?.[1]).toEqual({
+      providerUuids: [],
+      serviceUuids: [],
+      locationUuids: ['44c3efb0-2583-4c80-a79e-1f756a03c0a1'],
+    });
+  });
+
+  it('combines the location with the service and provider selections', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+
+    await user.click(screen.getByRole('combobox', { name: /^location$/i }));
+    await user.click(screen.getByRole('option', { name: /Outpatient Clinic/i }));
+    await user.click(screen.getByRole('combobox', { name: /^service$/i }));
+    await user.click(screen.getByRole('option', { name: /HIV Clinic/i }));
+
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
+      providerUuids: [],
+      serviceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'],
+      locationUuids: ['44c3efb0-2583-4c80-a79e-1f756a03c0a1'],
+    });
+  });
+
+  it('keeps the location selection from the store on first render', () => {
+    appointmentsStore.setState({ calendarLocationUuids: ['44c3efb0-2583-4c80-a79e-1f756a03c0a1'] });
+
+    renderCalendar();
+
+    expect(screen.getByText('1 location(s)')).toBeInTheDocument();
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
+      providerUuids: [],
+      serviceUuids: [],
+      locationUuids: ['44c3efb0-2583-4c80-a79e-1f756a03c0a1'],
+    });
+  });
 });
