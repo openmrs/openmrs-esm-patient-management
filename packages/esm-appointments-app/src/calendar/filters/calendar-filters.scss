@@ -2,7 +2,7 @@
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
 .calendarFilter {
-  min-width: layout.$spacing-12 * 2;
+  min-width: 15rem;
 
   :global(.cds--list-box) {
     background-color: $ui-01;
