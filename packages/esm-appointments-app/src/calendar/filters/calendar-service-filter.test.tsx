@@ -12,7 +12,7 @@ vi.mock('../../hooks/useAppointmentService', () => ({
 
 const mockUseAppointmentServices = vi.mocked(useAppointmentServices);
 
-const hivClinic = { uuid: 'service-hiv', name: 'HIV Clinic' } as AppointmentService;
+const hivClinic = { uuid: 'service-hiv', name: 'HIV Clinic', color: '#4589ff' } as AppointmentService;
 const outpatient = { uuid: 'service-outpatient', name: 'Outpatient' } as AppointmentService;
 
 describe('CalendarServiceFilter', () => {
@@ -39,6 +39,16 @@ describe('CalendarServiceFilter', () => {
 
     expect(screen.getByRole('option', { name: /HIV Clinic/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /Outpatient/i })).toBeInTheDocument();
+  });
+
+  it('shows each service with its calendar colour swatch', async () => {
+    const user = userEvent.setup();
+    render(<CalendarServiceFilter selectedServiceUuids={[]} onChange={vi.fn()} />);
+
+    await user.click(screen.getByRole('combobox', { name: /^service$/i }));
+
+    expect(screen.getByTestId('service-filter-swatch-service-hiv')).toHaveStyle({ backgroundColor: '#4589ff' });
+    expect(screen.getByTestId('service-filter-swatch-service-outpatient').style.backgroundColor).toBeTruthy();
   });
 
   it('calls onChange with the selected service uuids', async () => {
