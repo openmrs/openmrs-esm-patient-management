@@ -20,11 +20,20 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-  const { calendarProviderUuids, setCalendarProviderUuids, calendarServiceUuids, setCalendarServiceUuids } =
-    useAppointmentsStore();
+  const {
+    calendarProviderUuids,
+    setCalendarProviderUuids,
+    calendarServiceUuids,
+    setCalendarServiceUuids,
+    calendarLocationUuids,
+  } = useAppointmentsStore();
   const filters = useMemo<AppointmentsCalendarFilters>(
-    () => ({ providerUuids: calendarProviderUuids, serviceUuids: calendarServiceUuids }),
-    [calendarProviderUuids, calendarServiceUuids],
+    () => ({
+      providerUuids: calendarProviderUuids,
+      serviceUuids: calendarServiceUuids,
+      locationUuids: calendarLocationUuids,
+    }),
+    [calendarProviderUuids, calendarServiceUuids, calendarLocationUuids],
   );
   const { calendarEvents, isLoading, error } = useAppointmentsCalendar(
     calendarSelectedDate.toISOString(),
