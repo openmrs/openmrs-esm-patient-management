@@ -20,7 +20,8 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-  const { calendarProviderUuids, setCalendarProviderUuids, calendarServiceUuids } = useAppointmentsStore();
+  const { calendarProviderUuids, setCalendarProviderUuids, calendarServiceUuids, setCalendarServiceUuids } =
+    useAppointmentsStore();
   const filters = useMemo<AppointmentsCalendarFilters>(
     () => ({ providerUuids: calendarProviderUuids, serviceUuids: calendarServiceUuids }),
     [calendarProviderUuids, calendarServiceUuids],
@@ -94,6 +95,8 @@ const AppointmentsCalendarView: React.FC = () => {
         isCalendarView
         selectedProviderUuids={calendarProviderUuids}
         onProviderFilterChange={setCalendarProviderUuids}
+        selectedServiceUuids={calendarServiceUuids}
+        onServiceFilterChange={setCalendarServiceUuids}
       />
       <div className={styles.calendarContent}>
         <CalendarHeader
