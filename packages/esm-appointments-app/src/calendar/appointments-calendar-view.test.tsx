@@ -351,4 +351,52 @@ describe('Appointment calendar view', () => {
       serviceUuids: [],
     });
   });
+
+  it('passes the selected service to the monthly and daily requests', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+
+    await user.click(screen.getByRole('combobox', { name: /^service$/i }));
+    await user.click(screen.getByRole('option', { name: /HIV Clinic/i }));
+
+    expect(screen.getByText('1 service(s)')).toBeInTheDocument();
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
+      providerUuids: [],
+      serviceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'],
+    });
+
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+
+    expect(mockUseAppointmentsByDate.mock.calls.at(-1)?.[1]).toEqual({
+      providerUuids: [],
+      serviceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'],
+    });
+  });
+
+  it('combines the service and provider selections in one request', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+
+    await user.click(screen.getByRole('combobox', { name: /^service$/i }));
+    await user.click(screen.getByRole('option', { name: /HIV Clinic/i }));
+    await user.click(screen.getByRole('combobox', { name: /^provider$/i }));
+    await user.click(screen.getByRole('option', { name: /doctor - James Cook/i }));
+
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
+      providerUuids: ['f9badd80-ab76-11e2-9e96-0800200c9a66'],
+      serviceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'],
+    });
+  });
+
+  it('keeps the service selection from the store on first render', () => {
+    appointmentsStore.setState({ calendarServiceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'] });
+
+    renderCalendar();
+
+    expect(screen.getByText('1 service(s)')).toBeInTheDocument();
+    expect(mockUseAppointmentsCalendar.mock.calls.at(-1)?.[2]).toEqual({
+      providerUuids: [],
+      serviceUuids: ['53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1'],
+    });
+  });
 });
