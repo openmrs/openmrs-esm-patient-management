@@ -258,7 +258,6 @@ describe('Field', () => {
       setCapturePhotoProps: vi.fn(),
       setFieldValue: vi.fn(),
       setInitialFormValues: vi.fn(),
-      values: { identifiers: { openmrsID } } as unknown as FormValues,
       setFieldTouched: vi.fn(),
     };
 
@@ -266,7 +265,10 @@ describe('Field', () => {
       <ResourcesContextProvider value={mockResourcesContextValue}>
         <Field name="id" />
       </ResourcesContextProvider>,
-      { contextValues: updatedContextValues },
+      {
+        contextValues: updatedContextValues,
+        initialValues: { identifiers: { openmrsID } } as unknown as FormValues,
+      },
     );
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
   });
@@ -337,8 +339,8 @@ describe('Field', () => {
           contextValues: {
             ...initialContextValues,
             initialFormValues: { identifiers: {} } as FormValues,
-            values: { identifiers: {} } as FormValues,
           },
+          initialValues: { identifiers: {} } as FormValues,
         },
       );
 
