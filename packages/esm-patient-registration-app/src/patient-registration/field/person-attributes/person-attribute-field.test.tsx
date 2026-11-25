@@ -1,14 +1,16 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { useFormContext } from 'react-hook-form';
 import { OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { useConceptAnswers } from '../field.resource';
 import { PersonAttributeField } from './person-attribute-field.component';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
-import type { FieldDefinition } from '../../../config-schema';
+import type { FieldDefinition, RegistrationConfig } from '../../../config-schema';
 import type { FormValues } from '../../patient-registration.types';
+import type { createRegistrationResolver } from '../../registration-resolver';
 
 vi.mock('./person-attributes.resource', async () => ({
   ...((await vi.importActual('./person-attributes.resource')) as object),
@@ -19,6 +21,32 @@ vi.mock('../field.resource', async () => ({
   ...((await vi.importActual('../field.resource')) as object),
   useConceptAnswers: vi.fn(),
 }));
+
+// Counts the validation runs of forms rendered with `withValidation`
+const resolverCalls = vi.hoisted(() => ({ count: 0 }));
+vi.mock('../../registration-resolver', async () => {
+  const actual = await vi.importActual<{ createRegistrationResolver: typeof createRegistrationResolver }>(
+    '../../registration-resolver',
+  );
+  return {
+    ...actual,
+    createRegistrationResolver: (...args: Parameters<typeof createRegistrationResolver>) => {
+      const resolve = actual.createRegistrationResolver(...args);
+      return (...resolverArgs: Parameters<typeof resolve>) => {
+        resolverCalls.count++;
+        return resolve(...resolverArgs);
+      };
+    },
+  };
+});
+
+const validationConfig = {
+  freeTextFieldConceptUuid: 'free-text-uuid',
+  fieldConfigurations: {
+    gender: [{ label: 'M', value: 'male' }],
+    identifier: { allowPreferredSelection: false },
+  },
+} as unknown as RegistrationConfig;
 
 const mockUsePersonAttributeType = vi.mocked(usePersonAttributeType);
 const mockUseConceptAnswers = vi.mocked(useConceptAnswers);
@@ -329,6 +357,77 @@ describe('PersonAttributeField', () => {
       renderPersonAttributeFieldInForm(dateFieldDefinition, { attributes: { [uuid]: '2026-09-20' } });
 
       expect(screen.getByLabelText('Date of first visit')).toHaveValue('20/09/2026');
+    });
+
+    it('validates once when a date is selected: marking the field as touched does not validate', async () => {
+      const { getValues, getTouched } = renderWithRegistrationForm(
+        <PersonAttributeField fieldDefinition={dateFieldDefinition} />,
+        { initialValues: { attributes: {} }, withValidation: true, config: validationConfig },
+      );
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      const before = resolverCalls.count;
+
+      fireEvent.change(screen.getByLabelText('Date of first visit'), { target: { value: '2026-09-20' } });
+
+      await waitFor(() => expect(getTouched().attributes?.[uuid]).toBe(true));
+      expect(getValues().attributes[uuid]).toBe('2026-09-20');
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      });
+      expect(resolverCalls.count - before).toBe(1);
+    });
+
+    it('saves an empty string when the date is cleared', async () => {
+      const { getValues } = renderPersonAttributeFieldInForm(dateFieldDefinition, {
+        attributes: { [uuid]: '2026-09-20' },
+      });
+
+      act(() => vi.mocked(OpenmrsDatePicker).mock.calls.at(-1)[0].onChange(null));
+
+      await waitFor(() => expect(getValues().attributes[uuid]).toBe(''));
+      expect(screen.getByLabelText('Date of first visit')).toHaveValue('');
+    });
+
+    it('renders a date set from outside the field', async () => {
+      let setValue: ReturnType<typeof useFormContext<FormValues>>['setValue'];
+      const Writer = () => {
+        setValue = useFormContext<FormValues>().setValue;
+        return null;
+      };
+      renderWithRegistrationForm(
+        <>
+          <Writer />
+          <PersonAttributeField fieldDefinition={dateFieldDefinition} />
+        </>,
+        { initialValues: { attributes: {} } },
+      );
+      expect(screen.getByLabelText('Date of first visit')).toHaveValue('');
+
+      act(() => setValue(`attributes.${uuid}` as never, '2026-09-21' as never));
+
+      await waitFor(() => expect(screen.getByLabelText('Date of first visit')).toHaveValue('21/09/2026'));
+    });
+
+    it('passes the form error of the field as invalidText, without isInvalid', async () => {
+      let setError: ReturnType<typeof useFormContext<FormValues>>['setError'];
+      const ErrorSetter = () => {
+        setError = useFormContext<FormValues>().setError;
+        return null;
+      };
+      renderWithRegistrationForm(
+        <>
+          <ErrorSetter />
+          <PersonAttributeField fieldDefinition={dateFieldDefinition} />
+        </>,
+        { initialValues: { attributes: {} } },
+      );
+
+      act(() => setError(`attributes.${uuid}` as never, { type: 'custom', message: 'Invalid date' }));
+
+      await waitFor(() => expect(vi.mocked(OpenmrsDatePicker).mock.calls.at(-1)[0].invalidText).toBe('Invalid date'));
+      expect(vi.mocked(OpenmrsDatePicker).mock.calls.at(-1)[0].isInvalid).toBeUndefined();
     });
 
     it('does not allow future dates when allowFutureDates is false', () => {

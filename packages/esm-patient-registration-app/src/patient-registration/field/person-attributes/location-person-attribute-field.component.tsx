@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { ComboBox, InlineLoading, Layer } from '@carbon/react';
+import { useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Field, useField } from '../../form-adapter';
-import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { ComboBox, InlineLoading, Layer } from '@carbon/react';
+import { useFormHelpers } from '../../form-adapter';
 import { useLocations } from './location-person-attribute-field.resource';
+import type { FieldPath } from 'react-hook-form';
+import type { FormValues, PersonAttributeTypeResponse } from '../../patient-registration.types';
 import styles from './../field.scss';
 
 export interface LocationPersonAttributeFieldProps {
@@ -32,7 +34,8 @@ export function LocationPersonAttributeField({
 }: LocationPersonAttributeFieldProps) {
   const { t } = useTranslation();
   const fieldName = `attributes.${personAttributeType.uuid}`;
-  const [, meta, { setValue }] = useField<LocationAttributeValue>(fieldName);
+  const value = useWatch<FormValues>({ name: fieldName as FieldPath<FormValues> }) as LocationAttributeValue;
+  const { setFieldValue } = useFormHelpers();
   const [searchQuery, setSearchQuery] = useState('');
   const downshiftActions: React.ComponentProps<typeof ComboBox<LocationOption>>['downshiftActions'] = useRef(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -49,8 +52,8 @@ export function LocationPersonAttributeField({
     return prevLocationOptions.current;
   }, [locations, isLoading, loadingNewData]);
 
-  const savedUuid = meta.value?.uuid ?? '';
-  const savedLabel = meta.value?.display;
+  const savedUuid = value?.uuid ?? '';
+  const savedLabel = value?.display;
 
   // Built from the saved value rather than from the search results, and kept referentially stable,
   // because ComboBox resets its input to the label of `selectedItem` whenever that prop changes.
@@ -87,7 +90,7 @@ export function LocationPersonAttributeField({
     ({ selectedItem: item }: { selectedItem: LocationOption | null }) => {
       if (item) {
         if (item.value !== savedUuid) {
-          setValue({ uuid: item.value, display: item.label });
+          setFieldValue(fieldName, { uuid: item.value, display: item.label });
         }
         return;
       }
@@ -98,9 +101,9 @@ export function LocationPersonAttributeField({
         return;
       }
 
-      setValue(null);
+      setFieldValue(fieldName, null);
     },
-    [savedUuid, selectedItem, setValue],
+    [savedUuid, selectedItem, setFieldValue, fieldName],
   );
 
   return (
@@ -114,27 +117,20 @@ export function LocationPersonAttributeField({
         enterPressedWithSearchText.current = false;
       }}>
       <Layer>
-        <Field name={fieldName}>
-          {({ form: { touched, errors } }) => {
-            return (
-              <ComboBox
-                id={id}
-                ref={inputRef}
-                name={`person-attribute-${personAttributeType.uuid}`}
-                titleText={label}
-                items={items}
-                placeholder={t('searchLocationPersonAttribute', 'Search location')}
-                onInputChange={handleInputChange}
-                required={required}
-                onChange={handleSelect}
-                selectedItem={selectedItem}
-                downshiftActions={downshiftActions}
-                invalid={errors[fieldName] && touched[fieldName]}
-                typeahead
-              />
-            );
-          }}
-        </Field>
+        <ComboBox
+          id={id}
+          ref={inputRef}
+          name={`person-attribute-${personAttributeType.uuid}`}
+          titleText={label}
+          items={items}
+          placeholder={t('searchLocationPersonAttribute', 'Search location')}
+          onInputChange={handleInputChange}
+          required={required}
+          onChange={handleSelect}
+          selectedItem={selectedItem}
+          downshiftActions={downshiftActions}
+          typeahead
+        />
       </Layer>
       {loadingNewData && (
         <div className={styles.loadingContainer}>

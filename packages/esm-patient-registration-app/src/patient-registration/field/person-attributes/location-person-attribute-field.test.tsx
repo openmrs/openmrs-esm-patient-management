@@ -3,6 +3,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SWRConfig } from 'swr';
+import { useFormContext } from 'react-hook-form';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import { LocationPersonAttributeField } from './location-person-attribute-field.component';
@@ -29,6 +30,13 @@ const allLocations = [
 ];
 
 let getValues: () => FormValues;
+let setFormValue: ReturnType<typeof useFormContext<FormValues>>['setValue'];
+
+/** Gives the tests the form's `setValue`, to change the value from outside the field. */
+const Writer = () => {
+  setFormValue = useFormContext<FormValues>().setValue;
+  return null;
+};
 
 function getAttributeValue() {
   return getValues().attributes?.[personAttributeType.uuid] ?? null;
@@ -45,6 +53,7 @@ function locationsResponse(url: string) {
 function renderField(initialValue: unknown = savedLocation) {
   const utils = renderWithRegistrationForm(
     <SWRConfig value={{ provider: () => new Map() }}>
+      <Writer />
       <LocationPersonAttributeField
         id="healthCenter"
         label="Health Center"
@@ -180,5 +189,33 @@ describe('LocationPersonAttributeField', () => {
 
     await waitFor(() => expect(getAttributeValue()).toBeNull());
     expect(combobox).toHaveValue('');
+  });
+
+  it('displays a location set from outside the field', async () => {
+    renderField();
+
+    const combobox = screen.getByRole('combobox', { name: /health center/i });
+    await waitFor(() => expect(combobox).toHaveValue('Kisumu Clinic'));
+
+    act(() =>
+      setFormValue(
+        `attributes.${personAttributeType.uuid}` as never,
+        {
+          uuid: 'kitale-uuid',
+          display: 'Kitale Clinic',
+        } as never,
+      ),
+    );
+
+    await waitFor(() => expect(combobox).toHaveValue('Kitale Clinic'));
+  });
+
+  it('names the input after the person attribute type', () => {
+    renderField();
+
+    expect(screen.getByRole('combobox', { name: /health center/i })).toHaveAttribute(
+      'name',
+      `person-attribute-${personAttributeType.uuid}`,
+    );
   });
 });

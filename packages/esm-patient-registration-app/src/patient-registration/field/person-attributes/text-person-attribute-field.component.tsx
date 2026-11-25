@@ -1,10 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Field } from '../../form-adapter';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../input/basic-input/input/input.component';
-import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
-import { usePatternRule, type PatternRule } from '../../validation/pattern-rules';
+import { usePatternRule } from '../../validation/pattern-rules';
+import type { PersonAttributeTypeResponse } from '../../patient-registration.types';
+import type { PatternRule } from '../../validation/pattern-rules';
 import styles from './../field.scss';
 
 export interface TextPersonAttributeFieldProps {
@@ -34,20 +34,7 @@ export function TextPersonAttributeField({
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
-      <Field name={fieldName}>
-        {({ field, form: { touched, errors }, meta }) => {
-          return (
-            <Input
-              id={id}
-              name={`person-attribute-${personAttributeType.uuid}`}
-              labelText={label ?? personAttributeType?.display}
-              invalid={errors[fieldName] && touched[fieldName]}
-              {...field}
-              required={required}
-            />
-          );
-        }}
-      </Field>
+      <Input id={id} name={fieldName} labelText={label ?? personAttributeType?.display} required={required} />
     </div>
   );
 }

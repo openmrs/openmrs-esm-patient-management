@@ -1,13 +1,16 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { act, render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { get } from 'lodash-es';
+import { useFormState } from 'react-hook-form';
+import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { ObsField } from './obs-field.component';
 import { createPatternRuleRegistry, PatternRulesProvider } from '../../validation/pattern-rules';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import { getMessage } from '../../form-adapter';
 import type { FormValues } from '../../patient-registration.types';
 
 const validationConfig = {
@@ -176,6 +179,12 @@ const renderObsFieldInForm = (fieldDefinition: FieldDefinition, initialValues: P
   });
 };
 
+/** Shows the form-state error of `name` in an attribute, so a test can see an error the field does not show. */
+const ErrorInFormState: React.FC<{ name: string }> = ({ name }) => {
+  const { errors } = useFormState<FormValues>();
+  return <span data-testid="error-in-form-state" data-error={getMessage(get(errors, name)) ?? ''} />;
+};
+
 describe('ObsField', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({
@@ -278,6 +287,32 @@ describe('ObsField', () => {
       });
     });
 
+    it('shows the regex error only after the field is blurred, even when the error is in form state', async () => {
+      const user = userEvent.setup();
+      renderWithRegistrationForm(
+        <>
+          <ObsField fieldDefinition={{ ...textFieldDef, validation: { required: false, matches: '^[A-Z]+$' } }} />
+          <ErrorInFormState name="obs.chief-complaint-uuid" />
+        </>,
+        { initialValues: { obs: {} }, withValidation: true, config: validationConfig },
+      );
+
+      const textInput = screen.getByRole('textbox', { name: /chief complaint/i });
+      await user.type(textInput, 'lowercase');
+
+      // Each change validates the whole form, so the error is in form state, but the field is not touched yet.
+      await waitFor(() =>
+        expect(screen.getByTestId('error-in-form-state')).toHaveAttribute('data-error', 'Invalid Input'),
+      );
+      expect(screen.queryByText('Invalid Input')).not.toBeInTheDocument();
+      expect(textInput).not.toHaveAttribute('aria-invalid', 'true');
+
+      await user.tab();
+
+      expect(await screen.findByText('Invalid Input')).toBeInTheDocument();
+      expect(textInput).toHaveAttribute('aria-invalid', 'true');
+    });
+
     it('does not show error for valid input matching regex', async () => {
       const user = userEvent.setup();
       renderObsFieldInForm({
@@ -340,6 +375,18 @@ describe('ObsField', () => {
       });
     });
 
+    it('stores the typed number as a number, and an empty string when cleared', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderObsFieldInForm(numberFieldDef);
+
+      const numberInput = screen.getByRole('spinbutton', { name: /weight/i });
+      await user.type(numberInput, '5');
+      await waitFor(() => expect(getValues().obs['weight-uuid']).toBe(5));
+
+      await user.clear(numberInput);
+      await waitFor(() => expect(getValues().obs['weight-uuid']).toBe(''));
+    });
+
     it('renders as required when configured', () => {
       renderObsFieldInForm({
         ...numberFieldDef,
@@ -373,6 +420,45 @@ describe('ObsField', () => {
       await waitFor(() => {
         expect(getValues().obs['vaccination-date-uuid']).toBeTruthy();
       });
+    });
+
+    it('stores the picked date as a Date', async () => {
+      const { getValues } = renderObsFieldInForm(dateFieldDef);
+
+      fireEvent.change(screen.getByLabelText(/vaccination date/i), { target: { value: '2020-01-15' } });
+
+      await waitFor(() => expect(getValues().obs['vaccination-date-uuid']).toEqual(new Date(2020, 0, 15)));
+    });
+
+    it('shows the date from the form values', () => {
+      const date = new Date(2021, 5, 1);
+      renderObsFieldInForm(dateFieldDef, { obs: { 'vaccination-date-uuid': date } as unknown as FormValues['obs'] });
+
+      expect(screen.getByLabelText(/vaccination date/i)).toHaveValue('01/06/2021');
+      const props = vi.mocked(OpenmrsDatePicker).mock.lastCall[0];
+      expect(props.value).toEqual(date);
+      expect(props.name).toBe('obs.vaccination-date-uuid');
+      expect(props.id).toBe('obs.vaccination-date-uuid');
+      expect(props.isInvalid).toBeUndefined();
+    });
+
+    it("touches the blurred element's name, else its id, through the date picker's onBlur", async () => {
+      const { getTouched } = renderObsFieldInForm(dateFieldDef);
+
+      act(() =>
+        vi
+          .mocked(OpenmrsDatePicker)
+          .mock.lastCall[0].onBlur({ target: { name: 'obs.vaccination-date-uuid' } } as unknown as React.FocusEvent),
+      );
+      await waitFor(() => expect(getTouched().obs?.['vaccination-date-uuid']).toBe(true));
+
+      // A target with an id only touches that id, as Formik's handleBlur.
+      act(() =>
+        vi
+          .mocked(OpenmrsDatePicker)
+          .mock.lastCall[0].onBlur({ target: { id: 'obs.other-uuid' } } as unknown as React.FocusEvent),
+      );
+      await waitFor(() => expect(getTouched().obs?.['other-uuid']).toBe(true));
     });
 
     it('renders as required when configured', () => {
@@ -410,6 +496,35 @@ describe('ObsField', () => {
         expect(getValues().obs['nationality-uuid']).toBe('usa');
       });
       expect(select.value).toBe('usa');
+    });
+
+    it('stores an empty string when "Select an option" is selected again', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderObsFieldInForm(codedFieldDef);
+
+      const select = screen.getByRole('combobox', { name: 'Nationality' });
+      await user.selectOptions(select, 'usa');
+      await waitFor(() => expect(getValues().obs['nationality-uuid']).toBe('usa'));
+
+      await user.selectOptions(select, 'Select an option');
+      await waitFor(() => expect(getValues().obs['nationality-uuid']).toBe(''));
+      expect(select).toHaveValue('');
+    });
+
+    it('touches the obs path on blur', async () => {
+      const user = userEvent.setup();
+      const { getTouched } = renderObsFieldInForm(codedFieldDef);
+
+      await user.click(screen.getByRole('combobox', { name: 'Nationality' }));
+      await user.tab();
+
+      await waitFor(() => expect(getTouched()).toEqual({ obs: { 'nationality-uuid': true } }));
+    });
+
+    it('selects the answer from the form values', () => {
+      renderObsFieldInForm(codedFieldDef, { obs: { 'nationality-uuid': 'mex' } as FormValues['obs'] });
+
+      expect(screen.getByRole('combobox', { name: 'Nationality' })).toHaveValue('mex');
     });
 
     it('uses answerConceptSetUuid for answers when provided', () => {
