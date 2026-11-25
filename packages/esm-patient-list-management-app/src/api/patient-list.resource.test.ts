@@ -72,23 +72,37 @@ describe('patient list resource', () => {
       expect(result.at(-1)).toEqual(expect.objectContaining({ id: 'list-51', display: 'Test list 51' }));
     });
 
-    it('requests later pages through the configured API base, not the host in the next link', async () => {
+    it('requests later pages from the current origin, not the host in the next link', async () => {
       mockServer();
 
       await getAllPatientLists({}, systemListCohortTypeUuid);
 
-      const [firstPageUrl, secondPageUrl] = mockOpenmrsFetch.mock.calls.map(([url]) => url as string);
-      expect(secondPageUrl).toBe(`${firstPageUrl}&startIndex=50`);
-      expect(secondPageUrl).not.toContain('backend.example.org');
+      const secondPageUrl = new URL(mockOpenmrsFetch.mock.calls[1][0] as string);
+      expect(secondPageUrl.origin).toBe(window.location.origin);
+      expect(secondPageUrl.searchParams.get('startIndex')).toBe('50');
     });
 
-    it('stops when a page is empty, even if the response has a next link', async () => {
-      mockOpenmrsFetch.mockImplementation(() =>
-        respondWith({ results: [], links: nextLink('cohort?v=default&startIndex=50') }),
+    it('can be aborted while loading any page', async () => {
+      mockServer();
+      const ac = new AbortController();
+
+      await getAllPatientLists({}, systemListCohortTypeUuid, ac);
+
+      expect(mockOpenmrsFetch).toHaveBeenCalledTimes(2);
+      mockOpenmrsFetch.mock.calls.forEach(([, options]) => expect(options.signal).toBe(ac.signal));
+    });
+
+    it('throws an error returned in the response body of a later page', async () => {
+      const error = { message: 'Server error' };
+      mockOpenmrsFetch.mockImplementation((url: string) =>
+        respondWith(
+          url.includes('startIndex=50')
+            ? { results: [], error }
+            : { results: lists.slice(0, 50), links: nextLink('cohort?v=default&startIndex=50') },
+        ),
       );
 
-      await expect(getAllPatientLists({}, systemListCohortTypeUuid)).resolves.toEqual([]);
-      expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1);
+      await expect(getAllPatientLists({}, systemListCohortTypeUuid)).rejects.toBe(error);
     });
 
     it('rejects instead of returning a partial list when a later page fails', async () => {
