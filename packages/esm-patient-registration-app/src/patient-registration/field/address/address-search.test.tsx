@@ -2,18 +2,16 @@ import React from 'react';
 import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor, fireEvent } from '@testing-library/react';
-import { Formik, Form } from 'formik';
-import { renderWithContext } from 'tools';
-import { type Resources } from '../../../registration.resource';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { mockedAddressTemplate, mockedAddressOptions, mockedOrderedFields } from '__mocks__';
 import { ResourcesContextProvider } from '../../../resources-context';
 import { initialFormValues } from '../../patient-registration.component';
-import { type FormValues } from '../../patient-registration.types';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import AddressSearchComponent from './address-search.component';
+import type { Resources } from '../../../registration.resource';
+import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 const mockUseAddressHierarchy = vi.mocked(useAddressHierarchy);
@@ -37,9 +35,9 @@ const orderMap = Object.fromEntries(mockedOrderedFields.map((field, indx) => [fi
 allFields.sort((existingField1, existingField2) => orderMap[existingField1.name] - orderMap[existingField2.name]);
 
 /**
- * Helper to render AddressSearchComponent with Formik for state-dependent tests.
+ * Helper to render AddressSearchComponent in a registration form for state-dependent tests.
  */
-async function renderAddressSearchWithFormik(
+async function renderAddressSearchInForm(
   initialValues: Partial<FormValues> = {},
   addressTemplate = mockedAddressTemplate,
 ) {
@@ -48,40 +46,17 @@ async function renderAddressSearchWithFormik(
     ...initialValues,
   };
 
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
   const mockResourcesContextValue = { addressTemplate } as unknown as Resources;
 
-  const utils = await renderWithContext(
-    <Formik initialValues={defaultValues} onSubmit={() => {}}>
-      {({ setFieldValue, values }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        return (
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                identifierTypes: [],
-                values: formValuesRef,
-                inEditMode: false,
-                setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: vi.fn(),
-                setFieldTouched: vi.fn().mockResolvedValue(undefined),
-                currentPhoto: '',
-                initialFormValues: formValuesRef,
-              }}>
-              <AddressSearchComponent addressLayout={allFields} />
-            </PatientRegistrationContextProvider>
-          </Form>
-        );
-      }}
-    </Formik>,
-    ResourcesContextProvider,
-    mockResourcesContextValue,
+  return await renderWithRegistrationForm(
+    <ResourcesContextProvider value={mockResourcesContextValue}>
+      <AddressSearchComponent addressLayout={allFields} />
+    </ResourcesContextProvider>,
+    {
+      initialValues: defaultValues,
+      contextValues: { setFieldTouched: vi.fn().mockResolvedValue(undefined) },
+    },
   );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-  };
 }
 
 describe('Testing address search bar', () => {
@@ -112,7 +87,7 @@ describe('Testing address search bar', () => {
       isLoading: false,
     });
 
-    await renderAddressSearchWithFormik();
+    await renderAddressSearchInForm();
 
     const searchbox = screen.getByRole('searchbox', { name: /search address/i });
     expect(searchbox).toBeInTheDocument();
@@ -129,7 +104,7 @@ describe('Testing address search bar', () => {
       isLoading: false,
     });
 
-    await renderAddressSearchWithFormik();
+    await renderAddressSearchInForm();
 
     const searchbox = screen.getByRole('searchbox', { name: /search address/i });
     await user.type(searchbox, 'nea');
@@ -151,7 +126,7 @@ describe('Testing address search bar', () => {
       isLoading: false,
     });
 
-    const { getFormValues } = await renderAddressSearchWithFormik();
+    const { getValues } = await renderAddressSearchInForm();
 
     const searchbox = screen.getByRole('searchbox', { name: /search address/i });
     await user.type(searchbox, 'nea');
@@ -173,7 +148,7 @@ describe('Testing address search bar', () => {
     for (let index = 0; index < allFields.length; index++) {
       const { name } = allFields[index];
       await waitFor(() => {
-        const formValues = getFormValues();
+        const formValues = getValues();
         expect(formValues.address[name]).toBe(addressValues[index] || '');
       });
     }
@@ -187,7 +162,7 @@ describe('Testing address search bar', () => {
       isLoading: false,
     });
 
-    await renderAddressSearchWithFormik();
+    await renderAddressSearchInForm();
 
     const searchbox = screen.getByRole('searchbox', { name: /search address/i });
     await user.type(searchbox, 'nea');
@@ -219,7 +194,7 @@ describe('Testing address search bar', () => {
       isLoading: false,
     });
 
-    await renderAddressSearchWithFormik();
+    await renderAddressSearchInForm();
 
     const searchbox = screen.getByRole('searchbox', { name: /search address/i }) as HTMLInputElement;
     await user.type(searchbox, 'nea');
@@ -245,7 +220,7 @@ describe('Testing address search bar', () => {
       isLoading: true,
     });
 
-    await renderAddressSearchWithFormik();
+    await renderAddressSearchInForm();
 
     const searchbox = screen.getByRole('searchbox', { name: /search address/i });
     await user.type(searchbox, 'nea');
@@ -261,7 +236,7 @@ describe('Testing address search bar', () => {
       isLoading: false,
     });
 
-    await renderAddressSearchWithFormik();
+    await renderAddressSearchInForm();
 
     const searchbox = screen.getByRole('searchbox', { name: /search address/i });
     await user.type(searchbox, 'nea');
@@ -277,7 +252,7 @@ describe('Testing address search bar', () => {
       isLoading: false,
     });
 
-    await renderAddressSearchWithFormik();
+    await renderAddressSearchInForm();
 
     const searchbox = screen.getByRole('searchbox', { name: /search address/i });
     await user.type(searchbox, 'nonexistent');
@@ -299,26 +274,20 @@ describe('Testing address search bar', () => {
     const formValuesRef = { ...initialFormValues, ...defaultValues } as FormValues;
     const mockResourcesContextValue = { addressTemplate: mockedAddressTemplate } as unknown as Resources;
 
-    await renderWithContext(
-      <Formik initialValues={defaultValues} onSubmit={onSubmit}>
-        <Form>
-          <PatientRegistrationContextProvider
-            value={{
-              identifierTypes: [],
-              values: formValuesRef,
-              inEditMode: false,
-              setFieldValue: vi.fn() as any,
-              setCapturePhotoProps: vi.fn(),
-              setFieldTouched: vi.fn().mockResolvedValue(undefined),
-              currentPhoto: '',
-              initialFormValues: formValuesRef,
-            }}>
-            <AddressSearchComponent addressLayout={allFields} />
-          </PatientRegistrationContextProvider>
-        </Form>
-      </Formik>,
-      ResourcesContextProvider,
-      mockResourcesContextValue,
+    await renderWithRegistrationForm(
+      <ResourcesContextProvider value={mockResourcesContextValue}>
+        <AddressSearchComponent addressLayout={allFields} />
+      </ResourcesContextProvider>,
+      {
+        initialValues: defaultValues,
+        onSubmit,
+        contextValues: {
+          values: formValuesRef,
+          setFieldValue: vi.fn() as any,
+          setFieldTouched: vi.fn().mockResolvedValue(undefined),
+          initialFormValues: formValuesRef,
+        },
+      },
     );
 
     const searchbox = screen.getByRole('searchbox', { name: /search address/i });

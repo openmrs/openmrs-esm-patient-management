@@ -1,13 +1,11 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
-import { Formik, Form } from 'formik';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { PhoneField } from './phone-field.component';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
-import { type FormValues } from '../../patient-registration.types';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
@@ -25,25 +23,14 @@ vi.mock('../person-attributes/person-attribute-field.component', () => ({
  * Helper to render PhoneField.
  */
 const renderPhoneField = () => {
-  return render(
-    <Formik initialValues={{}} onSubmit={() => {}}>
-      <Form>
-        <PatientRegistrationContextProvider
-          value={{
-            identifierTypes: [],
-            values: initialFormValues,
-            inEditMode: false,
-            setFieldValue: vi.fn().mockResolvedValue(undefined),
-            setCapturePhotoProps: vi.fn(),
-            setFieldTouched: vi.fn().mockResolvedValue(undefined),
-            currentPhoto: '',
-            initialFormValues: initialFormValues,
-          }}>
-          <PhoneField />
-        </PatientRegistrationContextProvider>
-      </Form>
-    </Formik>,
-  );
+  return renderWithRegistrationForm(<PhoneField />, {
+    contextValues: {
+      values: initialFormValues,
+      setFieldValue: vi.fn().mockResolvedValue(undefined),
+      setFieldTouched: vi.fn().mockResolvedValue(undefined),
+      initialFormValues: initialFormValues,
+    },
+  });
 };
 
 describe('PhoneField', () => {

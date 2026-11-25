@@ -38,9 +38,10 @@
     "url": "https://openmrs.atlassian.net/jira/software/c/projects/O3/boards/37"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
     "classnames": "^2.3.2",
-    "formik": "^2.1.5",
     "lodash-es": "^4.17.15",
+    "react-hook-form": "^7.54.0",
     "uuid": "^8.3.2",
     "zod": "^3.24.1"
   },

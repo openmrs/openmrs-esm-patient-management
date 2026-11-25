@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Field } from 'formik';
+import { Field } from '../../form-adapter';
 import { Layer, Select, SelectItem } from '@carbon/react';
 import { reportError } from '@openmrs/esm-framework';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';

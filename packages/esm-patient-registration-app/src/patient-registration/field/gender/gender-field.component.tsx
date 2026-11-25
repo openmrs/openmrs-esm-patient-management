@@ -1,7 +1,7 @@
 import React from 'react';
 import { RadioButton, RadioButtonGroup } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useField } from 'formik';
+import { useField } from '../../form-adapter';
 import { type RegistrationConfig } from '../../../config-schema';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';

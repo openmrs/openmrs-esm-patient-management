@@ -1,18 +1,14 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
-import { Form, Formik } from 'formik';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig, useLayoutType, isDesktop } from '@openmrs/esm-framework';
 import { mockPatient, mockSession } from '__mocks__';
-import { renderWithContext } from 'tools';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../config-schema';
-import {
-  PatientRegistrationContextProvider,
-  type PatientRegistrationContextProps,
-} from '../../patient-registration-context';
 import { ResourcesContextProvider } from '../../../resources-context';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import PatientIdentifierOverlay from './identifier-selection-overlay.component';
+import type { PatientRegistrationContextProps } from '../../patient-registration-context';
 import type { AddressTemplate, FormValues, PatientIdentifierType } from '../../patient-registration.types';
 import type { Resources } from '../../../registration.resource';
 
@@ -118,7 +114,7 @@ const mockContextValues: PatientRegistrationContextProps = {
 } as unknown as PatientRegistrationContextProps;
 
 /**
- * Helper to render PatientIdentifierOverlay with Formik.
+ * Helper to render PatientIdentifierOverlay in a registration form.
  */
 function renderIdentifierSelectionOverlay(
   contextValues: PatientRegistrationContextProps = mockContextValues,
@@ -127,16 +123,11 @@ function renderIdentifierSelectionOverlay(
   const mockSetFieldValue = vi.fn();
   const mockCloseOverlay = vi.fn();
 
-  const utils = renderWithContext(
-    <Formik initialValues={{}} onSubmit={() => {}}>
-      <Form>
-        <PatientRegistrationContextProvider value={contextValues}>
-          <PatientIdentifierOverlay setFieldValue={mockSetFieldValue} closeOverlay={mockCloseOverlay} />
-        </PatientRegistrationContextProvider>
-      </Form>
-    </Formik>,
-    ResourcesContextProvider,
-    resourcesContextValue,
+  const utils = renderWithRegistrationForm(
+    <ResourcesContextProvider value={resourcesContextValue}>
+      <PatientIdentifierOverlay setFieldValue={mockSetFieldValue} closeOverlay={mockCloseOverlay} />
+    </ResourcesContextProvider>,
+    { contextValues },
   );
 
   return {

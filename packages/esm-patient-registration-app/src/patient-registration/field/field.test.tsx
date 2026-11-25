@@ -1,16 +1,14 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
-import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../config-schema';
-import { type Resources } from '../../registration.resource';
-import type { AddressTemplate, FormValues } from '../patient-registration.types';
-import { PatientRegistrationContextProvider } from '../patient-registration-context';
+import { renderWithRegistrationForm } from '../../test-utils/render-with-registration-form';
 import { ResourcesContextProvider } from '../../resources-context';
-import { renderWithContext } from 'tools';
+import type { Resources } from '../../registration.resource';
+import type { AddressTemplate, FormValues } from '../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
@@ -128,16 +126,11 @@ describe('Field', () => {
       } as RegistrationConfig['fieldConfigurations'],
     });
 
-    renderWithContext(
-      <Formik initialValues={{}} onSubmit={vi.fn()}>
-        <Form>
-          <PatientRegistrationContextProvider value={initialContextValues}>
-            <Field name="name" />
-          </PatientRegistrationContextProvider>
-        </Form>
-      </Formik>,
-      ResourcesContextProvider,
-      mockResourcesContextValue,
+    renderWithRegistrationForm(
+      <ResourcesContextProvider value={mockResourcesContextValue}>
+        <Field name="name" />
+      </ResourcesContextProvider>,
+      { contextValues: initialContextValues },
     );
 
     expect(screen.getByText('Full Name')).toBeInTheDocument();
@@ -157,31 +150,21 @@ describe('Field', () => {
       } as unknown as RegistrationConfig['fieldConfigurations'],
     });
 
-    renderWithContext(
-      <Formik initialValues={{}} onSubmit={vi.fn()}>
-        <Form>
-          <PatientRegistrationContextProvider value={initialContextValues}>
-            <Field name="gender" />
-          </PatientRegistrationContextProvider>
-        </Form>
-      </Formik>,
-      ResourcesContextProvider,
-      mockResourcesContextValue,
+    renderWithRegistrationForm(
+      <ResourcesContextProvider value={mockResourcesContextValue}>
+        <Field name="gender" />
+      </ResourcesContextProvider>,
+      { contextValues: initialContextValues },
     );
     expect(screen.getByLabelText('Male')).toBeInTheDocument();
   });
 
   it('should render DobField component when name prop is "dob"', () => {
-    renderWithContext(
-      <Formik initialValues={{}} onSubmit={vi.fn()}>
-        <Form>
-          <PatientRegistrationContextProvider value={initialContextValues}>
-            <Field name="dob" />
-          </PatientRegistrationContextProvider>
-        </Form>
-      </Formik>,
-      ResourcesContextProvider,
-      mockResourcesContextValue,
+    renderWithRegistrationForm(
+      <ResourcesContextProvider value={mockResourcesContextValue}>
+        <Field name="dob" />
+      </ResourcesContextProvider>,
+      { contextValues: initialContextValues },
     );
 
     expect(screen.getByText('Birth')).toBeInTheDocument();
@@ -209,16 +192,11 @@ describe('Field', () => {
       } as RegistrationConfig['fieldConfigurations'],
     });
 
-    renderWithContext(
-      <Formik initialValues={{}} onSubmit={vi.fn()}>
-        <Form>
-          <PatientRegistrationContextProvider value={initialContextValues}>
-            <Field name="address" />
-          </PatientRegistrationContextProvider>
-        </Form>
-      </Formik>,
-      ResourcesContextProvider,
-      mockResourcesContextValue,
+    renderWithRegistrationForm(
+      <ResourcesContextProvider value={mockResourcesContextValue}>
+        <Field name="address" />
+      </ResourcesContextProvider>,
+      { contextValues: initialContextValues },
     );
 
     expect(screen.getByText('Address')).toBeInTheDocument();
@@ -284,16 +262,11 @@ describe('Field', () => {
       setFieldTouched: vi.fn(),
     };
 
-    renderWithContext(
-      <Formik initialValues={{}} onSubmit={vi.fn()}>
-        <Form>
-          <PatientRegistrationContextProvider value={updatedContextValues}>
-            <Field name="id" />
-          </PatientRegistrationContextProvider>
-        </Form>
-      </Formik>,
-      ResourcesContextProvider,
-      mockResourcesContextValue,
+    renderWithRegistrationForm(
+      <ResourcesContextProvider value={mockResourcesContextValue}>
+        <Field name="id" />
+      </ResourcesContextProvider>,
+      { contextValues: updatedContextValues },
     );
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
   });
@@ -356,21 +329,17 @@ describe('Field', () => {
         fieldConfigurations: { ...defaults.fieldConfigurations, identifier: { allowPreferredSelection } },
       });
 
-      renderWithContext(
-        <Formik initialValues={{}} onSubmit={vi.fn()}>
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                ...initialContextValues,
-                initialFormValues: { identifiers: {} } as FormValues,
-                values: { identifiers: {} } as FormValues,
-              }}>
-              <Field name="id" />
-            </PatientRegistrationContextProvider>
-          </Form>
-        </Formik>,
-        ResourcesContextProvider,
-        mockResourcesContextValue,
+      renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <Field name="id" />
+        </ResourcesContextProvider>,
+        {
+          contextValues: {
+            ...initialContextValues,
+            initialFormValues: { identifiers: {} } as FormValues,
+            values: { identifiers: {} } as FormValues,
+          },
+        },
       );
 
       const section = screen.getByTestId('identifiers-section');
@@ -393,14 +362,10 @@ describe('Field', () => {
     let error = null;
 
     try {
-      renderWithContext(
-        <Formik initialValues={{}} onSubmit={vi.fn()}>
-          <Form>
-            <Field name="invalidField" />
-          </Form>
-        </Formik>,
-        ResourcesContextProvider,
-        mockResourcesContextValue,
+      renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <Field name="invalidField" />
+        </ResourcesContextProvider>,
       );
     } catch (err) {
       error = err;

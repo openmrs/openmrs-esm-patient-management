@@ -1,15 +1,14 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { Form, Formik, type FormikTouched } from 'formik';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { OpenmrsDatePicker } from '@openmrs/esm-framework';
-import { type FieldDefinition } from '../../../config-schema';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { useConceptAnswers } from '../field.resource';
 import { PersonAttributeField } from './person-attribute-field.component';
-import { initialFormValues } from '../../patient-registration.component';
-import { type FormValues } from '../../patient-registration.types';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import type { FieldDefinition } from '../../../config-schema';
+import type { FormValues } from '../../patient-registration.types';
 
 vi.mock('./person-attributes.resource', async () => ({
   ...((await vi.importActual('./person-attributes.resource')) as object),
@@ -33,40 +32,20 @@ const mockPersonAttributeType = {
 };
 
 /**
- * Helper to render PersonAttributeField with Formik render props for state-dependent tests.
+ * Helper to render PersonAttributeField in a registration form for state-dependent tests.
  */
-const renderPersonAttributeFieldWithFormik = (
+const renderPersonAttributeFieldInForm = (
   fieldDefinition: FieldDefinition,
   initialValues: Partial<FormValues> = {},
-  options?: { enableReinitialize?: boolean },
 ) => {
   const defaultValues = {
     attributes: {},
     ...initialValues,
   };
 
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
-  let formTouchedRef: FormikTouched<FormValues> = {};
-
-  const utils = render(
-    <Formik initialValues={defaultValues} onSubmit={() => {}} enableReinitialize={options?.enableReinitialize}>
-      {({ setFieldValue, values, setFieldTouched, touched }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        formTouchedRef = touched;
-        return (
-          <Form>
-            <PersonAttributeField fieldDefinition={fieldDefinition} />
-          </Form>
-        );
-      }}
-    </Formik>,
-  );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-    getFormTouched: () => formTouchedRef,
-  };
+  return renderWithRegistrationForm(<PersonAttributeField fieldDefinition={fieldDefinition} />, {
+    initialValues: defaultValues,
+  });
 };
 
 describe('PersonAttributeField', () => {
@@ -94,7 +73,7 @@ describe('PersonAttributeField', () => {
         type: 'person attribute',
       };
 
-      renderPersonAttributeFieldWithFormik(fieldDefinition);
+      renderPersonAttributeFieldInForm(fieldDefinition);
 
       await screen.findByRole('heading', { name: /attribute/i });
       expect(screen.queryByLabelText(/referred by/i)).not.toBeInTheDocument();
@@ -115,7 +94,7 @@ describe('PersonAttributeField', () => {
         type: 'person attribute',
       };
 
-      renderPersonAttributeFieldWithFormik(fieldDefinition);
+      renderPersonAttributeFieldInForm(fieldDefinition);
 
       // Check for the specific error message text
       expect(screen.getByText(/Unable to fetch person attribute type/i)).toBeInTheDocument();
@@ -140,7 +119,7 @@ describe('PersonAttributeField', () => {
         showHeading: true,
       };
 
-      renderPersonAttributeFieldWithFormik(fieldDefinition);
+      renderPersonAttributeFieldInForm(fieldDefinition);
 
       // Check for the specific error message text
       expect(screen.getByText(/Patient attribute type has unknown format/i)).toBeInTheDocument();
@@ -162,7 +141,7 @@ describe('PersonAttributeField', () => {
         showHeading: true,
       };
 
-      renderPersonAttributeFieldWithFormik(fieldDefinition);
+      renderPersonAttributeFieldInForm(fieldDefinition);
 
       expect(screen.getByRole('heading', { name: /referred by/i })).toBeInTheDocument();
     });
@@ -180,7 +159,7 @@ describe('PersonAttributeField', () => {
         showHeading: false,
       };
 
-      renderPersonAttributeFieldWithFormik(fieldDefinition);
+      renderPersonAttributeFieldInForm(fieldDefinition);
 
       expect(screen.queryByRole('heading')).not.toBeInTheDocument();
     });
@@ -200,7 +179,7 @@ describe('PersonAttributeField', () => {
     };
 
     it('renders a text input field for String format', () => {
-      renderPersonAttributeFieldWithFormik(textFieldDefinition);
+      renderPersonAttributeFieldInForm(textFieldDefinition);
 
       const input = screen.getByRole('textbox', { name: /referred by/i });
       expect(input).toBeInTheDocument();
@@ -208,18 +187,18 @@ describe('PersonAttributeField', () => {
 
     it('allows user to enter text', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderPersonAttributeFieldWithFormik(textFieldDefinition);
+      const { getValues } = renderPersonAttributeFieldInForm(textFieldDefinition);
 
       const input = screen.getByRole('textbox', { name: /referred by/i }) as HTMLInputElement;
       await user.type(input, 'Dr. Smith');
 
       await waitFor(() => {
-        expect(getFormValues().attributes['4dd56a75-14ab-4148-8700-1f4f704dc5b0']).toBe('Dr. Smith');
+        expect(getValues().attributes['4dd56a75-14ab-4148-8700-1f4f704dc5b0']).toBe('Dr. Smith');
       });
     });
 
     it('renders as required when configured', () => {
-      renderPersonAttributeFieldWithFormik({
+      renderPersonAttributeFieldInForm({
         ...textFieldDefinition,
         validation: {
           matches: '',
@@ -232,7 +211,7 @@ describe('PersonAttributeField', () => {
     });
 
     it('renders as optional when not required', () => {
-      renderPersonAttributeFieldWithFormik(textFieldDefinition);
+      renderPersonAttributeFieldInForm(textFieldDefinition);
 
       const input = screen.getByRole('textbox', { name: /referred by/i });
       expect(input).not.toBeRequired();
@@ -271,7 +250,7 @@ describe('PersonAttributeField', () => {
     });
 
     it('renders a select field for Concept format', () => {
-      renderPersonAttributeFieldWithFormik(codedFieldDefinition);
+      renderPersonAttributeFieldInForm(codedFieldDefinition);
 
       const select = screen.getByRole('combobox', { name: /referred by/i });
       expect(select).toBeInTheDocument();
@@ -281,19 +260,19 @@ describe('PersonAttributeField', () => {
 
     it('allows user to select an option', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderPersonAttributeFieldWithFormik(codedFieldDefinition);
+      const { getValues } = renderPersonAttributeFieldInForm(codedFieldDefinition);
 
       const select = screen.getByRole('combobox', { name: /referred by/i }) as HTMLSelectElement;
       await user.selectOptions(select, '1');
 
       await waitFor(() => {
-        expect(getFormValues().attributes['4dd56a75-14ab-4148-8700-1f4f704dc5b0']).toBe('1');
+        expect(getValues().attributes['4dd56a75-14ab-4148-8700-1f4f704dc5b0']).toBe('1');
       });
       expect(select.value).toBe('1');
     });
 
     it('renders as required when configured', () => {
-      renderPersonAttributeFieldWithFormik({
+      renderPersonAttributeFieldInForm({
         ...codedFieldDefinition,
         validation: {
           matches: '',
@@ -306,7 +285,7 @@ describe('PersonAttributeField', () => {
     });
 
     it('renders as optional when not required', () => {
-      renderPersonAttributeFieldWithFormik(codedFieldDefinition);
+      renderPersonAttributeFieldInForm(codedFieldDefinition);
 
       const select = screen.getByRole('combobox', { name: /referred by/i });
       expect(select).not.toBeRequired();
@@ -331,30 +310,30 @@ describe('PersonAttributeField', () => {
     });
 
     it('saves the selected date in the YYYY-MM-DD format', async () => {
-      const { getFormValues } = renderPersonAttributeFieldWithFormik(dateFieldDefinition);
+      const { getValues } = renderPersonAttributeFieldInForm(dateFieldDefinition);
 
       fireEvent.change(screen.getByLabelText('Date of first visit'), { target: { value: '2026-09-20' } });
 
-      await waitFor(() => expect(getFormValues().attributes[uuid]).toBe('2026-09-20'));
+      await waitFor(() => expect(getValues().attributes[uuid]).toBe('2026-09-20'));
     });
 
     it('marks the field as touched when a date is selected', async () => {
-      const { getFormTouched } = renderPersonAttributeFieldWithFormik(dateFieldDefinition);
+      const { getTouched } = renderPersonAttributeFieldInForm(dateFieldDefinition);
 
       fireEvent.change(screen.getByLabelText('Date of first visit'), { target: { value: '2026-09-20' } });
 
-      await waitFor(() => expect(getFormTouched().attributes?.[uuid]).toBe(true));
+      await waitFor(() => expect(getTouched().attributes?.[uuid]).toBe(true));
     });
 
     it('renders a saved date', () => {
-      renderPersonAttributeFieldWithFormik(dateFieldDefinition, { attributes: { [uuid]: '2026-09-20' } });
+      renderPersonAttributeFieldInForm(dateFieldDefinition, { attributes: { [uuid]: '2026-09-20' } });
 
       expect(screen.getByLabelText('Date of first visit')).toHaveValue('20/09/2026');
     });
 
     it('does not allow future dates when allowFutureDates is false', () => {
       vi.mocked(OpenmrsDatePicker).mockClear();
-      renderPersonAttributeFieldWithFormik({ ...dateFieldDefinition, allowFutureDates: false });
+      renderPersonAttributeFieldInForm({ ...dateFieldDefinition, allowFutureDates: false });
 
       const props = vi.mocked(OpenmrsDatePicker).mock.calls.at(-1)[0];
       expect(props.maxDate).toBeInstanceOf(Date);

@@ -1,20 +1,16 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
-import { Formik, Form } from 'formik';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { mockedAddressTemplate, mockedOrderedFields, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
-import { renderWithContext } from 'tools';
-import { type AddressTemplate } from '../../patient-registration.types';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
-import { type Resources } from '../../../registration.resource';
-import {
-  PatientRegistrationContextProvider,
-  type PatientRegistrationContextProps,
-} from '../../patient-registration-context';
 import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
 import { ResourcesContextProvider } from '../../../resources-context';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import { AddressComponent } from './address-field.component';
+import type { AddressTemplate } from '../../patient-registration.types';
+import type { Resources } from '../../../registration.resource';
+import type { PatientRegistrationContextProps } from '../../patient-registration-context';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 const mockUseOrderedAddressHierarchyLevels = vi.mocked(useOrderedAddressHierarchyLevels);
@@ -70,22 +66,17 @@ vi.mock('./address-hierarchy.resource', async () => ({
 }));
 
 /**
- * Helper to render AddressComponent with Formik.
+ * Helper to render AddressComponent in a registration form.
  */
 async function renderAddressHierarchy(
   contextValues: PatientRegistrationContextProps,
   resourcesContextValue: Resources = mockResourcesContextValue,
 ) {
-  return await renderWithContext(
-    <PatientRegistrationContextProvider value={contextValues}>
-      <Formik initialValues={mockInitialFormValues} onSubmit={() => {}}>
-        <Form>
-          <AddressComponent />
-        </Form>
-      </Formik>
-    </PatientRegistrationContextProvider>,
-    ResourcesContextProvider,
-    resourcesContextValue,
+  return await renderWithRegistrationForm(
+    <ResourcesContextProvider value={resourcesContextValue}>
+      <AddressComponent />
+    </ResourcesContextProvider>,
+    { initialValues: mockInitialFormValues, contextValues },
   );
 }
 

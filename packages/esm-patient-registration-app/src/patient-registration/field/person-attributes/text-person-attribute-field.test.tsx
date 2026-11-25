@@ -1,14 +1,11 @@
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Form, Formik } from 'formik';
 import { createPatternRuleRegistry, PatternRulesProvider } from '../../validation/pattern-rules';
-import { getValidationSchema } from '../../validation/patient-registration-validation';
-import { validateRegistrationForm } from '../../validation/validate-registration-form';
-import { type RegistrationConfig } from '../../../config-schema';
-import { type FormValues } from '../../patient-registration.types';
 import { TextPersonAttributeField } from './text-person-attribute-field.component';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import type { RegistrationConfig } from '../../../config-schema';
 
 const validationConfig = {
   freeTextFieldConceptUuid: 'free-text-uuid',
@@ -27,7 +24,7 @@ const mockPersonAttributeType = {
 };
 
 /**
- * Helper to render TextPersonAttributeField with Formik for state-dependent tests.
+ * Helper to render TextPersonAttributeField in a validating registration form for state-dependent tests.
  */
 const renderTextPersonAttributeField = (
   props: {
@@ -36,38 +33,17 @@ const renderTextPersonAttributeField = (
     validationRegex?: string;
     required?: boolean;
   } = {},
-) => {
-  const registry = createPatternRuleRegistry();
-  const utils = render(
-    <PatternRulesProvider registry={registry}>
-      <Formik
-        initialValues={{}}
-        onSubmit={() => {}}
-        validate={(values) =>
-          validateRegistrationForm(
-            getValidationSchema(
-              validationConfig,
-              (_key: string, defaultValue: string) => defaultValue,
-              registry.getRules,
-            ),
-            values as FormValues,
-          )
-        }>
-        <Form>
-          <TextPersonAttributeField
-            id={props.id || 'attributeId'}
-            personAttributeType={mockPersonAttributeType}
-            label={props.label}
-            validationRegex={props.validationRegex}
-            required={props.required}
-          />
-        </Form>
-      </Formik>
-    </PatternRulesProvider>,
+) =>
+  renderWithRegistrationForm(
+    <TextPersonAttributeField
+      id={props.id || 'attributeId'}
+      personAttributeType={mockPersonAttributeType}
+      label={props.label}
+      validationRegex={props.validationRegex}
+      required={props.required}
+    />,
+    { withValidation: true, config: validationConfig },
   );
-
-  return utils;
-};
 
 describe('TextPersonAttributeField', () => {
   it('renders the input field with a label', () => {
@@ -85,17 +61,13 @@ describe('TextPersonAttributeField', () => {
   describe('Pattern rule', () => {
     it('registers the regex rule for the attribute', () => {
       const registry = createPatternRuleRegistry();
-      render(
+      renderWithRegistrationForm(
         <PatternRulesProvider registry={registry}>
-          <Formik initialValues={{}} onSubmit={() => {}}>
-            <Form>
-              <TextPersonAttributeField
-                id="attributeId"
-                personAttributeType={mockPersonAttributeType}
-                validationRegex="^[A-Z]+$"
-              />
-            </Form>
-          </Formik>
+          <TextPersonAttributeField
+            id="attributeId"
+            personAttributeType={mockPersonAttributeType}
+            validationRegex="^[A-Z]+$"
+          />
         </PatternRulesProvider>,
       );
 

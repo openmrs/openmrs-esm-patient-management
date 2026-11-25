@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { Field } from 'formik';
+import { Field } from '../../form-adapter';
 import { useTranslation } from 'react-i18next';
 import { Layer } from '@carbon/react';
 import { OpenmrsDatePicker } from '@openmrs/esm-framework';

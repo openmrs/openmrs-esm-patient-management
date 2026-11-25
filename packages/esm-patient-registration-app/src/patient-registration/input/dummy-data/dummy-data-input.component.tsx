@@ -6,7 +6,7 @@ import { type FormValues } from '../../patient-registration.types';
 import styles from './../input.scss';
 
 interface DummyDataInputProps {
-  setValues(values: FormValues, shouldValidate?: boolean): void;
+  setValues(values: FormValues): void;
 }
 
 export const dummyFormValues: FormValues = {

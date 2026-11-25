@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layer, Select, SelectItem } from '@carbon/react';
-import { useField } from 'formik';
+import { useField } from '../../../form-adapter';
 import { useTranslation } from 'react-i18next';
 
 interface SelectInputProps {

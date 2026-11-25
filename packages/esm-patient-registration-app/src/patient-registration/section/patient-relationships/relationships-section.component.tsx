@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
 import { ActionableNotification, Button, Layer, Select, SelectItem, SkeletonText } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
-import { FieldArray } from 'formik';
+import { useFieldArray, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { v4 } from 'uuid';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { fetchPerson } from '../../patient-registration.resource';
 import { useResourcesContext } from '../../../resources-context';
-import { type RelationshipValue } from '../../patient-registration.types';
+import { type FormValues, type RelationshipValue } from '../../patient-registration.types';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
 
@@ -22,7 +22,7 @@ interface RelationshipViewProps {
   relationship: RelationshipValue;
   index: number;
   displayRelationshipTypes: RelationshipType[];
-  remove: <T>(index: number) => T;
+  remove: (index: number) => void;
 }
 
 const RelationshipView: React.FC<RelationshipViewProps> = ({
@@ -153,6 +153,10 @@ export const RelationshipsSection = () => {
   const { relationshipTypes } = useResourcesContext();
   const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
   const { t } = useTranslation();
+  // The rows come from the form values: the rows change nested values with `setFieldValue`, which `fields` of
+  // `useFieldArray` does not follow. `useFieldArray` only adds and removes rows.
+  const relationships = useWatch<FormValues, 'relationships'>({ name: 'relationships' });
+  const { append, remove } = useFieldArray<FormValues, 'relationships'>({ name: 'relationships' });
 
   useEffect(() => {
     if (relationshipTypes) {
@@ -192,45 +196,38 @@ export const RelationshipsSection = () => {
 
   return (
     <section aria-label="Relationships section">
-      <FieldArray name="relationships">
-        {({
-          push,
-          remove,
-          form: {
-            values: { relationships },
-          },
-        }) => (
-          <div>
-            {relationships && relationships.length > 0
-              ? relationships.map((relationship: RelationshipValue, index) => {
-                  return (
-                    <div key={relationship.uuid ?? relationship.clientId} className={sectionStyles.formSection}>
-                      <RelationshipView
-                        relationship={relationship}
-                        index={index}
-                        displayRelationshipTypes={displayRelationshipTypes}
-                        remove={remove}
-                      />
-                    </div>
-                  );
-                })
-              : null}
-            <div className={styles.actions}>
-              <Button
-                kind="ghost"
-                onClick={() =>
-                  push({
-                    clientId: v4(),
-                    relatedPersonUuid: '',
-                    action: 'ADD',
-                  })
-                }>
-                {t('addRelationshipButtonText', 'Add Relationship')}
-              </Button>
-            </div>
-          </div>
-        )}
-      </FieldArray>
+      <div>
+        {relationships && relationships.length > 0
+          ? relationships.map((relationship: RelationshipValue, index) => {
+              return (
+                <div key={relationship.uuid ?? relationship.clientId} className={sectionStyles.formSection}>
+                  <RelationshipView
+                    relationship={relationship}
+                    index={index}
+                    displayRelationshipTypes={displayRelationshipTypes}
+                    remove={remove}
+                  />
+                </div>
+              );
+            })
+          : null}
+        <div className={styles.actions}>
+          <Button
+            kind="ghost"
+            onClick={() =>
+              append(
+                {
+                  clientId: v4(),
+                  relatedPersonUuid: '',
+                  action: 'ADD',
+                } as RelationshipValue,
+                { shouldFocus: false },
+              )
+            }>
+            {t('addRelationshipButtonText', 'Add Relationship')}
+          </Button>
+        </div>
+      </div>
     </section>
   );
 };

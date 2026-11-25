@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, Layer } from '@carbon/react';
-import { useField } from 'formik';
+import { useField } from '../../form-adapter';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { Field } from '../../field/field.component';
 import styles from './../section.scss';

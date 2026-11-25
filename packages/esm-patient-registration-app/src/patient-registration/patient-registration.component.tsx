@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { Button, InlineLoading, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Form, Formik, type FormikHelpers, type FormikErrors } from 'formik';
+import { FormProvider, type FieldPath, useForm, useFormContext, useFormState } from 'react-hook-form';
+import { isEqual } from 'lodash-es';
 import {
   createErrorHandler,
   interpolateUrl,
@@ -19,6 +20,9 @@ import { getValidationSchema } from './validation/patient-registration-validatio
 import { validateRegistrationForm } from './validation/validate-registration-form';
 import { createPatternRuleRegistry, PatternRulesProvider } from './validation/pattern-rules';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
+import { useFormHelpers, useRevalidateOnChange, useStableFormValues } from './form-adapter';
+import { getLeafPaths, removeUndefinedLeaves } from './form-values-utils';
+import { createRegistrationResolver } from './registration-resolver';
 import { PatientRegistrationContextProvider } from './patient-registration-context';
 import { useResourcesContext } from '../resources-context';
 import { SectionWrapper } from './section/section-wrapper.component';
@@ -42,13 +46,89 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
 const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatientForm }) => {
   const { t } = useTranslation();
-  const { currentSession, identifierTypes } = useResourcesContext();
   const { patientUuid: uuidOfPatientToEdit } = useParams();
-  const { search } = useLocation();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const config = useConfig<RegistrationConfig>();
 
   const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientToEdit, uuidOfPatientToEdit);
+
+  const patternRules = useRef(createPatternRuleRegistry()).current;
+  const validationSchema = useMemo(
+    () => getValidationSchema(config, t, patternRules.getRules),
+    [config, t, patternRules],
+  );
+
+  const form = useForm<FormValues>({
+    defaultValues: initialFormValues,
+    resolver: createRegistrationResolver(validationSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
+    // Formik does not move the focus on a failed submit.
+    shouldFocusError: false,
+  });
+  const { reset } = form;
+
+  // As Formik's `enableReinitialize`: new initial values reset the values, touched state and errors.
+  const previousInitialFormValues = useRef(initialFormValues);
+  useEffect(() => {
+    if (!isEqual(previousInitialFormValues.current, initialFormValues)) {
+      previousInitialFormValues.current = initialFormValues;
+      // `keepIsValid` keeps React Hook Form's mounted flag on if a later change reads `formState.isValid`; with the
+      // flag off, `getValues` returns the default values and `setValue` events carry no field name. The cost: such a
+      // reader sees a stale `isValid` after this reset until the next validation.
+      reset(initialFormValues, { keepIsValid: true });
+    }
+  }, [initialFormValues, reset]);
+
+  useEffect(() => {
+    exportedInitialFormValuesForTesting = initialFormValues;
+  }, [initialFormValues]);
+
+  return (
+    <FormProvider {...form}>
+      <PatientRegistrationFormContent
+        savePatientForm={savePatientForm}
+        uuidOfPatientToEdit={uuidOfPatientToEdit}
+        isLoadingPatientToEdit={isLoadingPatientToEdit}
+        patientToEdit={patientToEdit}
+        initialFormValues={initialFormValues}
+        setInitialFormValues={setInitialFormValues}
+        patternRules={patternRules}
+        validationSchema={validationSchema}
+      />
+    </FormProvider>
+  );
+};
+
+interface PatientRegistrationFormContentProps extends PatientRegistrationProps {
+  uuidOfPatientToEdit: string | undefined;
+  isLoadingPatientToEdit: boolean;
+  patientToEdit: ReturnType<typeof usePatient>['patient'];
+  initialFormValues: FormValues;
+  setInitialFormValues: ReturnType<typeof useInitialFormValues>[1];
+  patternRules: ReturnType<typeof createPatternRuleRegistry>;
+  validationSchema: ReturnType<typeof getValidationSchema>;
+}
+
+const PatientRegistrationFormContent: React.FC<PatientRegistrationFormContentProps> = ({
+  savePatientForm,
+  uuidOfPatientToEdit,
+  isLoadingPatientToEdit,
+  patientToEdit,
+  initialFormValues,
+  setInitialFormValues,
+  patternRules,
+  validationSchema,
+}) => {
+  const { t } = useTranslation();
+  const { currentSession, identifierTypes } = useResourcesContext();
+  const { search } = useLocation();
+  const config = useConfig<RegistrationConfig>();
+  const { control, getValues, setValue, trigger, handleSubmit, reset } = useFormContext<FormValues>();
+  const values = useStableFormValues();
+  const { touchedFields, isSubmitting } = useFormState({ control });
+  const revalidation = useRevalidateOnChange();
+  const { setFieldValue, setFieldTouched } = useFormHelpers();
 
   const [patientUuidMap] = usePatientUuidMap({}, patientToEdit, uuidOfPatientToEdit);
 
@@ -63,15 +143,6 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
   );
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
-  const patternRules = useRef(createPatternRuleRegistry()).current;
-  const validationSchema = useMemo(
-    () => getValidationSchema(config, t, patternRules.getRules),
-    [config, t, patternRules],
-  );
-
-  useEffect(() => {
-    exportedInitialFormValuesForTesting = initialFormValues;
-  }, [initialFormValues]);
 
   const sections: Array<SectionDefinition> = useMemo(() => {
     return config.sections
@@ -83,9 +154,15 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
       .filter((s) => s);
   }, [config.sections, config.sectionDefinitions]);
 
-  const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
-    helpers.setSubmitting(true);
-
+  const onFormSubmit = async (submittedValues: FormValues) => {
+    // React Hook Form keeps an `undefined` value for each field that was touched without a value. Formik left those
+    // keys out, and the save treats every `obs` key as an obs to post.
+    // Person attributes stay as they are: a saved attribute that loads without a value (for example a concept
+    // attribute whose concept is gone) keeps its key, as with Formik, so the save deletes it.
+    const values = {
+      ...removeUndefinedLeaves(submittedValues),
+      ...(submittedValues.attributes && { attributes: submittedValues.attributes }),
+    };
     const updatedFormValues = { ...values, identifiers: filterOutUndefinedPatientIdentifiers(values.identifiers) };
     try {
       await savePatientForm(
@@ -140,12 +217,10 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
       } else {
         createErrorHandler()(error);
       }
-
-      helpers.setSubmitting(false);
     }
   };
 
-  const getDescription = (errors: FormikErrors<FormValues>): React.JSX.Element => {
+  const getDescription = (errors: Record<string, unknown>): React.JSX.Element => {
     return (
       <ul style={{ listStyle: 'inside' }}>
         {Object.keys(errors).map((error, index) => {
@@ -155,7 +230,7 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
     );
   };
 
-  const displayErrors = (errors: FormikErrors<FormValues>): void => {
+  const displayErrors = (errors: Record<string, unknown>): void => {
     if (errors && typeof errors === 'object' && !!Object.keys(errors).length) {
       showSnackbar({
         isLowContrast: true,
@@ -166,90 +241,107 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
     }
   };
 
-  const createContextValue = useCallback(
-    (formikProps) => ({
-      identifierTypes,
-      values: formikProps.values,
-      inEditMode,
-      setFieldValue: formikProps.setFieldValue,
-      setFieldTouched: formikProps.setFieldTouched,
-      setCapturePhotoProps,
-      currentPhoto: photo?.imageSrc,
-      initialFormValues: formikProps.initialValues,
-      setInitialFormValues,
-    }),
-    [identifierTypes, inEditMode, setCapturePhotoProps, photo?.imageSrc, setInitialFormValues],
-  );
+  // As Formik's submit handler: mark every field touched, then validate and save. Native validation can block the
+  // submit event; the button's click handler still validates and lists the errors.
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    revalidation.pause();
+    try {
+      for (const path of getLeafPaths(getValues())) {
+        const fieldPath = path as FieldPath<FormValues>;
+        setValue(fieldPath, getValues(fieldPath), { shouldTouch: true });
+      }
+    } finally {
+      revalidation.resume();
+    }
+    // React Hook Form rethrows errors from the submit handler; Formik logged them.
+    return handleSubmit(onFormSubmit)(event).catch((reason) => {
+      console.warn('Warning: An unhandled error was caught from submitForm()', reason);
+    });
+  };
+
+  const setValues = (newValues: FormValues) => {
+    // Replaces all values and keeps the rest of the form state, as Formik's `setValues`.
+    reset(newValues, {
+      keepDefaultValues: true,
+      keepTouched: true,
+      keepErrors: true,
+      keepDirty: true,
+      keepIsSubmitted: true,
+      keepSubmitCount: true,
+    });
+    trigger();
+  };
+
+  const contextValue = {
+    identifierTypes,
+    values,
+    inEditMode,
+    setFieldValue,
+    setFieldTouched,
+    setCapturePhotoProps,
+    currentPhoto: photo?.imageSrc,
+    initialFormValues,
+    setInitialFormValues,
+  };
 
   return (
-    <Formik
-      enableReinitialize
-      initialValues={initialFormValues}
-      onSubmit={onFormSubmit}
-      validate={(values) => validateRegistrationForm(validationSchema, values)}>
-      {(props) => (
-        <Form className={styles.form}>
-          <BeforeSavePrompt when={Object.keys(props.touched).length > 0} redirect={target} />
-          <div className={styles.formContainer}>
-            {/* Navigation Sidebar */}
-            <div className={styles.stickyColumn}>
-              <h4>
-                {inEditMode
-                  ? t('editPatientDetails', 'Edit patient details')
-                  : t('createNewPatient', 'Create new patient')}
-              </h4>
-              {showDummyDataInput && <DummyDataInput setValues={props.setValues} />}
-              <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
-              {sections.map((section) => (
-                <div className={classNames(styles.space05, styles.touchTarget)} key={section.name}>
-                  <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
-                    <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
-                  </Link>
-                </div>
+    <form className={styles.form} onSubmit={onSubmit}>
+      <BeforeSavePrompt when={Object.keys(touchedFields).length > 0} redirect={target} />
+      <div className={styles.formContainer}>
+        {/* Navigation Sidebar */}
+        <div className={styles.stickyColumn}>
+          <h4>
+            {inEditMode ? t('editPatientDetails', 'Edit patient details') : t('createNewPatient', 'Create new patient')}
+          </h4>
+          {showDummyDataInput && <DummyDataInput setValues={setValues} />}
+          <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
+          {sections.map((section) => (
+            <div className={classNames(styles.space05, styles.touchTarget)} key={section.name}>
+              <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
+                <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
+              </Link>
+            </div>
+          ))}
+          <hr className={styles.divider} />
+          <Button
+            className={styles.submitButton}
+            type="submit"
+            onClick={async () => {
+              await trigger();
+              displayErrors(validateRegistrationForm(validationSchema, getValues()));
+            }}
+            // Current session and identifiers are required for patient registration.
+            // If currentSession or identifierTypes are not available, then the
+            // user should be blocked to register the patient.
+            disabled={!currentSession || !identifierTypes || isSubmitting}>
+            {isSubmitting ? (
+              <InlineLoading
+                className={styles.spinner}
+                description={`${t('submitting', 'Submitting')} ...`}
+                iconDescription="submitting"
+              />
+            ) : inEditMode ? (
+              t('updatePatient', 'Update patient')
+            ) : (
+              t('registerPatient', 'Register patient')
+            )}
+          </Button>
+          <Button className={styles.cancelButton} kind="secondary" onClick={cancelRegistration}>
+            {t('cancel', 'Cancel')}
+          </Button>
+        </div>
+        {/* Registration Form */}
+        <div className={styles.infoGrid}>
+          <PatientRegistrationContextProvider value={contextValue}>
+            <PatternRulesProvider registry={patternRules}>
+              {sections.map((section, index) => (
+                <SectionWrapper key={`registration-section-${section.id}`} sectionDefinition={section} index={index} />
               ))}
-              <hr className={styles.divider} />
-              <Button
-                className={styles.submitButton}
-                type="submit"
-                onClick={() => props.validateForm().then((errors) => displayErrors(errors))}
-                // Current session and identifiers are required for patient registration.
-                // If currentSession or identifierTypes are not available, then the
-                // user should be blocked to register the patient.
-                disabled={!currentSession || !identifierTypes || props.isSubmitting}>
-                {props.isSubmitting ? (
-                  <InlineLoading
-                    className={styles.spinner}
-                    description={`${t('submitting', 'Submitting')} ...`}
-                    iconDescription="submitting"
-                  />
-                ) : inEditMode ? (
-                  t('updatePatient', 'Update patient')
-                ) : (
-                  t('registerPatient', 'Register patient')
-                )}
-              </Button>
-              <Button className={styles.cancelButton} kind="secondary" onClick={cancelRegistration}>
-                {t('cancel', 'Cancel')}
-              </Button>
-            </div>
-            {/* Registration Form */}
-            <div className={styles.infoGrid}>
-              <PatientRegistrationContextProvider value={createContextValue(props)}>
-                <PatternRulesProvider registry={patternRules}>
-                  {sections.map((section, index) => (
-                    <SectionWrapper
-                      key={`registration-section-${section.id}`}
-                      sectionDefinition={section}
-                      index={index}
-                    />
-                  ))}
-                </PatternRulesProvider>
-              </PatientRegistrationContextProvider>
-            </div>
-          </div>
-        </Form>
-      )}
-    </Formik>
+            </PatternRulesProvider>
+          </PatientRegistrationContextProvider>
+        </div>
+      </div>
+    </form>
   );
 };
 

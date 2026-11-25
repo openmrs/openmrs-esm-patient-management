@@ -1,79 +1,27 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { Formik, Form } from 'formik';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import { initialFormValues } from '../../patient-registration.component';
-import { getValidationSchema } from '../../validation/patient-registration-validation';
-import { validateRegistrationForm } from '../../validation/validate-registration-form';
 import { GenderField } from './gender-field.component';
-import { type FormValues } from '../../patient-registration.types';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
+import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
- * Helper to render GenderField with Formik render props for state-dependent tests.
- * Returns the render result and a ref to access form values.
+ * Helper to render GenderField in a registration form for state-dependent tests.
  */
-const renderGenderFieldWithFormik = (
-  initialValues: Partial<FormValues> = {},
-  options?: { enableReinitialize?: boolean; withValidation?: boolean },
-) => {
-  const defaultValues = {
-    gender: '',
-    ...initialValues,
-  };
-
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
-  const config = mockUseConfig();
-  const validationSchema = options?.withValidation
-    ? getValidationSchema(config, (key: string, defaultValue: string) => defaultValue)
-    : null;
-
-  const utils = render(
-    <Formik
-      initialValues={defaultValues}
-      onSubmit={() => {}}
-      enableReinitialize={options?.enableReinitialize}
-      validate={
-        validationSchema ? (values) => validateRegistrationForm(validationSchema, values as FormValues) : undefined
-      }
-      validateOnChange={true}
-      validateOnBlur={true}>
-      {({ setFieldValue, values, setFieldTouched, errors, touched }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        return (
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                identifierTypes: [],
-                values: formValuesRef,
-                inEditMode: false,
-                setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: vi.fn(),
-                setFieldTouched: setFieldTouched as any,
-                currentPhoto: '',
-                initialFormValues: formValuesRef,
-              }}>
-              <GenderField />
-            </PatientRegistrationContextProvider>
-          </Form>
-        );
-      }}
-    </Formik>,
-  );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-  };
-};
+const renderGenderFieldInForm = (initialValues: Partial<FormValues> = {}, options?: { withValidation?: boolean }) =>
+  renderWithRegistrationForm(<GenderField />, {
+    initialValues: { gender: '', ...initialValues },
+    withValidation: options?.withValidation,
+  });
 
 /**
- * Helper to render GenderField with mocked Formik functions (for simple rendering tests).
+ * Helper to render GenderField with mocked form functions (for simple rendering tests).
  */
 const renderGenderField = (initialValues: Partial<FormValues> = {}) => {
   const defaultValues = {
@@ -81,25 +29,15 @@ const renderGenderField = (initialValues: Partial<FormValues> = {}) => {
     ...initialValues,
   };
 
-  return render(
-    <Formik initialValues={defaultValues} onSubmit={() => {}}>
-      <Form>
-        <PatientRegistrationContextProvider
-          value={{
-            identifierTypes: [],
-            values: { ...initialFormValues, ...defaultValues } as FormValues,
-            inEditMode: false,
-            setFieldValue: vi.fn().mockResolvedValue(undefined),
-            setCapturePhotoProps: vi.fn(),
-            setFieldTouched: vi.fn().mockResolvedValue(undefined),
-            currentPhoto: '',
-            initialFormValues: { ...initialFormValues, ...defaultValues } as FormValues,
-          }}>
-          <GenderField />
-        </PatientRegistrationContextProvider>
-      </Form>
-    </Formik>,
-  );
+  return renderWithRegistrationForm(<GenderField />, {
+    initialValues: defaultValues,
+    contextValues: {
+      values: { ...initialFormValues, ...defaultValues } as FormValues,
+      setFieldValue: vi.fn().mockResolvedValue(undefined),
+      setFieldTouched: vi.fn().mockResolvedValue(undefined),
+      initialFormValues: { ...initialFormValues, ...defaultValues } as FormValues,
+    },
+  });
 };
 
 describe('GenderField', () => {
@@ -150,7 +88,7 @@ describe('GenderField', () => {
   describe('Gender selection', () => {
     it('updates form value when user selects female', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderGenderFieldWithFormik({ gender: 'male' });
+      const { getValues } = renderGenderFieldInForm({ gender: 'male' });
 
       await user.click(screen.getByText(/female/i));
 
@@ -158,12 +96,12 @@ describe('GenderField', () => {
         expect(screen.getByLabelText(/female/i)).toBeChecked();
       });
       expect(screen.getByLabelText(/^male/i)).not.toBeChecked();
-      expect(getFormValues().gender).toBe('female');
+      expect(getValues().gender).toBe('female');
     });
 
     it('updates form value when user selects male', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderGenderFieldWithFormik({ gender: 'female' });
+      const { getValues } = renderGenderFieldInForm({ gender: 'female' });
 
       await user.click(screen.getByText(/^male/i));
 
@@ -171,24 +109,24 @@ describe('GenderField', () => {
         expect(screen.getByLabelText(/^male/i)).toBeChecked();
       });
       expect(screen.getByLabelText(/female/i)).not.toBeChecked();
-      expect(getFormValues().gender).toBe('male');
+      expect(getValues().gender).toBe('male');
     });
 
     it('updates form value when user selects other', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderGenderFieldWithFormik();
+      const { getValues } = renderGenderFieldInForm();
 
       await user.click(screen.getByText(/other/i));
 
       await waitFor(() => {
         expect(screen.getByLabelText(/other/i)).toBeChecked();
       });
-      expect(getFormValues().gender).toBe('other');
+      expect(getValues().gender).toBe('other');
     });
 
     it('updates form value when user selects unknown', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderGenderFieldWithFormik({ gender: 'male' });
+      const { getValues } = renderGenderFieldInForm({ gender: 'male' });
 
       await user.click(screen.getByText(/unknown/i));
 
@@ -196,11 +134,11 @@ describe('GenderField', () => {
         expect(screen.getByLabelText(/unknown/i)).toBeChecked();
       });
       expect(screen.getByLabelText(/^male/i)).not.toBeChecked();
-      expect(getFormValues().gender).toBe('unknown');
+      expect(getValues().gender).toBe('unknown');
     });
 
     it('displays the initial gender value correctly', () => {
-      renderGenderFieldWithFormik({ gender: 'female' });
+      renderGenderFieldInForm({ gender: 'female' });
 
       expect(screen.getByLabelText(/female/i)).toBeChecked();
       expect(screen.getByLabelText(/^male/i)).not.toBeChecked();
@@ -208,44 +146,44 @@ describe('GenderField', () => {
 
     it('allows switching between all gender options', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderGenderFieldWithFormik();
+      const { getValues } = renderGenderFieldInForm();
 
       // Select male
       await user.click(screen.getByText(/^male/i));
       await waitFor(() => {
-        expect(getFormValues().gender).toBe('male');
+        expect(getValues().gender).toBe('male');
       });
 
       // Switch to female
       await user.click(screen.getByText(/female/i));
       await waitFor(() => {
-        expect(getFormValues().gender).toBe('female');
+        expect(getValues().gender).toBe('female');
       });
 
       // Switch to other
       await user.click(screen.getByText(/other/i));
       await waitFor(() => {
-        expect(getFormValues().gender).toBe('other');
+        expect(getValues().gender).toBe('other');
       });
 
       // Switch to unknown
       await user.click(screen.getByText(/unknown/i));
       await waitFor(() => {
-        expect(getFormValues().gender).toBe('unknown');
+        expect(getValues().gender).toBe('unknown');
       });
     });
   });
 
   describe('Validation error display', () => {
     it('does not show error when field is not touched', () => {
-      renderGenderFieldWithFormik({ gender: '' }, { withValidation: true });
+      renderGenderFieldInForm({ gender: '' }, { withValidation: true });
 
       expect(screen.queryByText(/gender is required/i)).not.toBeInTheDocument();
     });
 
     it('shows error message when user selects a gender and then form is validated', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderGenderFieldWithFormik({ gender: '' }, { withValidation: true });
+      const { getValues } = renderGenderFieldInForm({ gender: '' }, { withValidation: true });
 
       // Initially no error (field not touched)
       expect(screen.queryByText(/gender is required/i)).not.toBeInTheDocument();
@@ -254,7 +192,7 @@ describe('GenderField', () => {
       await user.click(screen.getByText(/^male/i));
 
       await waitFor(() => {
-        expect(getFormValues().gender).toBe('male');
+        expect(getValues().gender).toBe('male');
       });
 
       // After valid selection, no error should appear (user-visible)
@@ -264,7 +202,7 @@ describe('GenderField', () => {
 
     it('clears error message when valid gender is selected', async () => {
       const user = userEvent.setup();
-      renderGenderFieldWithFormik({ gender: '' }, { withValidation: true });
+      renderGenderFieldInForm({ gender: '' }, { withValidation: true });
 
       // Initially no error (field not touched)
       expect(screen.queryByText(/gender is required/i)).not.toBeInTheDocument();

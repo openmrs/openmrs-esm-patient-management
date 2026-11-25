@@ -1,8 +1,8 @@
 import { createContext, type SetStateAction, useContext } from 'react';
-import type { FormikHelpers } from 'formik';
 import { type PatientIdentifierType, useConfig } from '@openmrs/esm-framework';
 import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { type RegistrationConfig } from '../config-schema';
+import { type FormHelpers } from './form-adapter';
 
 export interface PatientRegistrationContextProps {
   currentPhoto: string;
@@ -10,8 +10,8 @@ export interface PatientRegistrationContextProps {
   inEditMode: boolean;
   initialFormValues: FormValues;
   setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
-  setFieldTouched: FormikHelpers<FormValues>['setFieldTouched'];
-  setFieldValue: FormikHelpers<FormValues>['setFieldValue'];
+  setFieldTouched: FormHelpers['setFieldTouched'];
+  setFieldValue: FormHelpers['setFieldValue'];
   setInitialFormValues?: React.Dispatch<SetStateAction<FormValues>>;
   values: FormValues;
 }

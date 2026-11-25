@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, TextInput } from '@carbon/react';
-import { useField } from 'formik';
+import { useField } from '../../../form-adapter';
 
 export type TextInputProps = React.ComponentProps<typeof TextInput>;
 

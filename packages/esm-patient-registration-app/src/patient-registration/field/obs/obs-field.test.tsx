@@ -1,18 +1,14 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { Formik, Form } from 'formik';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { ObsField } from './obs-field.component';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
-import { initialFormValues } from '../../patient-registration.component';
-import { type FormValues } from '../../patient-registration.types';
 import { createPatternRuleRegistry, PatternRulesProvider } from '../../validation/pattern-rules';
-import { getValidationSchema } from '../../validation/patient-registration-validation';
-import { validateRegistrationForm } from '../../validation/validate-registration-form';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import type { FormValues } from '../../patient-registration.types';
 
 const validationConfig = {
   freeTextFieldConceptUuid: 'free-text-uuid',
@@ -165,65 +161,19 @@ const codedFieldDef: FieldDefinition = {
 };
 
 /**
- * Helper to render ObsField with Formik render props for state-dependent tests.
+ * Helper to render ObsField in a validating registration form for state-dependent tests.
  */
-const renderObsFieldWithFormik = (
-  fieldDefinition: FieldDefinition,
-  initialValues: Partial<FormValues> = {},
-  options?: { enableReinitialize?: boolean },
-) => {
+const renderObsFieldInForm = (fieldDefinition: FieldDefinition, initialValues: Partial<FormValues> = {}) => {
   const defaultValues = {
     obs: {},
     ...initialValues,
   };
 
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
-
-  const registry = createPatternRuleRegistry();
-  const utils = render(
-    <PatternRulesProvider registry={registry}>
-      <Formik
-        initialValues={defaultValues}
-        onSubmit={() => {}}
-        enableReinitialize={options?.enableReinitialize}
-        validate={(values) =>
-          validateRegistrationForm(
-            getValidationSchema(
-              validationConfig,
-              (_key: string, defaultValue: string) => defaultValue,
-              registry.getRules,
-            ),
-            values as FormValues,
-          )
-        }>
-        {({ setFieldValue, values, setFieldTouched }) => {
-          formValuesRef = { ...initialFormValues, ...values } as FormValues;
-          return (
-            <Form>
-              <PatientRegistrationContextProvider
-                value={{
-                  identifierTypes: [],
-                  values: formValuesRef,
-                  inEditMode: false,
-                  setFieldValue: setFieldValue as any,
-                  setCapturePhotoProps: vi.fn(),
-                  setFieldTouched: setFieldTouched as any,
-                  currentPhoto: '',
-                  initialFormValues: formValuesRef,
-                }}>
-                <ObsField fieldDefinition={fieldDefinition} />
-              </PatientRegistrationContextProvider>
-            </Form>
-          );
-        }}
-      </Formik>
-    </PatternRulesProvider>,
-  );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-  };
+  return renderWithRegistrationForm(<ObsField fieldDefinition={fieldDefinition} />, {
+    initialValues: defaultValues,
+    withValidation: true,
+    config: validationConfig as unknown as RegistrationConfig,
+  });
 };
 
 describe('ObsField', () => {
@@ -273,14 +223,11 @@ describe('ObsField', () => {
   describe('Text obs field', () => {
     it('registers the regex rule for a text obs field', async () => {
       const registry = createPatternRuleRegistry();
-      render(
+      renderWithRegistrationForm(
         <PatternRulesProvider registry={registry}>
-          <Formik initialValues={{ obs: {} }} onSubmit={() => {}}>
-            <Form>
-              <ObsField fieldDefinition={{ ...textFieldDef, validation: { required: false, matches: '^[A-Z]+$' } }} />
-            </Form>
-          </Formik>
+          <ObsField fieldDefinition={{ ...textFieldDef, validation: { required: false, matches: '^[A-Z]+$' } }} />
         </PatternRulesProvider>,
+        { initialValues: { obs: {} } },
       );
 
       await screen.findByRole('textbox', { name: /chief complaint/i });
@@ -295,26 +242,26 @@ describe('ObsField', () => {
     });
 
     it('renders a text input for text concept', () => {
-      renderObsFieldWithFormik(textFieldDef);
+      renderObsFieldInForm(textFieldDef);
 
       expect(screen.getByRole('textbox', { name: /chief complaint/i })).toBeInTheDocument();
     });
 
     it('allows user to enter text', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderObsFieldWithFormik(textFieldDef);
+      const { getValues } = renderObsFieldInForm(textFieldDef);
 
       const textInput = screen.getByRole('textbox', { name: /chief complaint/i }) as HTMLInputElement;
       await user.type(textInput, 'Patient has fever');
 
       await waitFor(() => {
-        expect(getFormValues().obs['chief-complaint-uuid']).toBe('Patient has fever');
+        expect(getValues().obs['chief-complaint-uuid']).toBe('Patient has fever');
       });
     });
 
     it('validates input against regex pattern', async () => {
       const user = userEvent.setup();
-      renderObsFieldWithFormik({
+      renderObsFieldInForm({
         ...textFieldDef,
         validation: {
           required: false,
@@ -333,7 +280,7 @@ describe('ObsField', () => {
 
     it('does not show error for valid input matching regex', async () => {
       const user = userEvent.setup();
-      renderObsFieldWithFormik({
+      renderObsFieldInForm({
         ...textFieldDef,
         validation: {
           required: false,
@@ -351,7 +298,7 @@ describe('ObsField', () => {
     });
 
     it('renders as required when configured', () => {
-      renderObsFieldWithFormik({
+      renderObsFieldInForm({
         ...textFieldDef,
         validation: {
           required: true,
@@ -364,7 +311,7 @@ describe('ObsField', () => {
     });
 
     it('renders as optional when not required', () => {
-      renderObsFieldWithFormik(textFieldDef);
+      renderObsFieldInForm(textFieldDef);
 
       const textInput = screen.getByRole('textbox', { name: /chief complaint/i });
       expect(textInput).not.toBeRequired();
@@ -373,28 +320,28 @@ describe('ObsField', () => {
 
   describe('Numeric obs field', () => {
     it('renders a number input for numeric concept', () => {
-      renderObsFieldWithFormik(numberFieldDef);
+      renderObsFieldInForm(numberFieldDef);
 
       expect(screen.getByRole('spinbutton', { name: /weight/i })).toBeInTheDocument();
     });
 
     it('allows user to enter numeric value', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderObsFieldWithFormik(numberFieldDef);
+      const { getValues } = renderObsFieldInForm(numberFieldDef);
 
       const numberInput = screen.getByRole('spinbutton', { name: /weight/i }) as HTMLInputElement;
       await user.type(numberInput, '75');
 
       await waitFor(() => {
         // Numeric inputs can store values as numbers or strings depending on Formik behavior
-        const value = getFormValues().obs['weight-uuid'];
+        const value = getValues().obs['weight-uuid'];
         const stringValue = String(value);
         expect(stringValue === '75' || Number(value) === 75).toBe(true);
       });
     });
 
     it('renders as required when configured', () => {
-      renderObsFieldWithFormik({
+      renderObsFieldInForm({
         ...numberFieldDef,
         validation: {
           required: true,
@@ -409,13 +356,13 @@ describe('ObsField', () => {
 
   describe('Date obs field', () => {
     it('renders a date picker for date concept', () => {
-      renderObsFieldWithFormik(dateFieldDef);
+      renderObsFieldInForm(dateFieldDef);
 
       expect(screen.getByLabelText(/vaccination date/i)).toBeInTheDocument();
     });
 
     it('allows user to enter date', async () => {
-      const { getFormValues } = renderObsFieldWithFormik(dateFieldDef);
+      const { getValues } = renderObsFieldInForm(dateFieldDef);
 
       const dateInput = screen.getByLabelText(/vaccination date/i) as HTMLInputElement;
       const dateString = '2020-01-15';
@@ -424,12 +371,12 @@ describe('ObsField', () => {
       fireEvent.blur(dateInput);
 
       await waitFor(() => {
-        expect(getFormValues().obs['vaccination-date-uuid']).toBeTruthy();
+        expect(getValues().obs['vaccination-date-uuid']).toBeTruthy();
       });
     });
 
     it('renders as required when configured', () => {
-      renderObsFieldWithFormik({
+      renderObsFieldInForm({
         ...dateFieldDef,
         validation: {
           required: true,
@@ -445,7 +392,7 @@ describe('ObsField', () => {
 
   describe('Coded obs field', () => {
     it('renders a select for a coded concept', () => {
-      renderObsFieldWithFormik(codedFieldDef);
+      renderObsFieldInForm(codedFieldDef);
 
       expect(screen.getByRole('combobox', { name: 'Nationality' })).toBeInTheDocument();
       expect(screen.getByRole('option', { name: 'USA' })).toBeInTheDocument();
@@ -454,19 +401,19 @@ describe('ObsField', () => {
 
     it('allows user to select an option', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderObsFieldWithFormik(codedFieldDef);
+      const { getValues } = renderObsFieldInForm(codedFieldDef);
 
       const select = screen.getByRole('combobox', { name: 'Nationality' }) as HTMLSelectElement;
       await user.selectOptions(select, 'usa');
 
       await waitFor(() => {
-        expect(getFormValues().obs['nationality-uuid']).toBe('usa');
+        expect(getValues().obs['nationality-uuid']).toBe('usa');
       });
       expect(select.value).toBe('usa');
     });
 
     it('uses answerConceptSetUuid for answers when provided', () => {
-      renderObsFieldWithFormik({
+      renderObsFieldInForm({
         ...codedFieldDef,
         answerConceptSetUuid: 'other-countries-uuid',
       });
@@ -479,7 +426,7 @@ describe('ObsField', () => {
     });
 
     it('uses customConceptAnswers when provided', () => {
-      renderObsFieldWithFormik({
+      renderObsFieldInForm({
         ...codedFieldDef,
         customConceptAnswers: [
           {
@@ -495,7 +442,7 @@ describe('ObsField', () => {
     });
 
     it('renders as required when configured', () => {
-      renderObsFieldWithFormik({
+      renderObsFieldInForm({
         ...codedFieldDef,
         validation: {
           required: true,
@@ -521,7 +468,7 @@ describe('ObsField', () => {
         isLoading: false,
       });
 
-      renderObsFieldWithFormik({
+      renderObsFieldInForm({
         ...textFieldDef,
         uuid: 'unknown-uuid',
       });
