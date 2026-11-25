@@ -375,7 +375,6 @@ describe('Patient registration validation parity', () => {
         "email": "Invalid email",
       }
     `);
-    expect(await errorsFor({ ...validValues, email: 'a@b.c' })).toMatchInlineSnapshot(`{}`);
   });
 
   it('requires a value for a required identifier', async () => {

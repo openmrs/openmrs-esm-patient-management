@@ -25,12 +25,6 @@ export const SCHEMA_ERROR_KEY_ORDER = [
   'relationships',
 ] as const;
 
-// Copied from Yup 0.29 (`lib/string.js`) so that the same addresses are accepted as before.
-/* eslint-disable no-control-regex */
-const rEmail =
-  /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i;
-/* eslint-enable no-control-regex */
-
 const deathTimePattern = /^(1[0-2]|0?[1-9]):([0-5]?[0-9])$/;
 
 const optionalString = z.string().optional().nullable();
@@ -85,12 +79,7 @@ export function getValidationSchema(
       deathTimeFormat: optionalString,
       deathCause: optionalString,
       nonCodedCauseOfDeath: optionalString,
-      // Like Yup's `email()`, an empty string is not checked.
-      email: z
-        .string()
-        .refine((value) => value === '' || rEmail.test(value), t('invalidEmail', 'Invalid email'))
-        .optional()
-        .nullable(),
+      email: z.string().email(t('invalidEmail', 'Invalid email')).optional().nullable(),
       identifiers: z
         .record(z.object({ identifierValue: optionalString, initialValue: optionalString }).passthrough())
         .optional()
