@@ -8,7 +8,7 @@ import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { useParams } from 'react-router-dom';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
@@ -90,6 +90,43 @@ vi.mock('./field/field.resource', () => ({
     }
   }),
 }));
+
+const personAttributeTypeGate = vi.hoisted(() => {
+  let released = false;
+  const listeners = new Set<() => void>();
+  return {
+    isReleased: () => released,
+    subscribe: (listener: () => void) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    release: () => {
+      released = true;
+      listeners.forEach((listener) => listener());
+    },
+    reset: () => {
+      released = false;
+    },
+  };
+});
+
+vi.mock('./field/person-attributes/person-attributes.resource', async () => {
+  const { useSyncExternalStore } = await import('react');
+  return {
+    // Like the real hook, the type is not available on the first render. Tests make it available with
+    // `personAttributeTypeGate.release()`.
+    usePersonAttributeType: () => {
+      const released = useSyncExternalStore(personAttributeTypeGate.subscribe, personAttributeTypeGate.isReleased);
+      return released
+        ? {
+            data: { uuid: 'nickname-uuid', display: 'Nickname', format: 'java.lang.String' },
+            isLoading: false,
+            error: null,
+          }
+        : { data: undefined, isLoading: true, error: null };
+    },
+  };
+});
 
 vi.mock('react-router-dom', async () => ({
   ...((await vi.importActual('react-router-dom')) as object),
@@ -283,7 +320,10 @@ const fillRequiredFields = async () => {
   await user.click(genderInput);
 };
 
-const renderWithOptionalPreferredSsn = (savePatientForm: SavePatientForm = vi.fn()) => {
+const renderWithOptionalPreferredSsn = (
+  savePatientForm: SavePatientForm = vi.fn(),
+  ssnFormat: { format: string; formatDescription: string } = { format: null, formatDescription: null },
+) => {
   const defaultConfig = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
   mockUseConfig.mockReturnValue({
     ...defaultConfig,
@@ -306,8 +346,7 @@ const renderWithOptionalPreferredSsn = (savePatientForm: SavePatientForm = vi.fn
         uuid: 'ssn-uuid',
         name: 'SSN',
         fieldName: 'ssn',
-        format: null,
-        formatDescription: null,
+        ...ssnFormat,
         isPrimary: false,
         required: false,
         uniquenessBehavior: null,
@@ -319,6 +358,7 @@ const renderWithOptionalPreferredSsn = (savePatientForm: SavePatientForm = vi.fn
 
 describe('Registering a new patient', () => {
   beforeEach(() => {
+    personAttributeTypeGate.reset();
     mockUseConfig.mockReturnValue({
       ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       ...mockOpenmrsConfig,
@@ -406,6 +446,93 @@ describe('Registering a new patient', () => {
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 
+  it('lists the fields with errors in a fixed order when an empty form is submitted', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    await screen.findByRole('heading', { name: /create new patient/i });
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    await waitFor(() => expect(mockShowSnackbar).toHaveBeenCalled());
+    const { subtitle } = mockShowSnackbar.mock.calls.at(-1)[0];
+    render(<>{subtitle}</>);
+    expect(screen.getAllByRole('listitem').map((li) => li.textContent)).toMatchInlineSnapshot(`
+      [
+        "givenName",
+        "familyName",
+        "gender",
+        "birthdate",
+      ]
+    `);
+  });
+
+  it('lists pattern errors in form order with schema errors', async () => {
+    const user = userEvent.setup();
+    const defaultConfig = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+    mockUseConfig.mockReturnValue({
+      ...defaultConfig,
+      ...mockOpenmrsConfig,
+      sectionDefinitions: [
+        { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob', 'nickname', 'id'] },
+        { id: 'contact', name: 'Contact Info', fields: ['address'] },
+      ],
+      fieldDefinitions: [
+        {
+          id: 'nickname',
+          type: 'person attribute',
+          label: 'Nickname',
+          uuid: 'nickname-uuid',
+          placeholder: '',
+          validation: { required: false, matches: '^\\d+$' },
+          answerConceptSetUuid: null,
+          customConceptAnswers: [],
+        },
+      ],
+      defaultPatientIdentifierTypes: ['ssn-uuid'],
+    } as RegistrationConfig);
+    renderWithContext(<PatientRegistration savePatientForm={vi.fn()} />, ResourcesContextProvider, {
+      ...mockResourcesContextValue,
+      identifierTypes: [
+        {
+          uuid: 'ssn-uuid',
+          name: 'SSN',
+          fieldName: 'ssn',
+          format: '^A-\\d+$',
+          formatDescription: 'SSN must look like A-123',
+          isPrimary: false,
+          required: false,
+          uniquenessBehavior: null,
+          identifierSources: [],
+        },
+      ],
+    });
+
+    // The nickname is placed before the identifier in the form but loads after it, so it registers its pattern
+    // rule later.
+    await user.type(await screen.findByRole('textbox', { name: /ssn/i }), 'B');
+    act(() => personAttributeTypeGate.release());
+    await user.type(await screen.findByRole('textbox', { name: /nickname/i }), 'abc');
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    await waitFor(() => expect(mockShowSnackbar).toHaveBeenCalled());
+    const { subtitle } = mockShowSnackbar.mock.calls.at(-1)[0];
+    render(<>{subtitle}</>);
+    expect(screen.getAllByRole('listitem').map((li) => li.textContent)).toEqual([
+      'attributes',
+      'identifiers',
+      'givenName',
+      'familyName',
+      'gender',
+      'birthdate',
+    ]);
+  });
+
   it('shows the missing-value error as soon as an empty identifier is marked as preferred', async () => {
     const user = userEvent.setup();
     renderWithOptionalPreferredSsn();
@@ -435,6 +562,22 @@ describe('Registering a new patient', () => {
     expect(screen.queryByRole('textbox', { name: /ssn \(optional\)/i })).not.toBeInTheDocument();
     expect(await screen.findByText('Identifier value is required')).toBeInTheDocument();
     expect(ssnInput).toHaveAttribute('aria-invalid', 'true');
+    expect(mockSavePatientForm).not.toHaveBeenCalled();
+  });
+
+  it('shows the identifier format error after submit', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+    renderWithOptionalPreferredSsn(mockSavePatientForm, {
+      format: '^A-\\d+$',
+      formatDescription: 'SSN must look like A-123',
+    });
+
+    await fillRequiredFields();
+    await user.type(await screen.findByRole('textbox', { name: /ssn/i }), 'B');
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    expect(await screen.findByText('SSN must look like A-123')).toBeInTheDocument();
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 
