@@ -110,6 +110,21 @@ describe('usePatientListMembers', () => {
     expect(result.current.listMembers).toHaveLength(149);
   });
 
+  it('returns an error in the response body of a later page', async () => {
+    const error = { message: 'Server error' };
+    const servePage = mockOpenmrsFetch.getMockImplementation();
+    mockOpenmrsFetch.mockImplementation((url: string) =>
+      url.includes('startIndex=')
+        ? Promise.resolve({ data: { results: [], error } } as unknown as Awaited<ReturnType<typeof openmrsFetch>>)
+        : servePage(url),
+    );
+    const { result } = setup()();
+
+    await waitFor(() => expect(result.current.error).toBe(error));
+
+    expect(result.current.listMembers).toEqual([]);
+  });
+
   it('stops loading and returns the error when a later page fails', async () => {
     failLaterPages = true;
     const { result } = setup()();
