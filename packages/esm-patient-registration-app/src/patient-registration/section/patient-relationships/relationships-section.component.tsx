@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
-import { ActionableNotification, Button, Layer, Select, SelectItem, SkeletonText } from '@carbon/react';
-import { TrashCan } from '@carbon/react/icons';
 import { useFieldArray, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { v4 } from 'uuid';
+import { ActionableNotification, Button, Layer, Select, SelectItem, SkeletonText } from '@carbon/react';
+import { TrashCan } from '@carbon/react/icons';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
-import { usePatientRegistrationContext } from '../../patient-registration-context';
+import { useFormHelpers } from '../../form-adapter';
 import { fetchPerson } from '../../patient-registration.resource';
 import { useResourcesContext } from '../../../resources-context';
-import { type FormValues, type RelationshipValue } from '../../patient-registration.types';
+import type { FormValues, RelationshipValue } from '../../patient-registration.types';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
 
@@ -32,7 +32,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
   remove,
 }) => {
   const { t } = useTranslation();
-  const { setFieldValue } = usePatientRegistrationContext();
+  const { setFieldValue } = useFormHelpers();
   const [isInvalid, setIsInvalid] = useState(false);
   const newRelationship = !relationship.uuid;
   const selectId = useId();

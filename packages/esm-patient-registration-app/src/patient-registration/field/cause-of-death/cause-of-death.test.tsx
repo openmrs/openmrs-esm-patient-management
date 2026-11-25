@@ -1,5 +1,6 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { useFormState } from 'react-hook-form';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
@@ -7,6 +8,7 @@ import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../
 import { useConceptAnswers } from '../field.resource';
 import { CauseOfDeathField } from './cause-of-death.component';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import { useFormHelpers } from '../../form-adapter';
 import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
@@ -35,6 +37,51 @@ const renderCauseOfDeathFieldInForm = (initialValues: Partial<FormValues> = {}) 
 
   return renderWithRegistrationForm(<CauseOfDeathField />, { initialValues: defaultValues });
 };
+
+/** Touches or sets the cause of death fields on click through the form helpers, as the submit does. */
+const OutsideButtons: React.FC = () => {
+  const { setFieldTouched, setFieldValue } = useFormHelpers();
+  return (
+    <>
+      <button type="button" onClick={() => setFieldTouched('deathCause', true)}>
+        Touch cause
+      </button>
+      <button type="button" onClick={() => setFieldTouched('nonCodedCauseOfDeath', true)}>
+        Touch non-coded cause
+      </button>
+      <button type="button" onClick={() => setFieldValue('deathCause', 'pneumonia-uuid')}>
+        Set cause
+      </button>
+      <button type="button" onClick={() => setFieldValue('deathTime', '10:30')}>
+        Change another field
+      </button>
+    </>
+  );
+};
+
+/** Lists the cause of death fields that have an error in form state. */
+const ErrorProbe: React.FC = () => {
+  const { errors } = useFormState<FormValues>();
+  const withErrors = ['deathCause', 'nonCodedCauseOfDeath'].filter((name) => errors[name]);
+  return <output aria-label="Fields with errors">{withErrors.join(',')}</output>;
+};
+
+const renderWithValidation = (initialValues: Partial<FormValues>) =>
+  renderWithRegistrationForm(
+    <>
+      <CauseOfDeathField />
+      <OutsideButtons />
+      <ErrorProbe />
+    </>,
+    {
+      initialValues: { deathCause: '', nonCodedCauseOfDeath: '', ...initialValues },
+      withValidation: true,
+      config: {
+        ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+        freeTextFieldConceptUuid: 'other-uuid',
+      } as RegistrationConfig,
+    },
+  );
 
 describe('CauseOfDeathField', () => {
   beforeEach(() => {
@@ -203,6 +250,66 @@ describe('CauseOfDeathField', () => {
 
       const select = screen.getByRole('combobox', { name: /cause of death/i });
       expect(select).not.toBeRequired();
+    });
+  });
+
+  describe('Form state', () => {
+    it('marks an empty required cause invalid once touched, without showing the message', async () => {
+      const user = userEvent.setup();
+      renderWithValidation({ isDead: true });
+
+      const select = screen.getByRole('combobox', { name: /cause of death/i });
+      // A change elsewhere validates the whole form, so deathCause has its error but is not touched yet.
+      await user.click(screen.getByRole('button', { name: 'Change another field' }));
+      await waitFor(() =>
+        expect(screen.getByRole('status', { name: 'Fields with errors' })).toHaveTextContent('deathCause'),
+      );
+      expect(select).not.toHaveAttribute('aria-invalid');
+
+      await user.click(screen.getByRole('button', { name: 'Touch cause' }));
+
+      await waitFor(() => expect(select).toHaveAttribute('aria-invalid', 'true'));
+      // Kept as before: no message shows here, because the Formik code read `.message` of a string error.
+      expect(screen.queryByText('Cause of death is required')).not.toBeInTheDocument();
+    });
+
+    it('marks an empty required non-coded cause invalid once touched, without showing the message', async () => {
+      const user = userEvent.setup();
+      renderWithValidation({ isDead: true, deathCause: 'other-uuid' });
+
+      const textInput = screen.getByRole('textbox', { name: /non-coded cause of death/i });
+      await user.click(screen.getByRole('button', { name: 'Change another field' }));
+      await waitFor(() =>
+        expect(screen.getByRole('status', { name: 'Fields with errors' })).toHaveTextContent('nonCodedCauseOfDeath'),
+      );
+      expect(textInput).not.toHaveAttribute('aria-invalid');
+
+      await user.click(screen.getByRole('button', { name: 'Touch non-coded cause' }));
+
+      await waitFor(() => expect(textInput).toHaveAttribute('aria-invalid', 'true'));
+      expect(screen.queryByText('Non-coded cause of death is required')).not.toBeInTheDocument();
+    });
+
+    it('touches deathCause on blur', async () => {
+      const user = userEvent.setup();
+      const { getTouched } = renderCauseOfDeathFieldInForm();
+
+      await user.click(screen.getByRole('combobox', { name: /cause of death/i }));
+      expect(getTouched().deathCause).toBeUndefined();
+      await user.tab();
+
+      await waitFor(() => expect(getTouched().deathCause).toBe(true));
+    });
+
+    it('shows a value set from outside the field', async () => {
+      const user = userEvent.setup();
+      renderWithValidation({ deathCause: 'cardiac-uuid' });
+
+      await user.click(screen.getByRole('button', { name: 'Set cause' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('combobox', { name: /cause of death/i })).toHaveValue('pneumonia-uuid'),
+      );
     });
   });
 });
