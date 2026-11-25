@@ -6,7 +6,6 @@
   "dose": "መጠን",
   "encounterType": "Encounter Type",
   "endDate": "End date",
-  "filterActiveVisits": "Filter active visits",
   "filterTable": "Filter table",
   "indication": "Indication",
   "medications": "Medications",
@@ -28,6 +27,5 @@
   "thereIsNoInformationToDisplayHere": "There is no information to display here",
   "time": "Time",
   "totalVisits": "Total Visits Today",
-  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitSummary": "Visit Summary"
 }
