@@ -10,13 +10,4 @@
 
 .tab {
   height: 2.5rem;
-
-  &:active,
-  &:focus {
-    outline: none !important;
-  }
-
-  &:global(.cds--tabs__nav-item--selected) {
-    border-bottom-color: var(--brand-03);
-  }
 }
