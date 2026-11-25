@@ -1,10 +1,35 @@
 import React from 'react';
 import { vi, describe, it, expect, test } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useFormContext } from 'react-hook-form';
+import { getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
+import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
 import { renderWithRegistrationForm } from '../../../../test-utils/render-with-registration-form';
+import { initialFormValues } from '../../../patient-registration.component';
+import { useFormHelpers } from '../../../form-adapter';
 import { Input } from './input.component';
 import type { FormValues } from '../../../patient-registration.types';
+
+/** Resets the form to `values` on click, as the edit-mode reinitialize and the dummy data do. */
+const ResetButton: React.FC<{ values: Record<string, unknown> }> = ({ values }) => {
+  const { reset } = useFormContext<FormValues>();
+  return (
+    <button type="button" onClick={() => reset(values as unknown as FormValues)}>
+      Reset
+    </button>
+  );
+};
+
+/** Sets `name` to `value` on click through the form helpers. */
+const SetValueButton: React.FC<{ name: string; value: unknown }> = ({ name, value }) => {
+  const { setFieldValue } = useFormHelpers();
+  return (
+    <button type="button" onClick={() => setFieldValue(name, value)}>
+      Set value
+    </button>
+  );
+};
 
 /**
  * Helper to render Input component in a registration form.
@@ -163,6 +188,134 @@ describe('Input component', () => {
       await waitFor(() => {
         expect(screen.queryByText('name should be of 5 char')).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe('Form state', () => {
+    it('shows the schema error after a blur without typing', async () => {
+      const user = userEvent.setup();
+      renderWithRegistrationForm(<Input id="givenName" name="givenName" labelText="First name" required />, {
+        initialValues: { ...initialFormValues, givenName: '' },
+        withValidation: true,
+        config: getDefaultsFromConfigSchema(esmPatientRegistrationSchema) as RegistrationConfig,
+      });
+
+      expect(screen.queryByText('Given name is required')).not.toBeInTheDocument();
+
+      await user.click(screen.getByLabelText('First name'));
+      await user.tab();
+
+      expect(await screen.findByText('Given name is required')).toBeInTheDocument();
+      expect(screen.getByLabelText('First name')).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('stores a number from a number input, and an empty string once cleared', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderWithRegistrationForm(
+        <Input id="weight" name="weight" labelText="Weight" type="number" required />,
+        { initialValues: { weight: '' } as unknown as Partial<FormValues> },
+      );
+      const formValues = () => getValues() as unknown as Record<string, unknown>;
+      const input = screen.getByLabelText('Weight');
+
+      await user.type(input, '5');
+      expect(formValues().weight).toBe(5);
+
+      await user.clear(input);
+      expect(formValues().weight).toBe('');
+    });
+
+    it('stores typed text after the form is reset', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderWithRegistrationForm(
+        <>
+          <Input id="text" name="text" labelText="Text" required />
+          <ResetButton values={{ text: 'reset value' }} />
+        </>,
+        { initialValues: { text: '' } as Partial<FormValues> },
+      );
+      const formValues = () => getValues() as unknown as Record<string, string>;
+
+      await user.click(screen.getByRole('button', { name: 'Reset' }));
+      const input = screen.getByLabelText('Text') as HTMLInputElement;
+      await waitFor(() => expect(input.value).toBe('reset value'));
+
+      await user.clear(input);
+      await user.type(input, 'typed');
+
+      expect(input.value).toBe('typed');
+      expect(formValues().text).toBe('typed');
+    });
+
+    it('shows an empty input after a reset to values without the field', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderWithRegistrationForm(
+        <>
+          <Input id="text" name="text" labelText="Text" required />
+          <ResetButton values={{ other: 'other value' }} />
+        </>,
+        { initialValues: { text: 'first value' } as Partial<FormValues> },
+      );
+      const input = screen.getByLabelText('Text') as HTMLInputElement;
+      expect(input.value).toBe('first value');
+
+      await user.click(screen.getByRole('button', { name: 'Reset' }));
+
+      await waitFor(() => expect(input.value).toBe(''));
+      expect((getValues() as unknown as Record<string, unknown>).text).toBeUndefined();
+    });
+
+    it('shows an empty input when the value is set to undefined', async () => {
+      const user = userEvent.setup();
+      renderWithRegistrationForm(
+        <>
+          <Input id="text" name="text" labelText="Text" required />
+          <SetValueButton name="text" value={undefined} />
+        </>,
+        { initialValues: { text: 'first value' } as Partial<FormValues> },
+      );
+      const input = screen.getByLabelText('Text') as HTMLInputElement;
+
+      await user.click(screen.getByRole('button', { name: 'Set value' }));
+
+      await waitFor(() => expect(input.value).toBe(''));
+    });
+
+    it('shows a value written to the parent object of the field', async () => {
+      const user = userEvent.setup();
+      renderWithRegistrationForm(
+        <>
+          <Input id="parent.child" name="parent.child" labelText="Child" required />
+          <SetValueButton name="parent" value={{ child: 'new value' }} />
+        </>,
+        { initialValues: { parent: { child: '' } } as unknown as Partial<FormValues> },
+      );
+      const input = screen.getByLabelText('Child') as HTMLInputElement;
+
+      await user.click(screen.getByRole('button', { name: 'Set value' }));
+
+      await waitFor(() => expect(input.value).toBe('new value'));
+    });
+
+    it('marks the field touched on blur', async () => {
+      const user = userEvent.setup();
+      const { getTouched } = renderInput({ required: true });
+
+      await user.click(screen.getByLabelText('Text'));
+      expect(getTouched().text).toBeUndefined();
+
+      await user.tab();
+      expect(getTouched().text).toBe(true);
+    });
+
+    it('marks the name of the blurred element touched, as Formik', () => {
+      const { getTouched } = renderInput({ required: true });
+
+      // fireEvent sets the input's DOM name to `otherField` before the blur, since Input always renders its own name.
+      fireEvent.blur(screen.getByLabelText('Text'), { target: { name: 'otherField' } });
+
+      expect(getTouched().otherField).toBe(true);
+      expect(getTouched().text).toBeUndefined();
     });
   });
 });

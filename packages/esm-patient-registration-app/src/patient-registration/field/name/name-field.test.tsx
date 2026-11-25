@@ -2,13 +2,14 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { NameField, unidentifiedPatientAttributeTypeUuid } from './name-field.component';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockExtensionSlot = vi.mocked(ExtensionSlot);
 
 /**
  * Helper to render NameField in a registration form for state-dependent tests.
@@ -234,6 +235,109 @@ describe('NameField', () => {
       const firstNameIndex = inputs.findIndex((input) => (input as HTMLInputElement).id === 'givenName');
 
       expect(familyNameIndex).toBeLessThan(firstNameIndex);
+    });
+  });
+
+  describe('Name-known toggle writes', () => {
+    const attributePath = `attributes.${unidentifiedPatientAttributeTypeUuid}`;
+
+    it('sets the defaults and the attribute, and touches the three paths, when the toggle goes to no', async () => {
+      const user = userEvent.setup();
+      const { getValues, getTouched } = renderNameFieldInForm({ givenName: 'John', familyName: 'Doe' });
+
+      await user.click(screen.getByRole('tab', { name: /no/i }));
+
+      await waitFor(() => expect(getValues().attributes[unidentifiedPatientAttributeTypeUuid]).toBe('true'));
+      expect(getValues().givenName).toBe('UNKNOWN');
+      expect(getValues().familyName).toBe('UNKNOWN');
+      expect(getTouched().givenName).toBe(true);
+      expect(getTouched().familyName).toBe(true);
+      expect(getTouched().attributes?.[unidentifiedPatientAttributeTypeUuid]).toBe(true);
+    });
+
+    it('clears the names and sets the attribute to false when the toggle goes back to yes', async () => {
+      const user = userEvent.setup();
+      const { getValues, getTouched } = renderNameFieldInForm({
+        attributes: { [unidentifiedPatientAttributeTypeUuid]: 'true' },
+        givenName: 'UNKNOWN',
+        familyName: 'UNKNOWN',
+      });
+
+      await user.click(screen.getByRole('tab', { name: /yes/i }));
+
+      await waitFor(() => expect(getValues().attributes[unidentifiedPatientAttributeTypeUuid]).toBe('false'));
+      expect(getValues().givenName).toBe('');
+      expect(getValues().familyName).toBe('');
+      expect(getTouched().givenName).toBe(true);
+      expect(getTouched().familyName).toBe(true);
+      expect(getTouched().attributes?.[unidentifiedPatientAttributeTypeUuid]).toBe(true);
+    });
+
+    it('writes and touches through the context in the same order and with the same arguments', async () => {
+      const user = userEvent.setup();
+      const calls: Array<unknown[]> = [];
+      renderWithRegistrationForm(<NameField />, {
+        initialValues: {
+          givenName: 'John',
+          familyName: 'Doe',
+          attributes: { [unidentifiedPatientAttributeTypeUuid]: 'false' },
+        },
+        contextValues: {
+          setFieldValue: (...args) => {
+            calls.push(['value', ...args]);
+          },
+          setFieldTouched: (...args) => {
+            calls.push(['touched', ...args]);
+          },
+        },
+      });
+
+      await user.click(screen.getByRole('tab', { name: /no/i }));
+
+      await waitFor(() => expect(calls.length).toBeGreaterThan(0));
+      // The attribute write goes through the form helpers, not the context, so the spy does not see it.
+      expect(calls).toEqual([
+        ['value', 'givenName', 'UNKNOWN'],
+        ['value', 'familyName', 'UNKNOWN'],
+        ['touched', 'givenName', true],
+        ['touched', 'familyName', true],
+        ['touched', attributePath, true, false],
+      ]);
+    });
+  });
+
+  describe('Photo capture', () => {
+    it('touches photo without revalidation', () => {
+      const setCapturePhotoProps = vi.fn();
+      const setFieldTouched = vi.fn();
+      mockUseConfig.mockReturnValue({
+        ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+        fieldConfigurations: {
+          name: {
+            displayCapturePhoto: true,
+            allowUnidentifiedPatients: true,
+            defaultUnknownGivenName: 'UNKNOWN',
+            defaultUnknownFamilyName: 'UNKNOWN',
+            displayMiddleName: true,
+            displayReverseFieldOrder: false,
+          },
+        } as RegistrationConfig['fieldConfigurations'],
+      });
+      mockExtensionSlot.mockImplementation((() => null) as any);
+
+      renderWithRegistrationForm(<NameField />, {
+        initialValues: { givenName: '', familyName: '', attributes: {} },
+        contextValues: { setCapturePhotoProps, setFieldTouched },
+      });
+
+      const state = (mockExtensionSlot.mock.calls.at(-1)[0] as any).state;
+      state.onCapturePhoto('data:image/png;base64,abc', '2026-01-01');
+
+      expect(setCapturePhotoProps).toHaveBeenCalledWith({
+        imageData: 'data:image/png;base64,abc',
+        dateTime: '2026-01-01',
+      });
+      expect(setFieldTouched).toHaveBeenCalledWith('photo', true, false);
     });
   });
 });

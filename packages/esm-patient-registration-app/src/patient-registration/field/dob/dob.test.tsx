@@ -1,8 +1,8 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
-import { screen, waitFor, fireEvent } from '@testing-library/react';
+import { act, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { initialFormValues } from '../../patient-registration.component';
 import { DobField } from './dob.component';
@@ -10,6 +10,23 @@ import { renderWithRegistrationForm } from '../../../test-utils/render-with-regi
 import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+const mockOpenmrsDatePicker = vi.mocked(OpenmrsDatePicker);
+
+/**
+ * Helper to render DobField in a registration form validated with the registration schema.
+ */
+const renderDobFieldWithValidation = (initialValues: Partial<FormValues> = {}) =>
+  renderWithRegistrationForm(<DobField />, {
+    initialValues: {
+      birthdate: '',
+      birthdateEstimated: false,
+      yearsEstimated: 0,
+      monthsEstimated: 0,
+      ...initialValues,
+    },
+    withValidation: true,
+    config: getDefaultsFromConfigSchema(esmPatientRegistrationSchema) as RegistrationConfig,
+  });
 
 /**
  * Helper to render DobField in a registration form for state-dependent tests.
@@ -355,6 +372,150 @@ describe('Dob', () => {
         },
         { timeout: 1000 },
       );
+    });
+  });
+
+  describe('Form state', () => {
+    it('stores typed years as a number and shows the years error only after blur', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderDobFieldWithValidation({ birthdateEstimated: true });
+
+      const yearsInput = screen.getByLabelText(/estimated age in years/i);
+      await user.clear(yearsInput);
+      await user.type(yearsInput, '141');
+
+      expect(getValues().yearsEstimated).toBe(141);
+      expect(screen.queryByText('Estimated years cannot be more than 140')).not.toBeInTheDocument();
+
+      await user.tab();
+
+      expect(await screen.findByText('Estimated years cannot be more than 140')).toBeInTheDocument();
+      expect(getValues().yearsEstimated).toBe(141);
+    });
+
+    it('stores negative years and shows the negative years error after blur', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderDobFieldWithValidation({ birthdateEstimated: true });
+
+      const yearsInput = screen.getByLabelText(/estimated age in years/i);
+      await user.clear(yearsInput);
+      await user.type(yearsInput, '-1');
+
+      expect(getValues().yearsEstimated).toBe(-1);
+      expect(screen.queryByText('Estimated years cannot be negative')).not.toBeInTheDocument();
+
+      await user.tab();
+
+      expect(await screen.findByText('Estimated years cannot be negative')).toBeInTheDocument();
+    });
+
+    it('stores an empty string for years that are not a number, and 0 after blur', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderDobFieldWithValidation({ birthdateEstimated: true, yearsEstimated: 25 });
+
+      const yearsInput = screen.getByLabelText(/estimated age in years/i);
+      await user.clear(yearsInput);
+      await user.type(yearsInput, 'abc');
+
+      expect(getValues().yearsEstimated).toBe('');
+
+      await user.tab();
+
+      expect(getValues().yearsEstimated).toBe(0);
+    });
+
+    it('calculates the birthdate from the estimated years on blur, not while typing', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderDobFieldInForm({ birthdateEstimated: true, monthsEstimated: '' as any });
+
+      const yearsInput = screen.getByLabelText(/estimated age in years/i);
+      await user.clear(yearsInput);
+      await user.type(yearsInput, '25');
+
+      expect(getValues().yearsEstimated).toBe(25);
+      expect(getValues().birthdate).toBe('');
+
+      await user.tab();
+
+      const birthdate = getValues().birthdate;
+      expect(birthdate).toBeInstanceOf(Date);
+      // The config's estimated day (dayOfMonth 0 of January) is the last day of the year before.
+      expect(new Date().getFullYear() - (birthdate as Date).getFullYear()).toBe(26);
+    });
+
+    it('requires the months only while there are no estimated years', () => {
+      renderDobFieldInForm({ birthdateEstimated: true, yearsEstimated: 0 });
+      expect(screen.getByLabelText(/estimated age in years/i)).toHaveAttribute('name', 'yearsEstimated');
+      expect(screen.getByLabelText(/estimated age in months/i)).toHaveAttribute('name', 'monthsEstimated');
+      expect(screen.getByLabelText(/estimated age in months/i)).toBeRequired();
+    });
+
+    it('does not require the months when there are estimated years', () => {
+      renderDobFieldInForm({ birthdateEstimated: true, yearsEstimated: 5 });
+      expect(screen.getByLabelText(/estimated age in months/i)).not.toBeRequired();
+    });
+
+    it('passes the field name and its own handlers to the date picker', () => {
+      renderDobFieldInForm({ birthdate: '', birthdateEstimated: false });
+
+      const props = mockOpenmrsDatePicker.mock.lastCall[0] as Record<string, unknown>;
+      expect(Object.keys(props).sort()).toEqual(
+        [
+          'data-testid',
+          'id',
+          'invalidText',
+          'isInvalid',
+          'labelText',
+          'maxDate',
+          'name',
+          'onBlur',
+          'onChange',
+          'value',
+        ].sort(),
+      );
+      expect(props.name).toBe('birthdate');
+      expect(props.id).toBe('birthdate');
+      expect(props.value).toBe('');
+    });
+
+    it('shows no error when the date picker is blurred before any change', async () => {
+      const { getTouched } = renderDobFieldWithValidation({ birthdate: '', birthdateEstimated: false });
+
+      const props = mockOpenmrsDatePicker.mock.lastCall[0] as { onBlur(): void };
+      act(() => props.onBlur());
+
+      await waitFor(() => expect(getTouched().birthdate).toBe(true));
+      expect(screen.queryByText('Birthday is required')).not.toBeInTheDocument();
+      expect((mockOpenmrsDatePicker.mock.lastCall[0] as { isInvalid: boolean }).isInvalid).toBe(false);
+    });
+
+    it('resets the birth values and touches only birthdateEstimated when toggled to unknown and back', async () => {
+      const user = userEvent.setup();
+      const { getValues, getTouched } = renderDobFieldInForm({
+        birthdate: new Date(2000, 0, 1) as any,
+        birthdateEstimated: false,
+        yearsEstimated: 5,
+        monthsEstimated: 3,
+      });
+
+      await user.click(screen.getByRole('tab', { name: /no/i }));
+      await screen.findByLabelText(/estimated age in years/i);
+      expect(getValues()).toMatchObject({
+        birthdateEstimated: true,
+        birthdate: '',
+        yearsEstimated: 0,
+        monthsEstimated: '',
+      });
+
+      await user.click(screen.getByRole('tab', { name: /yes/i }));
+      await screen.findByLabelText(/date of birth/i);
+      expect(getValues()).toMatchObject({
+        birthdateEstimated: false,
+        birthdate: '',
+        yearsEstimated: 0,
+        monthsEstimated: '',
+      });
+      expect(getTouched()).toEqual({ birthdateEstimated: true });
     });
   });
 });

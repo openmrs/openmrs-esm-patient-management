@@ -1,10 +1,12 @@
 import React, { type ChangeEvent, useCallback } from 'react';
-import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
+import { useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useField } from '../../form-adapter';
+import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
+import { useRegistrationField } from '../../form-adapter';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
-import { type RegistrationConfig } from '../../../config-schema';
+import type { FormValues } from '../../patient-registration.types';
+import type { RegistrationConfig } from '../../../config-schema';
 import styles from '../field.scss';
 
 const calcBirthdate = (yearDelta, monthDelta, dateOfBirth) => {
@@ -26,10 +28,18 @@ export const DobField: React.FC = () => {
     fieldConfigurations: { dateOfBirth },
   } = useConfig<RegistrationConfig>();
   const allowEstimatedBirthDate = dateOfBirth?.allowEstimatedDateOfBirth;
-  const [{ value: dobUnknown }] = useField('birthdateEstimated');
-  const [birthdate, birthdateMeta] = useField('birthdate');
-  const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
-  const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
+  const dobUnknown = useWatch<FormValues, 'birthdateEstimated'>({ name: 'birthdateEstimated' });
+  const { field: birthdate, error: birthdateError, touched: birthdateTouched } = useRegistrationField('birthdate');
+  const {
+    field: yearsEstimated,
+    error: yearsEstimatedError,
+    touched: yearsEstimatedTouched,
+  } = useRegistrationField('yearsEstimated');
+  const {
+    field: monthsEstimated,
+    error: monthsEstimatedError,
+    touched: monthsEstimatedTouched,
+  } = useRegistrationField('monthsEstimated');
   const { setFieldValue, setFieldTouched } = usePatientRegistrationContext();
   const today = new Date();
 
@@ -58,10 +68,10 @@ export const DobField: React.FC = () => {
 
       if (!isNaN(years) && years < 140 && years >= 0) {
         setFieldValue('yearsEstimated', years);
-        setFieldValue('birthdate', calcBirthdate(years, monthsEstimateMeta.value, dateOfBirth));
+        setFieldValue('birthdate', calcBirthdate(years, monthsEstimated.value, dateOfBirth));
       }
     },
-    [setFieldValue, dateOfBirth, monthsEstimateMeta.value],
+    [setFieldValue, dateOfBirth, monthsEstimated.value],
   );
 
   const onEstimatedMonthsChange = useCallback(
@@ -70,22 +80,22 @@ export const DobField: React.FC = () => {
 
       if (!isNaN(months)) {
         setFieldValue('monthsEstimated', months);
-        setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months, dateOfBirth));
+        setFieldValue('birthdate', calcBirthdate(yearsEstimated.value, months, dateOfBirth));
       }
     },
-    [setFieldValue, dateOfBirth, yearsEstimateMeta.value],
+    [setFieldValue, dateOfBirth, yearsEstimated.value],
   );
 
   const updateBirthdate = useCallback(() => {
-    const months = +monthsEstimateMeta.value % 12;
-    const years = +yearsEstimateMeta.value + Math.floor(monthsEstimateMeta.value / 12);
+    const months = +monthsEstimated.value % 12;
+    const years = +yearsEstimated.value + Math.floor(monthsEstimated.value / 12);
     setFieldValue('yearsEstimated', years);
     setFieldValue('monthsEstimated', months > 0 ? months : '');
     setFieldValue('birthdate', calcBirthdate(years, months, dateOfBirth));
     setFieldTouched('yearsEstimated', true, false);
     setFieldTouched('monthsEstimated', true, false);
     setFieldTouched('birthdate', true, false);
-  }, [setFieldValue, setFieldTouched, monthsEstimateMeta, yearsEstimateMeta, dateOfBirth]);
+  }, [setFieldValue, setFieldTouched, monthsEstimated.value, yearsEstimated.value, dateOfBirth]);
 
   return (
     <div className={styles.halfWidthInDesktopView}>
@@ -112,8 +122,8 @@ export const DobField: React.FC = () => {
               onBlur={() => setFieldTouched('birthdate', true, false)}
               maxDate={today}
               labelText={t('dateOfBirthLabelText', 'Date of birth')}
-              isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
-              invalidText={t(birthdateMeta.error)}
+              isInvalid={!!(birthdateTouched && birthdateError)}
+              invalidText={t(birthdateError)}
               value={birthdate.value}
             />
           </div>
@@ -126,8 +136,8 @@ export const DobField: React.FC = () => {
                 name={yearsEstimated.name}
                 onChange={onEstimatedYearsChange}
                 labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
-                invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
-                invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
+                invalid={!!(yearsEstimatedTouched && yearsEstimatedError)}
+                invalidText={yearsEstimatedError && t(yearsEstimatedError)}
                 value={yearsEstimated.value}
                 min={0}
                 required
@@ -146,12 +156,12 @@ export const DobField: React.FC = () => {
                 name={monthsEstimated.name}
                 onChange={onEstimatedMonthsChange}
                 labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
-                invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
-                invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
+                invalid={!!(monthsEstimatedTouched && monthsEstimatedError)}
+                invalidText={monthsEstimatedError && t(monthsEstimatedError)}
                 value={monthsEstimated.value}
                 min={0}
                 {...monthsEstimated}
-                required={!yearsEstimateMeta.value}
+                required={!yearsEstimated.value}
                 onBlur={(e) => {
                   monthsEstimated.onBlur(e);
                   setFieldTouched('monthsEstimated', true, false);

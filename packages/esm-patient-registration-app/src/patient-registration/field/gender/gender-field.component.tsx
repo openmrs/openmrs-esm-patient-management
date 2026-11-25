@@ -1,17 +1,17 @@
 import React from 'react';
-import { RadioButton, RadioButtonGroup } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useField } from '../../form-adapter';
-import { type RegistrationConfig } from '../../../config-schema';
-import { usePatientRegistrationContext } from '../../patient-registration-context';
+import { RadioButton, RadioButtonGroup } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
+import { useRegistrationField } from '../../form-adapter';
+import { usePatientRegistrationContext } from '../../patient-registration-context';
+import type { RegistrationConfig } from '../../../config-schema';
 import styles from '../field.scss';
 
 export const GenderField: React.FC = () => {
   const { t } = useTranslation();
   const { fieldConfigurations } = useConfig<RegistrationConfig>();
   const { setFieldValue, setFieldTouched } = usePatientRegistrationContext();
-  const [field, meta] = useField('gender');
+  const { field, error, touched } = useRegistrationField<string>('gender');
   const fieldConfigs = fieldConfigurations?.gender;
 
   const setGender = (gender: string) => {
@@ -45,9 +45,7 @@ export const GenderField: React.FC = () => {
             />
           ))}
         </RadioButtonGroup>
-        {meta.touched && meta.error && (
-          <div className={styles.radioFieldError}>{t(meta.error, 'Gender is required')}</div>
-        )}
+        {touched && error && <div className={styles.radioFieldError}>{t(error, 'Gender is required')}</div>}
       </div>
     </div>
   );

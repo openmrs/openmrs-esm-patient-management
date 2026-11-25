@@ -7,9 +7,20 @@ import { renderWithRegistrationForm } from '../../../test-utils/render-with-regi
 import { initialFormValues } from '../../patient-registration.component';
 import { GenderField } from './gender-field.component';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
+import { useFormHelpers } from '../../form-adapter';
 import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
+
+/** Marks `gender` touched on click through the form helpers, as the submit does. */
+const TouchGenderButton: React.FC = () => {
+  const { setFieldTouched } = useFormHelpers();
+  return (
+    <button type="button" onClick={() => setFieldTouched('gender', true)}>
+      Touch gender
+    </button>
+  );
+};
 
 /**
  * Helper to render GenderField in a registration form for state-dependent tests.
@@ -217,6 +228,61 @@ describe('GenderField', () => {
 
       // Error should not appear after valid selection (user-visible)
       expect(screen.queryByText(/gender is required/i)).not.toBeInTheDocument();
+    });
+
+    it('shows the error of an empty sex once the field is touched', async () => {
+      const user = userEvent.setup();
+      renderWithRegistrationForm(
+        <>
+          <GenderField />
+          <TouchGenderButton />
+        </>,
+        { initialValues: { gender: '' }, withValidation: true },
+      );
+
+      expect(screen.queryByText('Gender is required')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Touch gender' }));
+
+      expect(await screen.findByText('Gender is required')).toBeInTheDocument();
+    });
+  });
+
+  describe('Form state', () => {
+    it('marks the field touched when a sex is selected', async () => {
+      const user = userEvent.setup();
+      const { getValues, getTouched } = renderGenderFieldInForm();
+
+      expect(getTouched().gender).toBeUndefined();
+
+      await user.click(screen.getByText(/female/i));
+
+      expect(getValues().gender).toBe('female');
+      expect(getTouched().gender).toBe(true);
+    });
+
+    it('shows a value set from outside the field', async () => {
+      const user = userEvent.setup();
+      const SetGenderButton: React.FC = () => {
+        const { setFieldValue } = useFormHelpers();
+        return (
+          <button type="button" onClick={() => setFieldValue('gender', 'other')}>
+            Set gender
+          </button>
+        );
+      };
+      renderWithRegistrationForm(
+        <>
+          <GenderField />
+          <SetGenderButton />
+        </>,
+        { initialValues: { gender: 'male' } },
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Set gender' }));
+
+      await waitFor(() => expect(screen.getByLabelText(/other/i)).toBeChecked());
+      expect(screen.getByLabelText(/^male/i)).not.toBeChecked();
     });
   });
 });

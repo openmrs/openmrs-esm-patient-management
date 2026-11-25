@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useField } from '../../form-adapter';
+import { useRegistrationField } from '../../form-adapter';
 import { Field } from '../../field/field.component';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import styles from './../section.scss';
@@ -9,16 +9,19 @@ export interface DemographicsSectionProps {
 }
 
 export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields }) => {
-  const [field, meta] = useField('addNameInLocalLanguage');
+  const {
+    field: { value: addNameInLocalLanguage },
+    touched,
+  } = useRegistrationField<boolean>('addNameInLocalLanguage');
   const { setFieldValue } = usePatientRegistrationContext();
 
   useEffect(() => {
-    if (!field.value && meta.touched) {
+    if (!addNameInLocalLanguage && touched) {
       setFieldValue('additionalGivenName', '');
       setFieldValue('additionalMiddleName', '');
       setFieldValue('additionalFamilyName', '');
     }
-  }, [field.value, meta.touched, setFieldValue]);
+  }, [addNameInLocalLanguage, touched, setFieldValue]);
 
   return (
     <section className={styles.formSection} aria-label="Demographics Section">

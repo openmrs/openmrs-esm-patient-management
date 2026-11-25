@@ -1,10 +1,11 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { initialFormValues } from '../../patient-registration.component';
 import { DemographicsSection } from './demographics-section.component';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
+import { useFormHelpers } from '../../form-adapter';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import type { FormValues } from '../../patient-registration.types';
 
@@ -117,6 +118,52 @@ describe('Demographics section', () => {
       expect(formValues.additionalGivenName).toBe('Local Given');
       expect(formValues.additionalMiddleName).toBe('Local Middle');
       expect(formValues.additionalFamilyName).toBe('Local Family');
+    });
+
+    describe('with the toggle driven through the form helpers', () => {
+      const names = {
+        additionalGivenName: 'Local Given',
+        additionalMiddleName: 'Local Middle',
+        additionalFamilyName: 'Local Family',
+      };
+
+      function renderWithHelpers() {
+        const helpersRef: { current?: ReturnType<typeof useFormHelpers> } = {};
+        const Capture = () => {
+          helpersRef.current = useFormHelpers();
+          return null;
+        };
+        const utils = renderWithRegistrationForm(
+          <>
+            <DemographicsSection fields={[]} />
+            <Capture />
+          </>,
+          { initialValues: { ...initialFormValues, addNameInLocalLanguage: true, ...names } },
+        );
+        return { ...utils, helpers: helpersRef };
+      }
+
+      it('clears the additional names when the toggle is false and touched', async () => {
+        const { helpers, getValues } = renderWithHelpers();
+
+        act(() => helpers.current.setFieldTouched('addNameInLocalLanguage', true));
+        expect(getValues().additionalGivenName).toBe('Local Given');
+        act(() => helpers.current.setFieldValue('addNameInLocalLanguage', false));
+
+        expect(getValues().additionalGivenName).toBe('');
+        expect(getValues().additionalMiddleName).toBe('');
+        expect(getValues().additionalFamilyName).toBe('');
+      });
+
+      it('keeps the additional names when the toggle is false and untouched', () => {
+        const { helpers, getValues } = renderWithHelpers();
+
+        act(() => helpers.current.setFieldValue('addNameInLocalLanguage', false));
+
+        expect(getValues().additionalGivenName).toBe('Local Given');
+        expect(getValues().additionalMiddleName).toBe('Local Middle');
+        expect(getValues().additionalFamilyName).toBe('Local Family');
+      });
     });
   });
 });
