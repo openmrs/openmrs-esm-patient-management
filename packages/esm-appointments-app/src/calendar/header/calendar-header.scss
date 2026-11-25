@@ -25,6 +25,32 @@
   column-gap: layout.$spacing-05;
 }
 
+.backButton {
+  padding-left: layout.$spacing-02 !important;
+  padding-inline-start: layout.$spacing-02 !important;
+  padding-right: layout.$spacing-02 !important;
+  padding-inline-end: layout.$spacing-02 !important;
+
+  // render the icon before text
+  svg,
+  :global(.cds--btn__icon) {
+    order: 1;
+    margin-left: 0 !important;
+    margin-inline-start: 0 !important;
+    margin-right: layout.$spacing-03;
+    margin-inline-end: layout.$spacing-03;
+  }
+
+  span {
+    order: 2;
+  }
+}
+
+.divider {
+  color: colors.$gray-30;
+  user-select: none;
+}
+
 .navButtonGroup {
   display: flex;
   align-items: center;

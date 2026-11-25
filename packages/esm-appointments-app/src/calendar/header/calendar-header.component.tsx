@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
-import { ChevronLeft, ChevronRight } from '@carbon/react/icons';
+import { ArrowLeft, ChevronLeft, ChevronRight } from '@carbon/react/icons';
 import { type CalendarViewMode } from '../../types';
 import { getCalendarFormat } from '../calendar-utils';
 import styles from './calendar-header.scss';
@@ -15,6 +16,7 @@ interface CalendarHeaderProps {
   onToday: () => void;
   onPrev: () => void;
   onNext: () => void;
+  onBack?: () => void;
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -25,9 +27,13 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onToday,
   onPrev,
   onNext,
+  onBack,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { locale, calendar } = getCalendarFormat();
+
+  const handleBack = onBack ?? (() => navigate('/'));
 
   const dateLabel = useMemo(() => {
     const isoDate = calendarSelectedDate.format('YYYY-MM-DD');
@@ -71,6 +77,12 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     <div className={styles.calendarHeaderContainer}>
       <div className={styles.navigationSection}>
         <div className={styles.navGroup}>
+          <Button kind="ghost" size="sm" renderIcon={ArrowLeft} onClick={handleBack} className={styles.backButton}>
+            <span>{t('back', 'Back')}</span>
+          </Button>
+          <span className={styles.divider} aria-hidden="true">
+            |
+          </span>
           <Button kind="tertiary" size="sm" onClick={onToday}>
             {t('today', 'Today')}
           </Button>
