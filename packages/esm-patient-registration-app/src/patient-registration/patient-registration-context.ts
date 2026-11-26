@@ -4,9 +4,11 @@ import type { ObjectSchema } from 'yup';
 import { type PatientIdentifierType, useConfig } from '@openmrs/esm-framework';
 import { type CapturePhotoProps, type FormValues } from './patient-registration.types';
 import { type RegistrationConfig } from '../config-schema';
+import { type HiddenElements } from './patient-registration-utils';
 
 export interface PatientRegistrationContextProps {
   currentPhoto: string;
+  hiddenElements?: HiddenElements;
   identifierTypes: Array<PatientIdentifierType>;
   inEditMode: boolean;
   initialFormValues: FormValues;

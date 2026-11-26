@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { type SectionDefinition } from '../../config-schema';
 import { Section } from './section.component';
 import styles from './section.scss';
+import { usePatientRegistrationContext } from '../patient-registration-context';
 
 export interface SectionWrapperProps {
   sectionDefinition: SectionDefinition;
@@ -12,6 +13,11 @@ export interface SectionWrapperProps {
 
 export const SectionWrapper = ({ sectionDefinition, index }: SectionWrapperProps) => {
   const { t } = useTranslation();
+  const { hiddenElements } = usePatientRegistrationContext();
+
+  if (hiddenElements?.sectionIds.has(sectionDefinition.id)) {
+    return null;
+  }
 
   /*
    * This comment exists to provide translation keys for the default section names.
