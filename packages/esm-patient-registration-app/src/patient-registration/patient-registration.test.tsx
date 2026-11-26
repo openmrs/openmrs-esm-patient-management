@@ -472,7 +472,7 @@ describe('Registering a new patient', () => {
     `);
   });
 
-  it('lists pattern errors in form order with schema errors', async () => {
+  it('lists pattern errors in form order after schema errors', async () => {
     const user = userEvent.setup();
     const defaultConfig = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
     mockUseConfig.mockReturnValue({
@@ -524,12 +524,12 @@ describe('Registering a new patient', () => {
     const { subtitle } = mockShowSnackbar.mock.calls.at(-1)[0];
     render(<>{subtitle}</>);
     expect(screen.getAllByRole('listitem').map((li) => li.textContent)).toEqual([
-      'attributes',
-      'identifiers',
       'givenName',
       'familyName',
       'gender',
       'birthdate',
+      'attributes',
+      'identifiers',
     ]);
   });
 

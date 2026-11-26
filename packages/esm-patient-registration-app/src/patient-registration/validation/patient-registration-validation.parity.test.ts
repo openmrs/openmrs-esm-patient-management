@@ -111,7 +111,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('rejects an unknown gender', async () => {
+  it('shows "Gender unspecified" when the gender is not in the configured list', async () => {
     expect(await errorsFor({ ...validValues, gender: 'x' })).toMatchInlineSnapshot(`
       {
         "gender": "Gender unspecified",
@@ -119,7 +119,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('rejects a future birthdate', async () => {
+  it('shows "Birthday cannot be in future" when the birthdate is in the future', async () => {
     expect(await errorsFor({ ...validValues, birthdate: new Date('2026-06-16') })).toMatchInlineSnapshot(`
       {
         "birthdate": "Birthday cannot be in future",
@@ -127,7 +127,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('rejects a birthdate over 140 years ago', async () => {
+  it('shows "Birthday cannot be more than 140 years ago" when the birthdate is over 140 years ago', async () => {
     expect(await errorsFor({ ...validValues, birthdate: new Date('1886-01-01') })).toMatchInlineSnapshot(`
       {
         "birthdate": "Birthday cannot be more than 140 years ago",
@@ -139,10 +139,10 @@ describe('Patient registration validation parity', () => {
     expect(await errorsFor({ ...validValues, birthdate: '1990-01-01' })).toMatchInlineSnapshot(`{}`);
   });
 
-  it('rejects a birthdate that is not a date', async () => {
+  it('shows "Invalid date" when the birthdate is not a date', async () => {
     expect(await errorsFor({ ...validValues, birthdate: 'abc' })).toMatchInlineSnapshot(`
       {
-        "birthdate": "birthdate must be a \`date\` type, but the final value was: \`Invalid Date\` (cast from the value \`"abc"\`).",
+        "birthdate": "Invalid date",
       }
     `);
   });
@@ -168,8 +168,8 @@ describe('Patient registration validation parity', () => {
     `);
     expect(Object.keys(await errorsFor(negative))).toMatchInlineSnapshot(`
       [
-        "yearsEstimated",
         "monthsEstimated",
+        "yearsEstimated",
       ]
     `);
     const tooLarge = { ...validValues, birthdateEstimated: true, yearsEstimated: 141 };
@@ -180,11 +180,11 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('rejects non-numeric estimates', async () => {
+  it('shows "Expected number, received nan" when the estimated years are not a number', async () => {
     const values = { ...validValues, birthdateEstimated: true, yearsEstimated: 'abc' };
     expect(await errorsFor(values)).toMatchInlineSnapshot(`
       {
-        "yearsEstimated": "yearsEstimated must be a \`number\` type, but the final value was: \`NaN\` (cast from the value \`"abc"\`).",
+        "yearsEstimated": "Expected number, received nan",
       }
     `);
   });
@@ -216,7 +216,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('reports a null death date for a dead patient as Yup does', async () => {
+  it('shows "Death date is required" when a dead patient\'s death date is null', async () => {
     const values = {
       ...validValues,
       isDead: true,
@@ -227,7 +227,7 @@ describe('Patient registration validation parity', () => {
     };
     expect(await errorsFor(values)).toMatchInlineSnapshot(`
       {
-        "deathDate": "deathDate must be a \`date\` type, but the final value was: \`Invalid Date\`.",
+        "deathDate": "Death date is required",
       }
     `);
     expect(Object.keys(await errorsFor(values))).toMatchInlineSnapshot(`
@@ -237,7 +237,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('reports an empty-string death date for a dead patient as Yup does', async () => {
+  it('shows "Death date is required" when a dead patient\'s death date is an empty string', async () => {
     const values = {
       ...validValues,
       isDead: true,
@@ -258,7 +258,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('rejects a death date before the birthdate', async () => {
+  it('shows "Death date and time cannot be before the birthday" when the death date is before the birthdate', async () => {
     const values = {
       ...validValues,
       isDead: true,
@@ -275,7 +275,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('rejects a death time later today', async () => {
+  it('shows "Death date cannot be in future" when the death time is later today', async () => {
     const values = {
       ...validValues,
       isDead: true,
@@ -331,14 +331,14 @@ describe('Patient registration validation parity', () => {
     `);
     expect(Object.keys(await errorsFor(values))).toMatchInlineSnapshot(`
       [
-        "deathDate",
         "deathTimeFormat",
         "deathTime",
+        "deathDate",
       ]
     `);
   });
 
-  it('checks the death date against the birthdate when the patient is not dead', async () => {
+  it('shows "Death date and time cannot be before the birthday" when the patient is not dead and the death date is before the birthdate', async () => {
     const values = {
       ...validValues,
       isDead: false,
@@ -352,7 +352,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('requires the non-coded cause for free-text cause of death', async () => {
+  it('shows "Non-coded cause of death is required" when the cause of death is free text and the non-coded cause is empty', async () => {
     const values = {
       ...validValues,
       isDead: true,
@@ -369,7 +369,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('rejects an invalid email', async () => {
+  it('shows "Invalid email" when the email is not valid', async () => {
     expect(await errorsFor({ ...validValues, email: 'not-an-email' })).toMatchInlineSnapshot(`
       {
         "email": "Invalid email",
@@ -377,7 +377,7 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('requires a value for a required identifier', async () => {
+  it('shows "Identifier value is required" when a required identifier is empty', async () => {
     const values = { ...validValues, identifiers: { a: { required: true, identifierValue: '' } } };
     expect(await errorsFor(values)).toMatchInlineSnapshot(`
       {
@@ -398,7 +398,7 @@ describe('Patient registration validation parity', () => {
     expect(await errorsFor(values)).toMatchInlineSnapshot(`{}`);
   });
 
-  it('requires a preferred identifier when preferred selection is on', async () => {
+  it('shows "Identifier value is required" when preferred selection is on and the preferred identifier is empty', async () => {
     const values = {
       ...validValues,
       identifiers: { a: { preferred: true, autoGeneration: false, identifierValue: '' } },
@@ -415,14 +415,14 @@ describe('Patient registration validation parity', () => {
     `);
   });
 
-  it('requires both fields of a relationship', async () => {
+  it('shows "Required" when both relationship fields are empty', async () => {
     const values = { ...validValues, relationships: [{ relatedPersonUuid: '', relationshipType: '' }] };
     expect(await errorsFor(values)).toMatchInlineSnapshot(`
       {
         "relationships": [
           {
-            "relatedPersonUuid": "relationships[0].relatedPersonUuid is a required field",
-            "relationshipType": "relationships[0].relationshipType is a required field",
+            "relatedPersonUuid": "Required",
+            "relationshipType": "Required",
           },
         ],
       }
@@ -476,8 +476,8 @@ describe('Patient registration validation parity', () => {
         "nonCodedCauseOfDeath": "Non-coded cause of death is required",
         "relationships": [
           {
-            "relatedPersonUuid": "relationships[0].relatedPersonUuid is a required field",
-            "relationshipType": "relationships[0].relationshipType is a required field",
+            "relatedPersonUuid": "Required",
+            "relationshipType": "Required",
           },
         ],
       }
@@ -486,18 +486,18 @@ describe('Patient registration validation parity', () => {
       [
         "givenName",
         "familyName",
-        "additionalGivenName",
-        "additionalFamilyName",
         "gender",
-        "birthdate",
         "monthsEstimated",
-        "deathDate",
         "deathTimeFormat",
         "deathTime",
-        "nonCodedCauseOfDeath",
         "email",
         "identifiers",
         "relationships",
+        "additionalGivenName",
+        "additionalFamilyName",
+        "birthdate",
+        "deathDate",
+        "nonCodedCauseOfDeath",
       ]
     `);
   });
