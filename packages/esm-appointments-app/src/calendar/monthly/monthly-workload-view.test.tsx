@@ -203,7 +203,7 @@ describe('MonthlyWorkloadView', () => {
     // The row is tinted from --service-color in CSS, so only the swatch carries the solid color
     const serviceArea = screen.getByTestId('service-area-e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90');
     expect(serviceArea.style.getPropertyValue('--service-color')).toBe('#73A947');
-    expect(serviceArea).toHaveStyle({backgroundColor:''});
+    expect(serviceArea).not.toHaveStyle({ backgroundColor: '#73A947' });
 
     const swatch = screen.getByTestId('service-swatch-e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90');
     expect(swatch).toHaveStyle({ backgroundColor: '#73A947' });
