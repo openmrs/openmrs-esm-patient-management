@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import PatientSearchWorkspace from '../patient-search-workspace/patient-search.workspace';
 import { type PatientSelectionCallback } from '../patient-search-context';
 import Overlay from '../ui-components/overlay.component';
-import { useIsSearchWorkspaceOpen } from './use-is-search-workspace-open';
 
 interface PatientSearchOverlayProps {
   onClose: () => void;
@@ -24,17 +23,11 @@ interface PatientSearchOverlayProps {
  */
 const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, query = '', patientClickSideEffect }) => {
   const { t } = useTranslation();
-  // The overlay covers the whole screen, above the workspaces. Hide it (rather than unmount it, which would
-  // lose the search) while the start visit workspace is open, so that the workspace can be used; the results
-  // come back when the workspace is closed.
-  const isWorkspaceOpen = useIsSearchWorkspaceOpen();
 
   return (
-    <div hidden={isWorkspaceOpen}>
-      <Overlay header={t('searchResults', 'Search results')} close={onClose}>
-        <PatientSearchWorkspace initialQuery={query} patientClickSideEffect={patientClickSideEffect} />
-      </Overlay>
-    </div>
+    <Overlay header={t('searchResults', 'Search results')} close={onClose}>
+      <PatientSearchWorkspace initialQuery={query} patientClickSideEffect={patientClickSideEffect} />
+    </Overlay>
   );
 };
 

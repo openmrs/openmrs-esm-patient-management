@@ -17,7 +17,6 @@ import { getUserPropertiesUrl } from '../patient-search.resource';
 import { type PatientSearchConfig } from '../config-schema';
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
-import { useIsSearchWorkspaceOpen } from '../patient-search-overlay/use-is-search-workspace-open';
 import styles from './patient-search-icon.scss';
 
 interface PatientSearchLaunchProps {}
@@ -33,9 +32,6 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const isSearchPage = useMemo(() => page === 'search', [page]);
   const [searchParams] = useSearchParams();
   const initialSearchTerm = isSearchPage ? searchParams.get('query') : '';
-
-  // The tablet overlay hides itself while the start visit workspace is open; its close button must hide too.
-  const isWorkspaceOpen = useIsSearchWorkspaceOpen();
 
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [canClickOutside, setCanClickOutside] = useState(false);
@@ -115,7 +111,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
             />
           )}
 
-          <div className={styles.closeButton} hidden={isWorkspaceOpen}>
+          <div className={styles.closeButton}>
             <HeaderGlobalAction
               aria-label={t('closeSearch', 'Close Search Panel')}
               className={styles.activeSearchIconButton}

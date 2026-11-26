@@ -74,56 +74,40 @@ test('Close the search overlay with its back button', async ({ page }) => {
   });
 });
 
-test.describe('Starting a visit from the search overlay', () => {
-  test('Start a visit for a patient without an active visit', async ({ page, patient }) => {
-    const { firstName, fullName } = getPatientNames(patient);
-    const searchPage = new PatientSearchPage(page);
+test('Open the chart from tablet search to start a visit', async ({ page, patient }) => {
+  const { firstName, fullName } = getPatientNames(patient);
+  const searchPage = new PatientSearchPage(page);
 
-    await test.step('Given I search for a patient who has no active visit', async () => {
-      await searchPage.goto(fullName);
-      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
-    });
+  await searchPage.goto(fullName);
+  await expect(searchPage.patientResultLink(firstName)).toBeVisible();
+  await expect(searchPage.startVisitButton()).toBeHidden();
 
-    await test.step('When I click the start visit button on the search result', async () => {
-      await searchPage.startVisitButton().click();
-    });
+  await searchPage.patientResultLink(firstName).click();
+  await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/patient-summary`);
+  await expect(searchPage.overlayHeader()).toBeHidden();
+  await page.getByRole('button', { name: 'Actions', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Add visit', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Start visit', exact: true })).toBeVisible();
+});
 
-    await test.step('Then the visit form opens, in front of the hidden search overlay', async () => {
-      await expect(searchPage.visitFormStartButton()).toBeVisible();
-      await expect(searchPage.overlayHeader()).toBeHidden();
-    });
+test('Closing tablet search preserves an open chart workspace', async ({ page, patient }) => {
+  const { fullName } = getPatientNames(patient);
+  const homePage = new HomePage(page);
+  const searchPage = new PatientSearchPage(page);
 
-    await test.step('When I fill in and submit the visit form', async () => {
-      await searchPage.startVisitInVisitForm();
-    });
+  await page.goto(`patient/${patient.uuid}/chart/patient-summary`);
+  await page.getByRole('button', { name: 'Actions', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Add visit', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Start visit', exact: true })).toBeVisible();
+  await page.getByRole('radio', { name: 'OPD Visit', exact: true }).check();
 
-    await test.step('Then the visit starts', async () => {
-      await expect(page.getByText(/visit started successfully/i)).toBeVisible();
-    });
-  });
+  await homePage.searchPatient(fullName);
+  await expect(searchPage.overlayHeader()).toBeVisible();
+  await expect(searchPage.resultsCount(1)).toBeVisible();
+  await expect(searchPage.startVisitButton()).toBeHidden();
+  await searchPage.overlayCloseButton().click();
 
-  test('Go back to the search results after discarding the visit form', async ({ page, patient }) => {
-    const { firstName, fullName } = getPatientNames(patient);
-    const searchPage = new PatientSearchPage(page);
-
-    await test.step('Given I opened the visit form from a search result', async () => {
-      await searchPage.goto(fullName);
-      await searchPage.startVisitButton().click();
-      await expect(searchPage.visitFormStartButton()).toBeVisible();
-    });
-
-    await test.step('When I discard the visit form', async () => {
-      await searchPage
-        .visitForm()
-        .getByRole('button', { name: /discard/i })
-        .click();
-    });
-
-    await test.step('Then the search overlay comes back with the same results', async () => {
-      await expect(searchPage.visitFormStartButton()).toBeHidden();
-      await expect(searchPage.overlayHeader()).toBeVisible();
-      await expect(searchPage.resultsCount(1)).toBeVisible();
-      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
-    });
-  });
+  await expect(searchPage.overlayHeader()).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Start visit', exact: true })).toBeVisible();
+  await expect(page.getByRole('radio', { name: 'OPD Visit', exact: true })).toBeChecked();
 });

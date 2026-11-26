@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useConfig, useDebounce } from '@openmrs/esm-framework';
 import { type PatientSearchConfig } from '../config-schema';
 import {
-  launchStartVisitWorkspaceOutsideWorkspace,
   PatientSearchContext2,
   type PatientSearchContext2Props,
   type PatientSelectionCallback,
@@ -35,7 +34,6 @@ const PatientSearchWorkspace: React.FC<PatientSearchWorkspaceProps> = ({ initial
 
   const contextValue: PatientSearchContext2Props = useMemo(
     () => ({
-      launchStartVisitWorkspace: launchStartVisitWorkspaceOutsideWorkspace,
       onBeforeNavigateToPatient: patientClickSideEffect,
     }),
     [patientClickSideEffect],

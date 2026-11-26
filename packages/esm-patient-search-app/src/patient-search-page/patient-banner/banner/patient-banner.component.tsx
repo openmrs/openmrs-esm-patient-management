@@ -100,7 +100,7 @@ const PatientBanner = React.memo(
                   patientUuid={patientUuid}
                 />
               ) : null}
-              {!isDeceased && !activeVisit && context2 && (
+              {!isDeceased && !activeVisit && launchStartVisitWorkspace && (
                 <ExtensionSlot
                   name="start-visit-button-slot2"
                   state={{

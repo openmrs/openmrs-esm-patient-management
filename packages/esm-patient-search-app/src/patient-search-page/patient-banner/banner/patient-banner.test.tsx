@@ -166,7 +166,7 @@ describe('PatientBanner with a select patient button', () => {
   });
 });
 
-describe('PatientBanner outside a workspace', () => {
+describe('PatientBanner visit actions and patient mapping', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
     mockUseVisit.mockReturnValue(noVisitState);
@@ -191,10 +191,24 @@ describe('PatientBanner outside a workspace', () => {
   it('calls onBeforeNavigateToPatient before following the link to the patient chart', async () => {
     const user = userEvent.setup();
     const onBeforeNavigateToPatient = vi.fn();
-    renderBanner(makeContext2({ onPatientSelected: undefined, onBeforeNavigateToPatient }));
+    renderBanner({ onBeforeNavigateToPatient });
 
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props?.name === 'start-visit-button-slot2')).toBe(false);
     await user.click(screen.getByRole('link'));
     expect(onBeforeNavigateToPatient).toHaveBeenCalledWith(patient.uuid, expect.objectContaining({ id: patient.uuid }));
+  });
+
+  it('does not offer Start visit for a deceased patient in embedded search', () => {
+    render(
+      <PatientSearchContext2.Provider value={makeContext2()}>
+        <PatientBanner
+          patient={{ ...patient, person: { ...patient.person, dead: true, deathDate: '2025-01-01' } }}
+          patientUuid={patient.uuid}
+        />
+      </PatientSearchContext2.Provider>,
+    );
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props?.name === 'start-visit-button-slot2')).toBe(false);
   });
 
   it('maps an estimated birthdate with day precision to the year for patients aged one or older', () => {

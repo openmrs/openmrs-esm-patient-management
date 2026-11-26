@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { launchWorkspace2, type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
+import { type Visit, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 
 export interface SelectPatientButtonConfig {
   /**
@@ -23,15 +23,6 @@ export type PatientSelectionCallback = (patientUuid: string, patient: fhir.Patie
  */
 export type LaunchStartVisitWorkspace = (workspaceProps?: object) => Promise<void>;
 
-/**
- * For search results that are not mounted inside a workspace (the search page and the tablet overlay),
- * where there is no parent workspace to launch a child of. The start visit workspace is hosted in the
- * search app's own workspace group, so that it never opens (or closes) another app's workspace group.
- */
-export const launchStartVisitWorkspaceOutsideWorkspace: LaunchStartVisitWorkspace = async (workspaceProps) => {
-  await launchWorkspace2('patient-search-app-start-visit-workspace', workspaceProps);
-};
-
 export interface PatientSearchContext2Props {
   onPatientSelected?(
     patientUuid: string,
@@ -51,11 +42,10 @@ export interface PatientSearchContext2Props {
     closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
   ): void;
   /**
-   * Launches the start visit workspace with the given workspace props. Whoever mounts the search results
-   * supplies this, because the right call depends on where they are mounted: inside a workspace it
-   * launches a child workspace, on the search page (no enclosing workspace) a top-level workspace.
+   * Supplied by an embedded search host to start a visit in its workspace. Standalone search
+   * omits this launcher and links to the patient chart without offering a start visit button.
    */
-  launchStartVisitWorkspace: LaunchStartVisitWorkspace;
+  launchStartVisitWorkspace?: LaunchStartVisitWorkspace;
   /**
    * Only defined when the search results are mounted inside a workspace. These are what
    * `onPatientSelected` and `onVisitStarted` receive.

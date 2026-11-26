@@ -8,8 +8,7 @@ interface StartVisitButtonProps {
   patientUuid: string;
   patient: fhir.Patient;
   /**
-   * Launches the start visit workspace with the given workspace props. The caller decides which workspace
-   * that is, and whether it opens as a child workspace or a top-level one.
+   * Launches the start visit workspace supplied by the embedded search host.
    */
   launchStartVisitWorkspace: LaunchStartVisitWorkspace;
   /**

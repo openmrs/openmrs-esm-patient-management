@@ -105,35 +105,20 @@ test('Show an empty state when no patient matches the search', async ({ page }) 
   });
 });
 
-test.describe('Starting a visit from the search page', () => {
-  test('Start a visit for a patient without an active visit', async ({ page, patient }) => {
+test.describe('Visit actions on the search page', () => {
+  test('Open the chart to start a visit for a patient without an active visit', async ({ page, patient }) => {
     const { firstName, fullName } = getPatientNames(patient);
     const searchPage = new PatientSearchPage(page);
 
-    await test.step('Given I search for a patient who has no active visit', async () => {
-      await searchPage.goto(fullName);
-      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
-    });
+    await searchPage.goto(fullName);
+    await expect(searchPage.patientResultLink(firstName)).toBeVisible();
+    await expect(searchPage.startVisitButton()).toBeHidden();
 
-    await test.step('When I click the start visit button on the search result', async () => {
-      await searchPage.startVisitButton().click();
-    });
-
-    await test.step('Then the visit form opens, and the search results stay on screen', async () => {
-      await expect(searchPage.visitFormStartButton()).toBeVisible();
-      await expect(page).toHaveURL(/\/spa\/search\?query=/);
-      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
-    });
-
-    await test.step('When I fill in and submit the visit form', async () => {
-      await searchPage.startVisitInVisitForm();
-    });
-
-    await test.step('Then the visit starts, and the result no longer offers to start a visit', async () => {
-      await expect(page.getByText(/visit started successfully/i)).toBeVisible();
-      await expect(searchPage.startVisitButton()).toBeHidden();
-      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
-    });
+    await searchPage.patientResultLink(firstName).click();
+    await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/patient-summary`);
+    await page.getByRole('button', { name: 'Actions', exact: true }).click();
+    await page.getByRole('menuitem', { name: 'Add visit', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Start visit', exact: true })).toBeVisible();
   });
 
   test('Do not offer to start a visit for a patient with an active visit', async ({ api, page, patient }) => {
