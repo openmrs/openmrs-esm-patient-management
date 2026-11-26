@@ -105,7 +105,6 @@ const initialContextValues = {
   setFieldValue: vi.fn(),
   setFieldTouched: vi.fn(),
   setInitialFormValues: vi.fn(),
-  validationSchema: null,
   values: {} as FormValues,
 };
 
@@ -281,7 +280,6 @@ describe('Field', () => {
       setCapturePhotoProps: vi.fn(),
       setFieldValue: vi.fn(),
       setInitialFormValues: vi.fn(),
-      validationSchema: null,
       values: { identifiers: { openmrsID } } as unknown as FormValues,
       setFieldTouched: vi.fn(),
     };
