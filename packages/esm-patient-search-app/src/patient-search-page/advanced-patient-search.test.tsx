@@ -50,9 +50,7 @@ vi.mock('react-router-dom', async () => ({
   ]),
 }));
 
-const mockPatientSearchContext: PatientSearchContext2Props = {
-  launchStartVisitWorkspace: vi.fn(),
-};
+const mockPatientSearchContext: PatientSearchContext2Props = {};
 
 const mockSearchResults: PatientSearchResponse = {
   isValidating: false,

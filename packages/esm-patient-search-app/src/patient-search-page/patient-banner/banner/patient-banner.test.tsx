@@ -70,9 +70,9 @@ const patient: SearchedPatient = {
 function makeContext2(contextOverrides: Partial<PatientSearchContext2Props> = {}): PatientSearchContext2Props {
   return {
     onPatientSelected: vi.fn(),
-    launchStartVisitWorkspace: vi.fn(),
     launchChildWorkspace: vi.fn(),
     closeWorkspace: vi.fn(),
+    startVisitWorkspaceName: 'start-visit-workspace',
     ...contextOverrides,
   };
 }
@@ -173,7 +173,7 @@ describe('PatientBanner visit actions and patient mapping', () => {
     mockExtensionSlot.mockImplementation(() => null);
   });
 
-  it('passes patientUuid, the mapped FHIR patient and the launcher to the start visit button slot', () => {
+  it('passes patientUuid, the mapped FHIR patient and the start visit workspace to the start visit button slot', () => {
     const context = makeContext2({ onPatientSelected: undefined });
     renderBanner(context);
 
@@ -183,7 +183,8 @@ describe('PatientBanner visit actions and patient mapping', () => {
       expect.objectContaining({
         patientUuid: patient.uuid,
         patient: expect.objectContaining({ id: patient.uuid, birthDate: patient.person.birthdate }),
-        launchStartVisitWorkspace: context.launchStartVisitWorkspace,
+        launchChildWorkspace: context.launchChildWorkspace,
+        startVisitWorkspaceName: 'start-visit-workspace',
       }),
     );
   });

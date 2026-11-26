@@ -166,9 +166,8 @@ const CreateAdmissionEncounterWorkspace: React.FC<
           <NoActiveVisitEmptyState
             patientUuid={selectedPatientUuid}
             patient={patient}
-            launchStartVisitWorkspace={(workspaceProps) =>
-              launchChildWorkspace(startVisitWorkspaceName, workspaceProps)
-            }
+            launchChildWorkspace={launchChildWorkspace}
+            startVisitWorkspaceName={startVisitWorkspaceName}
             closeWorkspace={() => closeWorkspace()}
           />
         )}

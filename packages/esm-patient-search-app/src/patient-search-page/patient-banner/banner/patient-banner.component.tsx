@@ -47,10 +47,10 @@ const PatientBanner = React.memo(
     const {
       onPatientSelected,
       onVisitStarted,
-      selectPatientButton,
-      launchStartVisitWorkspace,
       launchChildWorkspace,
       closeWorkspace,
+      startVisitWorkspaceName,
+      selectPatientButton,
     } = context2 ?? {};
 
     const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
@@ -100,13 +100,14 @@ const PatientBanner = React.memo(
                   patientUuid={patientUuid}
                 />
               ) : null}
-              {!isDeceased && !activeVisit && launchStartVisitWorkspace && (
+              {!isDeceased && !activeVisit && launchChildWorkspace && startVisitWorkspaceName && (
                 <ExtensionSlot
                   name="start-visit-button-slot2"
                   state={{
                     patientUuid,
                     patient: fhirMappedPatient,
-                    launchStartVisitWorkspace,
+                    launchChildWorkspace,
+                    startVisitWorkspaceName,
                     onVisitStarted: onVisitStarted
                       ? (visit: Visit) =>
                           onVisitStarted(patientUuid, fhirMappedPatient, visit, launchChildWorkspace, closeWorkspace)

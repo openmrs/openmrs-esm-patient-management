@@ -1,20 +1,22 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineNotification, Stack } from '@carbon/react';
-import { ArrowLeftIcon, ExtensionSlot, type Patient } from '@openmrs/esm-framework';
+import { ArrowLeftIcon, ExtensionSlot, type Patient, type Workspace2DefinitionProps } from '@openmrs/esm-framework';
 import styles from './create-admission-encounter.scss';
 
 interface NoActiveVisitEmptyStateProps {
   patientUuid: string;
   patient: Patient;
-  launchStartVisitWorkspace: (workspaceProps?: object) => Promise<void>;
+  launchChildWorkspace: Workspace2DefinitionProps['launchChildWorkspace'];
+  startVisitWorkspaceName: string;
   closeWorkspace: () => void;
 }
 
 const NoActiveVisitEmptyState: React.FC<NoActiveVisitEmptyStateProps> = ({
   patientUuid,
   patient,
-  launchStartVisitWorkspace,
+  launchChildWorkspace,
+  startVisitWorkspaceName,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
@@ -32,7 +34,8 @@ const NoActiveVisitEmptyState: React.FC<NoActiveVisitEmptyStateProps> = ({
         state={{
           patientUuid,
           patient,
-          launchStartVisitWorkspace,
+          launchChildWorkspace,
+          startVisitWorkspaceName,
         }}
       />
       <Button

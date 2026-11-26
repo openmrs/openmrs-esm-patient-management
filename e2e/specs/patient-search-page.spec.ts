@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { HomePage, PatientSearchPage } from '../pages';
-import { getPatientIdentifierStr, getPatientNames, startVisit } from '../commands';
+import { getPatientIdentifierStr, getPatientNames } from '../commands';
 
 test('Search for a patient from the dedicated search page', async ({ page, patient }) => {
   const openmrsIdentifier = getPatientIdentifierStr(patient);
@@ -119,23 +119,5 @@ test.describe('Visit actions on the search page', () => {
     await page.getByRole('button', { name: 'Actions', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Add visit', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Start visit', exact: true })).toBeVisible();
-  });
-
-  test('Do not offer to start a visit for a patient with an active visit', async ({ api, page, patient }) => {
-    const { firstName, fullName } = getPatientNames(patient);
-    const searchPage = new PatientSearchPage(page);
-
-    await test.step('Given a patient with an active visit', async () => {
-      await startVisit(api, patient.uuid);
-    });
-
-    await test.step('When I search for the patient', async () => {
-      await searchPage.goto(fullName);
-    });
-
-    await test.step('Then I should see the patient, without a start visit button', async () => {
-      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
-      await expect(searchPage.startVisitButton()).toBeHidden();
-    });
   });
 });

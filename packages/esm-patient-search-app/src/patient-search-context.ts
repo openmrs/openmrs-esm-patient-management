@@ -18,11 +18,6 @@ export interface SelectPatientButtonConfig {
  */
 export type PatientSelectionCallback = (patientUuid: string, patient: fhir.Patient) => void;
 
-/**
- * Launches the start visit workspace, in whichever way suits where the caller is mounted.
- */
-export type LaunchStartVisitWorkspace = (workspaceProps?: object) => Promise<void>;
-
 export interface PatientSearchContext2Props {
   onPatientSelected?(
     patientUuid: string,
@@ -42,16 +37,16 @@ export interface PatientSearchContext2Props {
     closeWorkspace: Workspace2DefinitionProps['closeWorkspace'],
   ): void;
   /**
-   * Supplied by an embedded search host to start a visit in its workspace. Standalone search
-   * omits this launcher and links to the patient chart without offering a start visit button.
-   */
-  launchStartVisitWorkspace?: LaunchStartVisitWorkspace;
-  /**
    * Only defined when the search results are mounted inside a workspace. These are what
    * `onPatientSelected` and `onVisitStarted` receive.
    */
   launchChildWorkspace?: Workspace2DefinitionProps['launchChildWorkspace'];
   closeWorkspace?: Workspace2DefinitionProps['closeWorkspace'];
+  /**
+   * The start visit workspace an embedded search host launches as a child workspace. Standalone
+   * search omits it and links to the patient chart without offering a start visit button.
+   */
+  startVisitWorkspaceName?: string;
   /**
    * Called just before following a result's link to the patient chart (e.g. to close the search overlay).
    * Not called when `onPatientSelected` or `selectPatientButton` handle the selection.
