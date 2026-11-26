@@ -7,6 +7,7 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
 import { getValidationSchema } from '../../validation/patient-registration-validation';
+import { validateRegistrationForm } from '../../validation/validate-registration-form';
 import { GenderField } from './gender-field.component';
 import { type FormValues } from '../../patient-registration.types';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
@@ -37,7 +38,9 @@ const renderGenderFieldWithFormik = (
       initialValues={defaultValues}
       onSubmit={() => {}}
       enableReinitialize={options?.enableReinitialize}
-      validationSchema={validationSchema || undefined}
+      validate={
+        validationSchema ? (values) => validateRegistrationForm(validationSchema, values as FormValues) : undefined
+      }
       validateOnChange={true}
       validateOnBlur={true}>
       {({ setFieldValue, values, setFieldTouched, errors, touched }) => {
@@ -48,7 +51,6 @@ const renderGenderFieldWithFormik = (
               value={{
                 identifierTypes: [],
                 values: formValuesRef,
-                validationSchema: validationSchema,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
                 setCapturePhotoProps: vi.fn(),
@@ -86,7 +88,6 @@ const renderGenderField = (initialValues: Partial<FormValues> = {}) => {
           value={{
             identifierTypes: [],
             values: { ...initialFormValues, ...defaultValues } as FormValues,
-            validationSchema: null,
             inEditMode: false,
             setFieldValue: vi.fn().mockResolvedValue(undefined),
             setCapturePhotoProps: vi.fn(),

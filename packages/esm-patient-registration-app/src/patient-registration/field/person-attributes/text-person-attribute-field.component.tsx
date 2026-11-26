@@ -4,6 +4,7 @@ import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../input/basic-input/input/input.component';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { usePatternRule, type PatternRule } from '../../validation/pattern-rules';
 import styles from './../field.scss';
 
 export interface TextPersonAttributeFieldProps {
@@ -23,23 +24,17 @@ export function TextPersonAttributeField({
 }: TextPersonAttributeFieldProps) {
   const { t } = useTranslation();
 
-  const validateInput = (value: string) => {
-    if (!value || !validationRegex || validationRegex === '' || typeof validationRegex !== 'string' || value === '') {
-      return;
-    }
-    const regex = new RegExp(validationRegex);
-    if (regex.test(value)) {
-      return;
-    } else {
-      return t('invalidInput', 'Invalid Input');
-    }
-  };
-
   const fieldName = `attributes.${personAttributeType.uuid}`;
+  const invalidInputMessage = t('invalidInput', 'Invalid Input');
+  const regexRule: PatternRule | null =
+    validationRegex && typeof validationRegex === 'string'
+      ? { path: fieldName, pattern: validationRegex, message: invalidInputMessage, onInvalidPattern: 'throw' }
+      : null;
+  usePatternRule(regexRule);
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
-      <Field name={fieldName} validate={validateInput}>
+      <Field name={fieldName}>
         {({ field, form: { touched, errors }, meta }) => {
           return (
             <Input

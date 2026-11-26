@@ -16,6 +16,8 @@ import {
 import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
 import { cancelRegistration, filterOutUndefinedPatientIdentifiers, scrollIntoView } from './patient-registration-utils';
 import { getValidationSchema } from './validation/patient-registration-validation';
+import { validateRegistrationForm } from './validation/validate-registration-form';
+import { createPatternRuleRegistry, PatternRulesProvider } from './validation/pattern-rules';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { PatientRegistrationContextProvider } from './patient-registration-context';
 import { useResourcesContext } from '../resources-context';
@@ -61,7 +63,11 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
   );
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
-  const validationSchema = getValidationSchema(config, t);
+  const patternRules = useRef(createPatternRuleRegistry()).current;
+  const validationSchema = useMemo(
+    () => getValidationSchema(config, t, patternRules.getRules),
+    [config, t, patternRules],
+  );
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -163,7 +169,6 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
   const createContextValue = useCallback(
     (formikProps) => ({
       identifierTypes,
-      validationSchema,
       values: formikProps.values,
       inEditMode,
       setFieldValue: formikProps.setFieldValue,
@@ -173,7 +178,7 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
       initialFormValues: formikProps.initialValues,
       setInitialFormValues,
     }),
-    [identifierTypes, validationSchema, inEditMode, setCapturePhotoProps, photo?.imageSrc, setInitialFormValues],
+    [identifierTypes, inEditMode, setCapturePhotoProps, photo?.imageSrc, setInitialFormValues],
   );
 
   return (
@@ -181,7 +186,7 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
       enableReinitialize
       initialValues={initialFormValues}
       onSubmit={onFormSubmit}
-      validationSchema={validationSchema}>
+      validate={(values) => validateRegistrationForm(validationSchema, values)}>
       {(props) => (
         <Form className={styles.form}>
           <BeforeSavePrompt when={Object.keys(props.touched).length > 0} redirect={target} />
@@ -230,13 +235,15 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
             {/* Registration Form */}
             <div className={styles.infoGrid}>
               <PatientRegistrationContextProvider value={createContextValue(props)}>
-                {sections.map((section, index) => (
-                  <SectionWrapper
-                    key={`registration-section-${section.id}`}
-                    sectionDefinition={section}
-                    index={index}
-                  />
-                ))}
+                <PatternRulesProvider registry={patternRules}>
+                  {sections.map((section, index) => (
+                    <SectionWrapper
+                      key={`registration-section-${section.id}`}
+                      sectionDefinition={section}
+                      index={index}
+                    />
+                  ))}
+                </PatternRulesProvider>
               </PatientRegistrationContextProvider>
             </div>
           </div>
