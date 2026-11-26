@@ -1,12 +1,24 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import { type TFunction } from 'i18next';
 import { launchWorkspace2, type Workspace2DefinitionProps, restBaseUrl } from '@openmrs/esm-framework';
-import { AppointmentStatus } from '../types';
+import { type AppointmentsCalendarFilters, AppointmentStatus } from '../types';
 import { appointmentsFormWorkspace, omrsDateFormat } from '../constants';
 
-export const buildAppointmentsUrl = (isoDate: string): string => {
+/**
+ * Serialises calendar filters as repeated query params (e.g. `&providerUuids=a&providerUuids=b`).
+ * Returns an empty string when no filter is set so the request stays unchanged.
+ */
+export const buildAppointmentsFilterQuery = (filters?: AppointmentsCalendarFilters): string => {
+  const params = new URLSearchParams();
+  filters?.providerUuids?.forEach((uuid) => params.append('providerUuids', uuid));
+  filters?.serviceUuids?.forEach((uuid) => params.append('serviceUuids', uuid));
+  const query = params.toString();
+  return query ? `&${query}` : '';
+};
+
+export const buildAppointmentsUrl = (isoDate: string, filters?: AppointmentsCalendarFilters): string => {
   const startOfDay = dayjs(isoDate).startOf('day').format(omrsDateFormat);
-  return `${restBaseUrl}/appointments?forDate=${encodeURIComponent(startOfDay)}`;
+  return `${restBaseUrl}/appointments?forDate=${encodeURIComponent(startOfDay)}${buildAppointmentsFilterQuery(filters)}`;
 };
 
 export const formatAMPM = (date: Date): string => {

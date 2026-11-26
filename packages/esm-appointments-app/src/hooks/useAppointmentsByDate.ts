@@ -1,16 +1,17 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { type Appointment, type AppointmentsFetchResponse } from '../types';
+import { type Appointment, type AppointmentsCalendarFilters, type AppointmentsFetchResponse } from '../types';
 import { buildAppointmentsUrl } from '../helpers';
 
 export const useAppointmentsByDate = (
   isoDate: string | null,
+  filters?: AppointmentsCalendarFilters,
 ): {
   appointments: Array<Appointment>;
   isLoading: boolean;
   error: Error | undefined;
 } => {
-  const url = isoDate ? buildAppointmentsUrl(isoDate) : null;
+  const url = isoDate ? buildAppointmentsUrl(isoDate, filters) : null;
 
   const { data, isLoading, error } = useSWR<AppointmentsFetchResponse, Error>(url, openmrsFetch, {
     errorRetryCount: 2,

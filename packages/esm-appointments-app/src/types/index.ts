@@ -150,6 +150,12 @@ export interface Provider {
   name?: string;
 }
 
+/** Optional server-side filters accepted by the appointments calendar endpoints. */
+export interface AppointmentsCalendarFilters {
+  providerUuids?: Array<string>;
+  serviceUuids?: Array<string>;
+}
+
 export enum DurationPeriod {
   monthly,
   weekly,
