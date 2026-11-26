@@ -202,4 +202,28 @@ describe('CodedPersonAttributeField', () => {
       expect(screen.queryByRole('combobox', { name: /Referred by/i })).not.toBeInTheDocument();
     });
   });
+
+  it('shows the validation message under the field once it is touched', () => {
+    render(
+      <Formik
+        initialValues={{ attributes: {} }}
+        initialErrors={{ attributes: { [personAttributeType.uuid]: 'Required' } }}
+        initialTouched={{ attributes: { [personAttributeType.uuid]: true } }}
+        onSubmit={() => {}}>
+        <Form>
+          <CodedPersonAttributeField
+            id="attributeId"
+            personAttributeType={personAttributeType}
+            answerConceptSetUuid={answerConceptSetUuid}
+            label={personAttributeType.display}
+            customConceptAnswers={[]}
+            required
+          />
+        </Form>
+      </Formik>,
+    );
+
+    expect(screen.getByRole('combobox', { name: /referred by/i })).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByText('Required')).toBeInTheDocument();
+  });
 });

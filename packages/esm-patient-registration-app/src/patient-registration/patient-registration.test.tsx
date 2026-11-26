@@ -91,6 +91,20 @@ vi.mock('./field/field.resource', () => ({
   }),
 }));
 
+const clinicAttributeUuid = 'clinic-attribute-uuid';
+const phoneAttributeUuid = '14d4f066-15f5-102d-96e4-000c29c2a5d7';
+
+vi.mock('./field/person-attributes/person-attributes.resource', () => ({
+  usePersonAttributeType: vi.fn().mockImplementation((uuid: string) => {
+    const display = { [clinicAttributeUuid]: 'Clinic', [phoneAttributeUuid]: 'Telephone Number' }[uuid];
+    return {
+      data: display ? { uuid, display, format: 'java.lang.String' } : undefined,
+      isLoading: false,
+      error: undefined,
+    };
+  }),
+}));
+
 vi.mock('react-router-dom', async () => ({
   ...((await vi.importActual('react-router-dom')) as object),
   useLocation: () => ({
@@ -435,6 +449,54 @@ describe('Registering a new patient', () => {
     expect(screen.queryByRole('textbox', { name: /ssn \(optional\)/i })).not.toBeInTheDocument();
     expect(await screen.findByText('Identifier value is required')).toBeInTheDocument();
     expect(ssnInput).toHaveAttribute('aria-invalid', 'true');
+    expect(mockSavePatientForm).not.toHaveBeenCalled();
+  });
+
+  it('says which required person attributes are empty, in the toast and under each field', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+    const defaultConfig = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+    mockUseConfig.mockReturnValue({
+      ...defaultConfig,
+      ...mockOpenmrsConfig,
+      sections: ['demographics', 'clinic'],
+      sectionDefinitions: [
+        ...mockOpenmrsConfig.sectionDefinitions,
+        { id: 'clinic', name: 'Clinic', fields: ['clinic', 'phone'] },
+      ],
+      fieldDefinitions: [
+        {
+          id: 'clinic',
+          type: 'person attribute',
+          uuid: clinicAttributeUuid,
+          label: 'Clinic',
+          validation: { required: true },
+        },
+      ],
+      fieldConfigurations: {
+        ...defaultConfig.fieldConfigurations,
+        ...mockOpenmrsConfig.fieldConfigurations,
+        phone: { personAttributeUuid: phoneAttributeUuid, validation: { required: true } },
+      },
+    } as RegistrationConfig);
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+    await fillRequiredFields();
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    await waitFor(() => expect(mockShowSnackbar).toHaveBeenCalled());
+    // Each field's wrapper shares its input's id, so the textboxes are told apart by their ids
+    const attributeInputs = screen.getAllByRole('textbox').filter((box) => ['clinic', 'phone'].includes(box.id));
+    expect(attributeInputs).toHaveLength(2);
+    attributeInputs.forEach((input) => expect(input).toHaveAttribute('aria-invalid', 'true'));
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0);
+    render(<>{mockShowSnackbar.mock.lastCall[0].subtitle}</>);
+    expect(screen.getAllByRole('listitem').map((item) => item.textContent)).toEqual(['Clinic', 'Phone number']);
+    expect(screen.getAllByText('Required')).toHaveLength(2);
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 
