@@ -6,7 +6,8 @@ import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import AppointmentsHeader from '../header/appointments-header.component';
 import { useSelectedDate } from '../hooks/useSelectedDate';
-import { type CalendarViewMode } from '../types';
+import { useAppointmentsStore } from '../store';
+import { type AppointmentsCalendarFilters, type CalendarViewMode } from '../types';
 import CalendarHeader from './header/calendar-header.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import DailyCalendarView from './daily/daily-calendar-view.component';
@@ -19,7 +20,27 @@ const AppointmentsCalendarView: React.FC = () => {
   const selectedDate = useSelectedDate();
   const [viewMode, setViewMode] = useState<CalendarViewMode>('monthly');
   const [calendarSelectedDate, setCalendarSelectedDate] = useState<Dayjs>(dayjs(selectedDate));
-  const { calendarEvents, isLoading, error } = useAppointmentsCalendar(calendarSelectedDate.toISOString(), viewMode);
+  const {
+    calendarProviderUuids,
+    setCalendarProviderUuids,
+    calendarServiceUuids,
+    setCalendarServiceUuids,
+    calendarLocationUuids,
+    setCalendarLocationUuids,
+  } = useAppointmentsStore();
+  const filters = useMemo<AppointmentsCalendarFilters>(
+    () => ({
+      providerUuids: calendarProviderUuids,
+      serviceUuids: calendarServiceUuids,
+      locationUuids: calendarLocationUuids,
+    }),
+    [calendarProviderUuids, calendarServiceUuids, calendarLocationUuids],
+  );
+  const { calendarEvents, isLoading, error } = useAppointmentsCalendar(
+    calendarSelectedDate.toISOString(),
+    viewMode,
+    filters,
+  );
   const { serviceTypes } = useAppointmentServices();
   const serviceColorMap = useMemo(() => buildServiceColorMap(serviceTypes), [serviceTypes]);
 
@@ -51,7 +72,7 @@ const AppointmentsCalendarView: React.FC = () => {
     appointments: dailyAppointments,
     isLoading: isLoadingDaily,
     error: dailyError,
-  } = useAppointmentsByDate(dailyIsoDate);
+  } = useAppointmentsByDate(dailyIsoDate, filters);
 
   const appointmentsCount = useMemo(() => {
     if (viewMode === 'daily') {
@@ -79,7 +100,16 @@ const AppointmentsCalendarView: React.FC = () => {
 
   return (
     <div data-testid="appointments-calendar" className={styles.backgroundColor}>
-      <AppointmentsHeader title={t('calendar', 'Calendar')} isCalendarView />
+      <AppointmentsHeader
+        title={t('calendar', 'Calendar')}
+        isCalendarView
+        selectedProviderUuids={calendarProviderUuids}
+        onProviderFilterChange={setCalendarProviderUuids}
+        selectedServiceUuids={calendarServiceUuids}
+        onServiceFilterChange={setCalendarServiceUuids}
+        selectedLocationUuids={calendarLocationUuids}
+        onLocationFilterChange={setCalendarLocationUuids}
+      />
       <div className={styles.calendarContent}>
         <CalendarHeader
           viewMode={viewMode}
@@ -99,7 +129,11 @@ const AppointmentsCalendarView: React.FC = () => {
           />
         )}
         {viewMode === 'daily' && (
-          <DailyCalendarView calendarSelectedDate={calendarSelectedDate} serviceColorMap={serviceColorMap} />
+          <DailyCalendarView
+            calendarSelectedDate={calendarSelectedDate}
+            serviceColorMap={serviceColorMap}
+            filters={filters}
+          />
         )}
       </div>
       <ServicesLegend services={legendServices} serviceColorMap={serviceColorMap} />

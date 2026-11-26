@@ -4,6 +4,9 @@ import { type AppointmentStatus } from './types';
 interface AppointmentsStore {
   appointmentServiceTypes: Array<string>;
   selectedAppointmentStatuses: Array<AppointmentStatus>;
+  calendarProviderUuids: Array<string>;
+  calendarServiceUuids: Array<string>;
+  calendarLocationUuids: Array<string>;
 }
 
 export const appointmentsStore = createGlobalStore<AppointmentsStore>(
@@ -11,6 +14,9 @@ export const appointmentsStore = createGlobalStore<AppointmentsStore>(
   {
     appointmentServiceTypes: [],
     selectedAppointmentStatuses: [],
+    calendarProviderUuids: [],
+    calendarServiceUuids: [],
+    calendarLocationUuids: [],
   },
   'sessionStorage',
 );
@@ -21,6 +27,15 @@ export const storeActions = {
   },
   setSelectedAppointmentStatuses(_, selectedAppointmentStatuses: Array<AppointmentStatus>) {
     return { selectedAppointmentStatuses };
+  },
+  setCalendarProviderUuids(_, calendarProviderUuids: Array<string>) {
+    return { calendarProviderUuids };
+  },
+  setCalendarServiceUuids(_, calendarServiceUuids: Array<string>) {
+    return { calendarServiceUuids };
+  },
+  setCalendarLocationUuids(_, calendarLocationUuids: Array<string>) {
+    return { calendarLocationUuids };
   },
 } satisfies Actions<AppointmentsStore>;
 

@@ -7,8 +7,11 @@
   background-color: colors.$gray-10;
   border-block: 1px solid $ui-03;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  height: auto;
+  min-height: layout.$spacing-12;
   padding-right: layout.$spacing-03;
 }
 
@@ -28,6 +31,16 @@
     margin-left: layout.$spacing-03 !important;
     flex-shrink: 0;
   }
+}
+
+.calendarControls {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: layout.$spacing-03;
+  padding-bottom: layout.$spacing-03;
 }
 
 // Overriding styles for RTL support
