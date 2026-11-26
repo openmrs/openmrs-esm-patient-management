@@ -99,7 +99,10 @@ test('Closing tablet search preserves an open chart workspace', async ({ page, p
   await page.getByRole('button', { name: 'Actions', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Add visit', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Start visit', exact: true })).toBeVisible();
-  await page.getByRole('radio', { name: 'OPD Visit', exact: true }).check();
+  await page
+    .locator('label')
+    .filter({ hasText: /^OPD Visit$/ })
+    .click();
 
   await homePage.searchPatient(fullName);
   await expect(searchPage.overlayHeader()).toBeVisible();
