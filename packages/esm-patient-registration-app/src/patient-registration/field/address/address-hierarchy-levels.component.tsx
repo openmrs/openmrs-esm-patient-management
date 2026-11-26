@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAddressEntries, useAddressEntryFetchConfig } from './address-hierarchy.resource';
-import { useField } from '../../form-adapter';
+import { useFormHelpers, useRegistrationField } from '../../form-adapter';
 import ComboInput from '../../input/combo-input/combo-input.component';
+import { useAddressEntries, useAddressEntryFetchConfig } from './address-hierarchy.resource';
 
 interface AddressComboBoxProps {
   attribute: {
@@ -20,7 +20,9 @@ interface AddressHierarchyLevelsProps {
 
 const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
   const { t } = useTranslation();
-  const [field, meta, { setValue }] = useField(`address.${attribute.name}`);
+  const fieldName = `address.${attribute.name}`;
+  const { field } = useRegistrationField<string>(fieldName);
+  const { setFieldValue } = useFormHelpers();
   const { fetchEntriesForField, searchString, updateChildElements } = useAddressEntryFetchConfig(attribute.name);
   const { entries, isLoadingAddressEntries, errorFetchingAddressEntries } = useAddressEntries(
     fetchEntriesForField,
@@ -30,19 +32,19 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
 
   const handleInputChange = useCallback(
     (newValue) => {
-      setValue(newValue);
+      setFieldValue(fieldName, newValue);
     },
-    [setValue],
+    [fieldName, setFieldValue],
   );
 
   const handleSelection = useCallback(
     (selectedItem) => {
-      if (meta.value !== selectedItem) {
-        setValue(selectedItem);
+      if (field.value !== selectedItem) {
+        setFieldValue(fieldName, selectedItem);
         updateChildElements();
       }
     },
-    [updateChildElements, meta.value, setValue],
+    [updateChildElements, field.value, fieldName, setFieldValue],
   );
 
   return (
@@ -51,7 +53,7 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
       error={errorFetchingAddressEntries}
       isLoading={isLoadingAddressEntries}
       handleSelection={handleSelection}
-      name={`address.${attribute.name}`}
+      name={fieldName}
       fieldProps={{
         ...field,
         id: attribute.name,

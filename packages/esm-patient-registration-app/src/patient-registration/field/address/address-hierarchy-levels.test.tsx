@@ -8,10 +8,10 @@ import { mockSession } from '__mocks__';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { ResourcesContextProvider } from '../../../resources-context';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import { Input } from '../../input/basic-input/input/input.component';
 import { AddressComponent } from './address-field.component';
 import type { Resources } from '../../../registration.resource';
 import type { AddressTemplate, FormValues } from '../../patient-registration.types';
-import type { PatientRegistrationContextProps } from '../../patient-registration-context';
 
 /**
  * Regression test for O3-5912.
@@ -57,9 +57,7 @@ function getAddressValues() {
   return getValues().address;
 }
 
-function renderAddress() {
-  const contextValue = { setFieldValue: vi.fn(), values: {} } as unknown as PatientRegistrationContextProps;
-
+function renderAddress(initialAddress: Partial<FormValues['address']> = {}) {
   const utils = renderWithRegistrationForm(
     // A fresh SWR cache per render, so hierarchy responses do not leak between tests.
     <SWRConfig value={{ provider: () => new Map() }}>
@@ -67,7 +65,7 @@ function renderAddress() {
         <AddressComponent />
       </ResourcesContextProvider>
     </SWRConfig>,
-    { initialValues: { address: {} }, contextValues: contextValue },
+    { initialValues: { address: initialAddress as FormValues['address'] } },
   );
   getValues = utils.getValues;
   return utils;
@@ -174,5 +172,103 @@ describe('Address hierarchy: clearing dependent fields', () => {
 
     await waitFor(() => expect(getAddressValues()).toEqual({ stateProvince: 'Nairobi', country: 'Uganda' }));
     expect(mockOpenmrsFetch).not.toHaveBeenCalledWith(expect.stringContaining('getChildAddressHierarchyEntries'));
+  });
+
+  it('touches the level when its input loses focus', async () => {
+    const user = userEvent.setup();
+    const { getTouched } = renderAddress();
+
+    await user.click(await screen.findByLabelText('Country (optional)'));
+    expect(getTouched().address?.country).toBeFalsy();
+
+    await user.click(document.body);
+
+    await waitFor(() => expect(getTouched().address?.country).toBe(true));
+  });
+
+  it('does not clear the dependent levels when the same parent value is selected again', async () => {
+    const user = userEvent.setup();
+    renderAddress();
+
+    await choose(user, 'Country (optional)', 'Kenya');
+    await choose(user, 'State/Province (optional)', 'Nairobi');
+    await choose(user, 'City/Village (optional)', 'Westlands');
+
+    await waitFor(() =>
+      expect(getAddressValues()).toEqual({ country: 'Kenya', stateProvince: 'Nairobi', cityVillage: 'Westlands' }),
+    );
+
+    const countryInput = screen.getByLabelText('Country (optional)');
+    await user.click(countryInput);
+    await user.click(await screen.findByText('Kenya'));
+
+    expect(getAddressValues()).toEqual({ country: 'Kenya', stateProvince: 'Nairobi', cityVillage: 'Westlands' });
+  });
+
+  it('fetches the child entries for the new parent after the parent changes', async () => {
+    const user = userEvent.setup();
+    renderAddress();
+
+    await choose(user, 'Country (optional)', 'Kenya');
+    await user.click(await screen.findByLabelText('State/Province (optional)'));
+    expect(await screen.findByText('Nairobi')).toBeInTheDocument();
+
+    await choose(user, 'Country (optional)', 'Uganda');
+    await user.click(screen.getByLabelText('State/Province (optional)'));
+
+    expect(await screen.findByText('Kampala')).toBeInTheDocument();
+    expect(screen.queryByText('Nairobi')).not.toBeInTheDocument();
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      expect.stringContaining('getChildAddressHierarchyEntries.form?searchString=Uganda'),
+    );
+  });
+
+  it('shows the form value of each level in its input', async () => {
+    renderAddress({ country: 'Kenya', stateProvince: 'Nairobi' });
+
+    expect(await screen.findByLabelText('Country (optional)')).toHaveValue('Kenya');
+    expect(screen.getByLabelText('State/Province (optional)')).toHaveValue('Nairobi');
+    expect(screen.getByLabelText('City/Village (optional)')).toHaveValue('');
+  });
+
+  it('does not load or report the level entries again when another field changes', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockOpenmrsFetch.mockImplementation(((url: string) => {
+      if (url.includes('getOrderedAddressHierarchyLevels')) {
+        return Promise.resolve({ data: levels.map((addressField) => ({ addressField })) });
+      }
+      return Promise.reject(new Error('Address hierarchy is down'));
+    }) as unknown as typeof openmrsFetch);
+    const user = userEvent.setup();
+    renderWithRegistrationForm(
+      <SWRConfig value={{ provider: () => new Map(), shouldRetryOnError: false }}>
+        <ResourcesContextProvider value={resources}>
+          <Input id="givenName" name="givenName" labelText="Given name" />
+          <AddressComponent />
+        </ResourcesContextProvider>
+      </SWRConfig>,
+      {
+        initialValues: { givenName: '', address: {} } as Partial<FormValues>,
+        withValidation: true,
+        config: {
+          freeTextFieldConceptUuid: 'free-text-uuid',
+          fieldConfigurations: {
+            gender: [{ label: 'M', value: 'male' }],
+            identifier: { allowPreferredSelection: false },
+          },
+        } as unknown as RegistrationConfig,
+      },
+    );
+    await screen.findByLabelText('Country (optional)');
+    await waitFor(() => expect(consoleError).toHaveBeenCalled());
+    const fetchesBefore = mockOpenmrsFetch.mock.calls.length;
+    const errorsBefore = consoleError.mock.calls.length;
+
+    await user.type(screen.getByRole('textbox', { name: /Given name/i }), 'abc');
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(mockOpenmrsFetch.mock.calls.length).toBe(fetchesBefore);
+    expect(consoleError.mock.calls.length).toBe(errorsBefore);
+    consoleError.mockRestore();
   });
 });

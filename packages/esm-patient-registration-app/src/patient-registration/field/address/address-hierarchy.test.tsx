@@ -48,13 +48,12 @@ const mockInitialFormValues = {
   yearsEstimated: 0,
 };
 
-const initialContextValues: PatientRegistrationContextProps = {
+const initialContextValues: Partial<PatientRegistrationContextProps> = {
   currentPhoto: '',
   inEditMode: false,
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
   setCapturePhotoProps: vi.fn(),
-  setFieldValue: vi.fn(),
   setFieldTouched: vi.fn(),
   setInitialFormValues: vi.fn(),
   values: mockInitialFormValues,
@@ -69,7 +68,7 @@ vi.mock('./address-hierarchy.resource', async () => ({
  * Helper to render AddressComponent in a registration form.
  */
 async function renderAddressHierarchy(
-  contextValues: PatientRegistrationContextProps,
+  contextValues: Partial<PatientRegistrationContextProps>,
   resourcesContextValue: Resources = mockResourcesContextValue,
 ) {
   return await renderWithRegistrationForm(
@@ -267,6 +266,35 @@ describe('Address hierarchy', () => {
         const textFieldInput = screen.getByLabelText(`${field.displayText} (optional)`);
         expect(textFieldInput).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('Element defaults', () => {
+    it('writes the address template element defaults to the address values of the form', () => {
+      mockResourcesContextValue.addressTemplate = mockedAddressTemplate;
+      mockUseConfig.mockReturnValue({
+        ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+        fieldConfigurations: {
+          address: {
+            useAddressHierarchy: { enabled: false, useQuickSearch: false, searchAddressByLevel: false },
+          },
+        } as RegistrationConfig['fieldConfigurations'],
+        fieldDefinitions: [],
+      });
+      mockUseOrderedAddressHierarchyLevels.mockReturnValue({
+        orderedFields: [],
+        isLoadingFieldOrder: false,
+        errorFetchingFieldOrder: undefined,
+      });
+
+      const { getValues } = renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <AddressComponent />
+        </ResourcesContextProvider>,
+        { initialValues: mockInitialFormValues },
+      );
+
+      expect(getValues().address).toEqual(mockedAddressTemplate.elementDefaults);
     });
   });
 });

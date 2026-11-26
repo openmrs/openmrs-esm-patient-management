@@ -2,10 +2,10 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText, InlineNotification } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
-import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { useResourcesContext } from '../../../resources-context';
+import { useFormHelpers } from '../../form-adapter';
 import { Input } from '../../input/basic-input/input/input.component';
+import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
 import AddressSearchComponent from './address-search.component';
 import styles from '../field.scss';
@@ -13,7 +13,7 @@ import styles from '../field.scss';
 export const AddressComponent: React.FC = () => {
   const config = useConfig();
   const { t } = useTranslation();
-  const { setFieldValue } = usePatientRegistrationContext();
+  const { setFieldValue } = useFormHelpers();
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   const {
