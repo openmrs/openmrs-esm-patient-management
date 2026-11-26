@@ -3,7 +3,20 @@ import { vi, describe, it, expect } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
+import { createPatternRuleRegistry, PatternRulesProvider } from '../../validation/pattern-rules';
+import { getValidationSchema } from '../../validation/patient-registration-validation';
+import { validateRegistrationForm } from '../../validation/validate-registration-form';
+import { type RegistrationConfig } from '../../../config-schema';
+import { type FormValues } from '../../patient-registration.types';
 import { TextPersonAttributeField } from './text-person-attribute-field.component';
+
+const validationConfig = {
+  freeTextFieldConceptUuid: 'free-text-uuid',
+  fieldConfigurations: {
+    gender: [{ label: 'M', value: 'male' }],
+    identifier: { allowPreferredSelection: false },
+  },
+} as unknown as RegistrationConfig;
 
 const mockPersonAttributeType = {
   format: 'java.lang.String',
@@ -24,18 +37,33 @@ const renderTextPersonAttributeField = (
     required?: boolean;
   } = {},
 ) => {
+  const registry = createPatternRuleRegistry();
   const utils = render(
-    <Formik initialValues={{}} onSubmit={() => {}}>
-      <Form>
-        <TextPersonAttributeField
-          id={props.id || 'attributeId'}
-          personAttributeType={mockPersonAttributeType}
-          label={props.label}
-          validationRegex={props.validationRegex}
-          required={props.required}
-        />
-      </Form>
-    </Formik>,
+    <PatternRulesProvider registry={registry}>
+      <Formik
+        initialValues={{}}
+        onSubmit={() => {}}
+        validate={(values) =>
+          validateRegistrationForm(
+            getValidationSchema(
+              validationConfig,
+              (_key: string, defaultValue: string) => defaultValue,
+              registry.getRules,
+            ),
+            values as FormValues,
+          )
+        }>
+        <Form>
+          <TextPersonAttributeField
+            id={props.id || 'attributeId'}
+            personAttributeType={mockPersonAttributeType}
+            label={props.label}
+            validationRegex={props.validationRegex}
+            required={props.required}
+          />
+        </Form>
+      </Formik>
+    </PatternRulesProvider>,
   );
 
   return utils;
@@ -52,6 +80,34 @@ describe('TextPersonAttributeField', () => {
     renderTextPersonAttributeField();
 
     expect(screen.getByRole('textbox', { name: /referred by \(optional\)/i })).toBeInTheDocument();
+  });
+
+  describe('Pattern rule', () => {
+    it('registers the regex rule for the attribute', () => {
+      const registry = createPatternRuleRegistry();
+      render(
+        <PatternRulesProvider registry={registry}>
+          <Formik initialValues={{}} onSubmit={() => {}}>
+            <Form>
+              <TextPersonAttributeField
+                id="attributeId"
+                personAttributeType={mockPersonAttributeType}
+                validationRegex="^[A-Z]+$"
+              />
+            </Form>
+          </Formik>
+        </PatternRulesProvider>,
+      );
+
+      expect(registry.getRules()).toEqual([
+        {
+          path: `attributes.${mockPersonAttributeType.uuid}`,
+          pattern: '^[A-Z]+$',
+          message: 'Invalid Input',
+          onInvalidPattern: 'throw',
+        },
+      ]);
+    });
   });
 
   describe('Input validation', () => {

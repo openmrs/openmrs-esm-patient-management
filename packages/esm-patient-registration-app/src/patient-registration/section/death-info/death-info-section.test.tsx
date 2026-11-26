@@ -33,7 +33,6 @@ function renderDeathInfoSectionWithFormik(fields: string[] = [], initialValues: 
               value={{
                 identifierTypes: [],
                 values: formValuesRef,
-                validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
                 setCapturePhotoProps: vi.fn(),

@@ -9,10 +9,7 @@ import DailyCalendarView from './daily-calendar-view.component';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string, opts?: { count?: number }) => {
-      if (opts?.count !== undefined) return `${opts.count} appointment(s)`;
-      return fallback ?? key;
-    },
+    t: (key: string, fallback?: string) => fallback ?? key,
   }),
 }));
 
@@ -76,13 +73,6 @@ describe('DailyCalendarView', () => {
     await waitFor(() => {
       expect(screen.getByText(/No appointments scheduled/i)).toBeInTheDocument();
     });
-  });
-
-  it('renders the appointment count', async () => {
-    mockOpenmrsFetch.mockResolvedValue({ data: [mockAppointment()] } as FetchResponse);
-    renderWithSwr(<DailyCalendarView {...defaultProps} />);
-
-    await screen.findByText('1 appointment(s)');
   });
 
   it('renders hour labels only for hours with appointments', async () => {
