@@ -45,9 +45,7 @@ export const PatternRulesProvider: React.FC<{ registry: PatternRuleRegistry; chi
 
 /**
  * Registers a pattern rule while the calling component is mounted. The effect has no dependency array on purpose:
- * the rule is unregistered and registered again on every commit, which copies how Formik's `<Field validate>`
- * registered its validator on every render. The rules then follow the form order, and the snackbar lists the
- * pattern errors in the same order as before.
+ * the rule is unregistered and registered again on every commit, so the rules follow the form order.
  */
 export function usePatternRule(rule: PatternRule | null): void {
   const registry = useContext(PatternRulesContext);

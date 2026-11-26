@@ -69,7 +69,14 @@ export function getValidationSchema(
       gender: optionalString
         .refine(isPresentString, t('genderRequired', 'Gender is required'))
         .refine((value) => value == null || genderValues.includes(value), t('genderUnspecified', 'Gender unspecified')),
-      birthdate: dateFromString(z.date().nullish()),
+      // An invalid date is a refinement and not a type error, so the estimated years and custom field checks in
+      // `superRefine` still run. A large estimate in years gives an invalid derived birthdate.
+      birthdate: dateFromString(
+        z
+          .instanceof(Date)
+          .refine((date) => !isNaN(date.getTime()), 'Invalid date')
+          .nullish(),
+      ),
       yearsEstimated: numberFromString(z.number().nullish()),
       monthsEstimated: numberFromString(
         z.number().min(0, t('negativeMonths', 'Estimated months cannot be negative')).nullish(),

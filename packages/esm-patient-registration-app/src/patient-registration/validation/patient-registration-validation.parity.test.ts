@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type RegistrationConfig } from '../../config-schema';
 import { type FormValues } from '../patient-registration.types';
 import { getValidationSchema } from './patient-registration-validation';
+import { type PatternRule } from './pattern-rules';
 import { validateRegistrationForm } from './validate-registration-form';
 
 const baseConfig = {
@@ -43,10 +44,18 @@ const validValues = {
 };
 
 /** Runs the schema the way the form does and returns the form errors. */
-async function errorsFor(values: Partial<FormValues> | Record<string, unknown>, configOverrides = {}) {
+async function errorsFor(
+  values: Partial<FormValues> | Record<string, unknown>,
+  configOverrides = {},
+  patternRules: Array<PatternRule> = [],
+) {
   const config = merge({}, baseConfig, configOverrides) as unknown as RegistrationConfig;
   return validateRegistrationForm(
-    getValidationSchema(config, (_key: string, defaultValue: string) => defaultValue),
+    getValidationSchema(
+      config,
+      (_key: string, defaultValue: string) => defaultValue,
+      () => patternRules,
+    ),
     values as FormValues,
   );
 }
@@ -175,6 +184,32 @@ describe('Patient registration validation parity', () => {
     const tooLarge = { ...validValues, birthdateEstimated: true, yearsEstimated: 141 };
     expect(await errorsFor(tooLarge)).toMatchInlineSnapshot(`
       {
+        "yearsEstimated": "Estimated years cannot be more than 140",
+      }
+    `);
+  });
+
+  it('still checks the estimated years and custom fields when the derived birthdate is invalid', async () => {
+    // 1000000 estimated years gives a birthdate outside the range of a JavaScript Date
+    const values = {
+      ...validValues,
+      birthdateEstimated: true,
+      yearsEstimated: 1000000,
+      birthdate: new Date(NaN),
+      obs: { weight: 'abc' },
+    };
+    const weightRule: PatternRule = {
+      path: 'obs.weight',
+      pattern: '^\\d+$',
+      message: 'Weight must be a number',
+      onInvalidPattern: 'pass',
+    };
+    expect(await errorsFor(values, {}, [weightRule])).toMatchInlineSnapshot(`
+      {
+        "birthdate": "Invalid date",
+        "obs": {
+          "weight": "Weight must be a number",
+        },
         "yearsEstimated": "Estimated years cannot be more than 140",
       }
     `);
