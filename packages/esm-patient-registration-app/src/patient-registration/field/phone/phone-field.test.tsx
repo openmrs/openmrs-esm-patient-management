@@ -32,7 +32,6 @@ const renderPhoneField = () => {
           value={{
             identifierTypes: [],
             values: initialFormValues,
-            validationSchema: null,
             inEditMode: false,
             setFieldValue: vi.fn().mockResolvedValue(undefined),
             setCapturePhotoProps: vi.fn(),

@@ -40,7 +40,6 @@ const renderDobFieldWithFormik = (
               value={{
                 identifierTypes: [],
                 values: formValuesRef,
-                validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
                 setCapturePhotoProps: vi.fn(),
@@ -81,7 +80,6 @@ const renderDobField = (initialValues: Partial<FormValues> = {}) => {
           value={{
             identifierTypes: [],
             values: { ...initialFormValues, ...defaultValues } as FormValues,
-            validationSchema: null,
             inEditMode: false,
             setFieldValue: vi.fn().mockResolvedValue(undefined),
             setCapturePhotoProps: vi.fn(),

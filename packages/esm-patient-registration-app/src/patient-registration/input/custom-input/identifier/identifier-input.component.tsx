@@ -11,6 +11,7 @@ import { Input } from '../../basic-input/input/input.component';
 import { usePatientRegistrationContext } from '../../../patient-registration-context';
 import { useResourcesContext } from '../../../../resources-context';
 import type { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../../patient-registration.types';
+import { usePatternRule, type PatternRule } from '../../../validation/pattern-rules';
 import styles from '../../input.scss';
 
 /**
@@ -82,27 +83,18 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     return map;
   }, [defaultPatientIdentifierTypes]);
 
-  const validateInput = (value: string) => {
-    if (!value || value === '') {
-      return;
-    }
-
-    if (!identifierType?.format) {
-      return;
-    }
-
-    try {
-      const regex = new RegExp(identifierType.format);
-      if (regex.test(value)) {
-        return;
-      }
-
-      return identifierType.formatDescription ?? `Expected format: ${identifierType.format}`;
-    } catch (e) {
-      console.error('Invalid regex pattern:', identifierType.format);
-      return;
-    }
-  };
+  const identifierFormat = identifierType?.format;
+  const identifierFormatDescription = identifierType?.formatDescription;
+  const formatRule: PatternRule | null =
+    identifierFormat && !hideInputField
+      ? {
+          path: name,
+          pattern: identifierFormat,
+          message: identifierFormatDescription ?? `Expected format: ${identifierFormat}`,
+          onInvalidPattern: 'pass',
+        }
+      : null;
+  usePatternRule(formatRule);
 
   const handleReset = useCallback(() => {
     setHideInputField(true);
@@ -199,7 +191,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   return (
     <div className={styles.IDInput}>
       {!hideInputField ? (
-        <Field name={name} validate={validateInput}>
+        <Field name={name}>
           {({ field, form: { touched, errors } }) => (
             <Input
               id={name}
