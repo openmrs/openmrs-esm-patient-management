@@ -3,7 +3,9 @@ import { vi, describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { navigate } from '@openmrs/esm-framework';
+import { spaHomePage } from '../constants';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
@@ -33,17 +35,6 @@ function renderCalendar() {
     <BrowserRouter>
       <AppointmentsCalendarView />
     </BrowserRouter>,
-  );
-}
-
-function renderInCalendarRoute() {
-  return render(
-    <MemoryRouter initialEntries={['/calendar']}>
-      <Routes>
-        <Route path="/calendar" element={<AppointmentsCalendarView />} />
-        <Route path="/" element={<div>Appointments dashboard</div>} />
-      </Routes>
-    </MemoryRouter>,
   );
 }
 
@@ -304,17 +295,17 @@ describe('Appointment calendar view', () => {
 
   describe('back button', () => {
     it('renders a Back button', () => {
-      renderInCalendarRoute();
+      renderCalendar();
       expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
     });
 
-    it('navigates to the appointments dashboard instead of going back in history', async () => {
+    it('navigates to the appointments dashboard when Back is clicked', async () => {
       const user = userEvent.setup();
-      renderInCalendarRoute();
+      renderCalendar();
 
       await user.click(screen.getByRole('button', { name: /back/i }));
 
-      expect(await screen.findByText('Appointments dashboard')).toBeInTheDocument();
+      expect(vi.mocked(navigate)).toHaveBeenCalledWith({ to: `${spaHomePage}/appointments` });
     });
   });
 });

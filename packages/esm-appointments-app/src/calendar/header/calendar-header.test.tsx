@@ -28,10 +28,9 @@ function renderCalendarHeader(props = {}) {
 }
 
 describe('CalendarHeader', () => {
-  it('renders the Back, Today, Previous and Next buttons with a divider', () => {
+  it('renders the Back, Today, Previous and Next buttons', () => {
     renderCalendarHeader();
     expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
-    expect(screen.getByText('|')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^today$/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /previous/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();

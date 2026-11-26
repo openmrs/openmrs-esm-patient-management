@@ -80,9 +80,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           <Button kind="ghost" size="sm" renderIcon={ArrowLeft} onClick={handleBack} className={styles.backButton}>
             <span>{t('back', 'Back')}</span>
           </Button>
-          <span className={styles.divider} aria-hidden="true">
-            |
-          </span>
           <Button kind="tertiary" size="sm" onClick={onToday}>
             {t('today', 'Today')}
           </Button>
