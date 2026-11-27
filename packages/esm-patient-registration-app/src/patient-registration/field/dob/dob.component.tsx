@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
@@ -52,30 +52,6 @@ export const DobField: React.FC = () => {
     [setFieldValue, setFieldTouched],
   );
 
-  const onEstimatedYearsChange = useCallback(
-    (ev: ChangeEvent<HTMLInputElement>) => {
-      const years = +ev.target.value;
-
-      if (!isNaN(years) && years < 140 && years >= 0) {
-        setFieldValue('yearsEstimated', years);
-        setFieldValue('birthdate', calcBirthdate(years, monthsEstimateMeta.value, dateOfBirth));
-      }
-    },
-    [setFieldValue, dateOfBirth, monthsEstimateMeta.value],
-  );
-
-  const onEstimatedMonthsChange = useCallback(
-    (ev: ChangeEvent<HTMLInputElement>) => {
-      const months = +ev.target.value;
-
-      if (!isNaN(months)) {
-        setFieldValue('monthsEstimated', months);
-        setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months, dateOfBirth));
-      }
-    },
-    [setFieldValue, dateOfBirth, yearsEstimateMeta.value],
-  );
-
   const updateBirthdate = useCallback(() => {
     const months = +monthsEstimateMeta.value % 12;
     const years = +yearsEstimateMeta.value + Math.floor(monthsEstimateMeta.value / 12);
@@ -124,7 +100,6 @@ export const DobField: React.FC = () => {
                 id="yearsEstimated"
                 type="number"
                 name={yearsEstimated.name}
-                onChange={onEstimatedYearsChange}
                 labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
                 invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
                 invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
@@ -144,7 +119,6 @@ export const DobField: React.FC = () => {
                 id="monthsEstimated"
                 type="number"
                 name={monthsEstimated.name}
-                onChange={onEstimatedMonthsChange}
                 labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
                 invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
                 invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
