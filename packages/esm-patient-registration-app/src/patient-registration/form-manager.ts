@@ -364,7 +364,7 @@ export class FormManager {
     const attributes: Array<AttributeValue> = [];
     if (values.attributes) {
       Object.entries(values.attributes)
-        .filter(([, value]) => !!value)
+        .filter(([, value]) => value !== '' && value != null)
         .forEach(([key, value]) => {
           // Saved attributes of formats like Location load as `{ uuid, display }` references, but the
           // REST API only accepts the uuid when saving them. Other values, such as booleans, are sent as loaded.
@@ -387,7 +387,7 @@ export class FormManager {
     getSettledValuesOrThrow(
       await Promise.allSettled(
         Object.entries(values.attributes)
-          .filter(([, value]) => !value)
+          .filter(([, value]) => value === '' || value == null)
           .map(([key]) => patientUuidMap[`attribute.${key}`])
           .filter(Boolean)
           .map((attributeUuid) =>

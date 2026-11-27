@@ -392,6 +392,24 @@ describe('FormManager', () => {
         { attributeType: 'household-size-uuid', value: 5 },
       ]);
     });
+
+    it('preserves saved false boolean and zero numeric attributes', () => {
+      const values: FormValues = {
+        ...formValues,
+        attributes: {
+          'test-patient-uuid': false as unknown as string,
+          'household-size-uuid': 0 as unknown as string,
+          'empty-string-uuid': '',
+          'null-attribute-uuid': null,
+          'undefined-attribute-uuid': undefined,
+        },
+      };
+
+      expect(FormManager.getPatientAttributes(values)).toEqual([
+        { attributeType: 'test-patient-uuid', value: false },
+        { attributeType: 'household-size-uuid', value: 0 },
+      ]);
+    });
   });
 
   describe('getDeletedNames', () => {
@@ -521,6 +539,42 @@ describe('FormManager', () => {
       await savePromise;
 
       expect(mockSavePatient).toHaveBeenCalledOnce();
+    });
+
+    it('does not delete saved false boolean or zero numeric attributes when saving an existing patient', async () => {
+      const patientUuidMap = {
+        preferredNameUuid: 'preferred-name-uuid',
+        'attribute.test-patient-uuid': 'test-patient-attr-uuid',
+        'attribute.household-size-uuid': 'household-size-attr-uuid',
+        'attribute.cleared-uuid': 'cleared-attr-uuid',
+      } as PatientUuidMapType;
+
+      await saveExistingPatient(
+        {
+          attributes: {
+            'test-patient-uuid': false as unknown as string,
+            'household-size-uuid': 0 as unknown as string,
+            'cleared-uuid': '',
+          },
+        },
+        patientUuidMap,
+      );
+
+      expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1);
+      expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/person/patient-uuid/attribute/cleared-attr-uuid', {
+        method: 'DELETE',
+      });
+      expect(mockSavePatient).toHaveBeenCalledWith(
+        expect.objectContaining({
+          person: expect.objectContaining({
+            attributes: [
+              { attributeType: 'test-patient-uuid', value: false },
+              { attributeType: 'household-size-uuid', value: 0 },
+            ],
+          }),
+        }),
+        'patient-uuid',
+      );
     });
 
     it('rejects the save when name deletion fails', async () => {
