@@ -138,7 +138,7 @@
   "somePartsOfTheFormDidntLoad": "Some parts of the form didn't load",
   "startedDatetime": "Started {{datetime}}",
   "timeOnWard": "Time on this ward: {{timeOnWard}}",
-  "timeSinceAdmission": "Admitted: {{timeSinceAdmission}}",
+  "timeSinceAdmission": "Time since admission: {{timeSinceAdmission}}",
   "totalBeds": "Total beds",
   "transfer": "Transfer",
   "transferElsewhere": "Transfer elsewhere",
