@@ -20,9 +20,9 @@ const gregorianCalendar = new GregorianCalendar();
  * `chinese`) and falls back to Gregorian for them, so the calendar it resolved is used everywhere, keeping the
  * month grid and the titles in the same calendar.
  */
-export function getCalendarFormat(): { locale: string; calendar: string } {
+export function getCalendarFormat(): { locale: string; calendar: CalendarIdentifier } {
   const locale = getLocale() || 'en';
-  const calendar = createCalendar((getDefaultCalendar(locale) ?? 'gregory') as CalendarIdentifier).identifier;
+  const calendar = createCalendar(getDefaultCalendar(locale) ?? 'gregory').identifier;
   return { locale, calendar };
 }
 
@@ -34,7 +34,7 @@ export function formatInCalendar(
   date: Date,
   options: Intl.DateTimeFormatOptions,
   locale: string,
-  calendar: string,
+  calendar: CalendarIdentifier,
 ): string {
   const parts = new Intl.DateTimeFormat(locale, { ...options, calendar }).formatToParts(date);
   const isEthiopicEra = (index: number) =>
@@ -49,11 +49,8 @@ export function formatInCalendar(
 // Appointments, and the calendar's state, keep Gregorian dates. These helpers work out months in the calendar
 // that the user's locale uses (e.g. the 13-month Ethiopic calendar), and hand back Gregorian dates.
 
-function toLocaleCalendarDate(date: Dayjs, calendar: string): CalendarDate {
-  return toCalendar(
-    new CalendarDate(date.year(), date.month() + 1, date.date()),
-    createCalendar(calendar as CalendarIdentifier),
-  );
+function toLocaleCalendarDate(date: Dayjs, calendar: CalendarIdentifier): CalendarDate {
+  return toCalendar(new CalendarDate(date.year(), date.month() + 1, date.date()), createCalendar(calendar));
 }
 
 function toGregorianDayjs(date: CalendarDate): Dayjs {
@@ -62,7 +59,7 @@ function toGregorianDayjs(date: CalendarDate): Dayjs {
 }
 
 /** The first and last days of the month, in the given calendar, that contains `date`. */
-export function getCalendarMonthRange(date: Dayjs, calendar: string): { start: Dayjs; end: Dayjs } {
+export function getCalendarMonthRange(date: Dayjs, calendar: CalendarIdentifier): { start: Dayjs; end: Dayjs } {
   const localeDate = toLocaleCalendarDate(date, calendar);
   return {
     start: toGregorianDayjs(startOfMonth(localeDate)),
@@ -71,16 +68,16 @@ export function getCalendarMonthRange(date: Dayjs, calendar: string): { start: D
 }
 
 /** Moves `date` by a number of months in the given calendar, keeping the day of the month where it exists. */
-export function addCalendarMonths(date: Dayjs, months: number, calendar: string): Dayjs {
+export function addCalendarMonths(date: Dayjs, months: number, calendar: CalendarIdentifier): Dayjs {
   return toGregorianDayjs(toLocaleCalendarDate(date, calendar).add({ months }));
 }
 
-export function isSameCalendarMonth(date: Dayjs, otherDate: Dayjs, calendar: string): boolean {
+export function isSameCalendarMonth(date: Dayjs, otherDate: Dayjs, calendar: CalendarIdentifier): boolean {
   return isSameMonth(toLocaleCalendarDate(date, calendar), toLocaleCalendarDate(otherDate, calendar));
 }
 
 /** The day of the month of `date` in the given calendar. */
-export function getCalendarDayOfMonth(date: Dayjs, calendar: string): number {
+export function getCalendarDayOfMonth(date: Dayjs, calendar: CalendarIdentifier): number {
   return toLocaleCalendarDate(date, calendar).day;
 }
 
@@ -89,7 +86,7 @@ export function getCalendarDayOfMonth(date: Dayjs, calendar: string): number {
  * Sunday and are filled with the days of the previous and next months. When the month and the days before it
  * fill 30 cells or fewer, a further week is added. This keeps the layout the Gregorian calendar had before.
  */
-export function getMonthGridDays(date: Dayjs, calendar: string): Array<Dayjs> {
+export function getMonthGridDays(date: Dayjs, calendar: CalendarIdentifier): Array<Dayjs> {
   const { start, end } = getCalendarMonthRange(date, calendar);
   const leadingDays = start.day();
   const daysInMonth = end.diff(start, 'day') + 1;
