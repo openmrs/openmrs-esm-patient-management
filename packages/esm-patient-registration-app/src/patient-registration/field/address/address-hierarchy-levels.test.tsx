@@ -185,4 +185,42 @@ describe('Address hierarchy: clearing dependent fields', () => {
     await waitFor(() => expect(getAddressValues()).toEqual({ stateProvince: 'Nairobi', country: 'Uganda' }));
     expect(mockOpenmrsFetch).not.toHaveBeenCalledWith(expect.stringContaining('getChildAddressHierarchyEntries'));
   });
+
+  it('clears dependent levels when typing a new parent and picking that same entry', async () => {
+    const user = userEvent.setup();
+    renderAddress();
+
+    await choose(user, 'Country (optional)', 'Kenya');
+    await choose(user, 'State/Province (optional)', 'Nairobi');
+    await choose(user, 'City/Village (optional)', 'Westlands');
+
+    await waitFor(() =>
+      expect(getAddressValues()).toEqual({ country: 'Kenya', stateProvince: 'Nairobi', cityVillage: 'Westlands' }),
+    );
+
+    const countryInput = screen.getByLabelText('Country (optional)');
+    await user.clear(countryInput);
+    await user.type(countryInput, 'Uganda');
+    await user.click(await screen.findByText('Uganda'));
+
+    await waitFor(() => expect(getAddressValues()).toEqual({ country: 'Uganda', stateProvince: '', cityVillage: '' }));
+  });
+
+  it('does not clear dependent levels when the same parent entry is selected again without editing', async () => {
+    const user = userEvent.setup();
+    renderAddress();
+
+    await choose(user, 'Country (optional)', 'Kenya');
+    await choose(user, 'State/Province (optional)', 'Nairobi');
+    await choose(user, 'City/Village (optional)', 'Westlands');
+
+    await waitFor(() =>
+      expect(getAddressValues()).toEqual({ country: 'Kenya', stateProvince: 'Nairobi', cityVillage: 'Westlands' }),
+    );
+
+    await user.click(screen.getByLabelText('Country (optional)'));
+    await user.click(await screen.findByText('Kenya'));
+
+    expect(getAddressValues()).toEqual({ country: 'Kenya', stateProvince: 'Nairobi', cityVillage: 'Westlands' });
+  });
 });

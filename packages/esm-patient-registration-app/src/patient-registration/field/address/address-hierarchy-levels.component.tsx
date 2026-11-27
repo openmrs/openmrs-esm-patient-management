@@ -30,9 +30,12 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
 
   const handleInputChange = useCallback(
     (newValue) => {
-      setValue(newValue);
+      if (meta.value !== newValue) {
+        setValue(newValue);
+        updateChildElements();
+      }
     },
-    [setValue],
+    [meta.value, setValue, updateChildElements],
   );
 
   const handleSelection = useCallback(
