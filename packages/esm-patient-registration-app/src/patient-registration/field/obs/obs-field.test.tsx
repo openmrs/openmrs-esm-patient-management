@@ -10,6 +10,17 @@ import { ObsField } from './obs-field.component';
 import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
+import { createPatternRuleRegistry, PatternRulesProvider } from '../../validation/pattern-rules';
+import { getValidationSchema } from '../../validation/patient-registration-validation';
+import { validateRegistrationForm } from '../../validation/validate-registration-form';
+
+const validationConfig = {
+  freeTextFieldConceptUuid: 'free-text-uuid',
+  fieldConfigurations: {
+    gender: [{ label: 'M', value: 'male' }],
+    identifier: { allowPreferredSelection: false },
+  },
+} as unknown as RegistrationConfig;
 
 const mockUseConcept = vi.mocked(useConcept);
 const mockUseConceptAnswers = vi.mocked(useConceptAnswers);
@@ -168,30 +179,45 @@ const renderObsFieldWithFormik = (
 
   let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
 
+  const registry = createPatternRuleRegistry();
   const utils = render(
-    <Formik initialValues={defaultValues} onSubmit={() => {}} enableReinitialize={options?.enableReinitialize}>
-      {({ setFieldValue, values, setFieldTouched }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        return (
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                identifierTypes: [],
-                values: formValuesRef,
-                validationSchema: null,
-                inEditMode: false,
-                setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: vi.fn(),
-                setFieldTouched: setFieldTouched as any,
-                currentPhoto: '',
-                initialFormValues: formValuesRef,
-              }}>
-              <ObsField fieldDefinition={fieldDefinition} />
-            </PatientRegistrationContextProvider>
-          </Form>
-        );
-      }}
-    </Formik>,
+    <PatternRulesProvider registry={registry}>
+      <Formik
+        initialValues={defaultValues}
+        onSubmit={() => {}}
+        enableReinitialize={options?.enableReinitialize}
+        validate={(values) =>
+          validateRegistrationForm(
+            getValidationSchema(
+              validationConfig,
+              (_key: string, defaultValue: string) => defaultValue,
+              registry.getRules,
+            ),
+            values as FormValues,
+          )
+        }>
+        {({ setFieldValue, values, setFieldTouched }) => {
+          formValuesRef = { ...initialFormValues, ...values } as FormValues;
+          return (
+            <Form>
+              <PatientRegistrationContextProvider
+                value={{
+                  identifierTypes: [],
+                  values: formValuesRef,
+                  inEditMode: false,
+                  setFieldValue: setFieldValue as any,
+                  setCapturePhotoProps: vi.fn(),
+                  setFieldTouched: setFieldTouched as any,
+                  currentPhoto: '',
+                  initialFormValues: formValuesRef,
+                }}>
+                <ObsField fieldDefinition={fieldDefinition} />
+              </PatientRegistrationContextProvider>
+            </Form>
+          );
+        }}
+      </Formik>
+    </PatternRulesProvider>,
   );
 
   return {
@@ -245,6 +271,29 @@ describe('ObsField', () => {
   });
 
   describe('Text obs field', () => {
+    it('registers the regex rule for a text obs field', async () => {
+      const registry = createPatternRuleRegistry();
+      render(
+        <PatternRulesProvider registry={registry}>
+          <Formik initialValues={{ obs: {} }} onSubmit={() => {}}>
+            <Form>
+              <ObsField fieldDefinition={{ ...textFieldDef, validation: { required: false, matches: '^[A-Z]+$' } }} />
+            </Form>
+          </Formik>
+        </PatternRulesProvider>,
+      );
+
+      await screen.findByRole('textbox', { name: /chief complaint/i });
+      expect(registry.getRules()).toEqual([
+        {
+          path: 'obs.chief-complaint-uuid',
+          pattern: '^[A-Z]+$',
+          message: 'Invalid Input',
+          onInvalidPattern: 'throw',
+        },
+      ]);
+    });
+
     it('renders a text input for text concept', () => {
       renderObsFieldWithFormik(textFieldDef);
 

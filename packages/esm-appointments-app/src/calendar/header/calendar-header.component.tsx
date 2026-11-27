@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
-import { ChevronLeft, ChevronRight } from '@carbon/react/icons';
+import { ArrowLeft, ChevronLeft, ChevronRight } from '@carbon/react/icons';
 import { type CalendarViewMode } from '../../types';
 import { getCalendarFormat } from '../calendar-utils';
 import styles from './calendar-header.scss';
@@ -15,6 +15,7 @@ interface CalendarHeaderProps {
   onToday: () => void;
   onPrev: () => void;
   onNext: () => void;
+  onBack: () => void;
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
@@ -25,6 +26,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onToday,
   onPrev,
   onNext,
+  onBack,
 }) => {
   const { t } = useTranslation();
   const { locale, calendar } = getCalendarFormat();
@@ -71,6 +73,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     <div className={styles.calendarHeaderContainer}>
       <div className={styles.navigationSection}>
         <div className={styles.navGroup}>
+          <Button kind="ghost" size="sm" renderIcon={ArrowLeft} onClick={onBack} className={styles.backButton}>
+            <span>{t('back', 'Back')}</span>
+          </Button>
           <Button kind="tertiary" size="sm" onClick={onToday}>
             {t('today', 'Today')}
           </Button>

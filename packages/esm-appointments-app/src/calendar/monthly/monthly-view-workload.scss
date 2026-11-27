@@ -105,6 +105,7 @@
   align-items: center;
   gap: layout.$spacing-02;
   border-radius: 0.25rem;
+  background-color: color-mix(in srgb, var(--service-color) 15%, transparent);
   @include type.type-style('label-01');
   color: colors.$gray-100;
   box-sizing: border-box;

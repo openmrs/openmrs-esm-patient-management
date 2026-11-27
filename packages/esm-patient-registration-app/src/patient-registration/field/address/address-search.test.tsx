@@ -61,7 +61,6 @@ async function renderAddressSearchWithFormik(
               value={{
                 identifierTypes: [],
                 values: formValuesRef,
-                validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
                 setCapturePhotoProps: vi.fn(),
@@ -307,7 +306,6 @@ describe('Testing address search bar', () => {
             value={{
               identifierTypes: [],
               values: formValuesRef,
-              validationSchema: null,
               inEditMode: false,
               setFieldValue: vi.fn() as any,
               setCapturePhotoProps: vi.fn(),

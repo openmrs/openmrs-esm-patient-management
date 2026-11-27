@@ -35,7 +35,6 @@ function renderDemographicsSectionWithFormik(
               value={{
                 identifierTypes: [],
                 values: formValuesRef,
-                validationSchema: null,
                 inEditMode: false,
                 setFieldValue: setFieldValue as any,
                 setCapturePhotoProps: vi.fn(),
