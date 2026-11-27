@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { type FetchResponse, openmrsFetch, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { type ConceptAnswers, type ConceptResponse } from '../patient-registration.types';
@@ -9,13 +9,15 @@ export function useConcept(conceptUuid: string): { data: ConceptResponse; isLoad
     shouldFetch ? `${restBaseUrl}/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
-  if (error) {
-    showSnackbar({
-      title: error.name,
-      subtitle: error.message,
-      kind: 'error',
-    });
-  }
+  useEffect(() => {
+    if (error) {
+      showSnackbar({
+        title: error.name,
+        subtitle: error.message,
+        kind: 'error',
+      });
+    }
+  }, [error]);
   const results = useMemo(() => ({ data: data?.data, isLoading }), [data, isLoading]);
   return results;
 }
@@ -30,13 +32,15 @@ export function useConceptAnswers(conceptUuid: string): {
     shouldFetch ? `${restBaseUrl}/concept/${conceptUuid}?v=custom:(uuid,display,answers:(uuid,display))` : null,
     openmrsFetch,
   );
-  if (error) {
-    showSnackbar({
-      title: error.name,
-      subtitle: error.message,
-      kind: 'error',
-    });
-  }
+  useEffect(() => {
+    if (error) {
+      showSnackbar({
+        title: error.name,
+        subtitle: error.message,
+        kind: 'error',
+      });
+    }
+  }, [error]);
   const results = useMemo(() => ({ data: data?.data?.answers, isLoading, error }), [isLoading, error, data]);
   return results;
 }
