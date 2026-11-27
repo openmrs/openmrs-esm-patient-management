@@ -367,11 +367,18 @@ export class FormManager {
         .filter(([, value]) => value !== '' && value != null)
         .forEach(([key, value]) => {
           // Saved attributes of formats like Location load as `{ uuid, display }` references, but the
-          // REST API only accepts the uuid when saving them. Other values, such as booleans, are sent as loaded.
+          // REST API only accepts the uuid when saving them. Saved numbers load as JSON numbers, which the REST API
+          // cannot convert to the string it stores, so they are sent as strings. Other values, such as booleans, are
+          // sent as loaded.
           const loadedValue: unknown = value;
           attributes.push({
             attributeType: key,
-            value: typeof loadedValue === 'object' ? (loadedValue as { uuid: string }).uuid : value,
+            value:
+              typeof loadedValue === 'object'
+                ? (loadedValue as { uuid: string }).uuid
+                : typeof loadedValue === 'number'
+                  ? String(loadedValue)
+                  : value,
           });
         });
     }

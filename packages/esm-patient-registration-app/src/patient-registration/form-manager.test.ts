@@ -389,7 +389,7 @@ describe('FormManager', () => {
         { attributeType: 'health-center-uuid', value: 'site-23-uuid' },
         { attributeType: 'referred-by-uuid', value: 'Kisumu Clinic' },
         { attributeType: 'test-patient-uuid', value: true },
-        { attributeType: 'household-size-uuid', value: 5 },
+        { attributeType: 'household-size-uuid', value: '5' },
       ]);
     });
 
@@ -407,7 +407,7 @@ describe('FormManager', () => {
 
       expect(FormManager.getPatientAttributes(values)).toEqual([
         { attributeType: 'test-patient-uuid', value: false },
-        { attributeType: 'household-size-uuid', value: 0 },
+        { attributeType: 'household-size-uuid', value: '0' },
       ]);
     });
   });
@@ -569,7 +569,7 @@ describe('FormManager', () => {
           person: expect.objectContaining({
             attributes: [
               { attributeType: 'test-patient-uuid', value: false },
-              { attributeType: 'household-size-uuid', value: 0 },
+              { attributeType: 'household-size-uuid', value: '0' },
             ],
           }),
         }),
