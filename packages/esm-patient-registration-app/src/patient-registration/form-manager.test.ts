@@ -147,6 +147,23 @@ describe('FormManager', () => {
       );
       expect(mockGenerateIdentifier.mock.calls).toHaveLength(0);
     });
+
+    it('should generate identifier if manual entry enabled and the value is left empty', async () => {
+      formValues.identifiers.foo.autoGeneration = true;
+      formValues.identifiers.foo.selectedSource.autoGenerationOption.manualEntryEnabled = true;
+      formValues.identifiers.foo.identifierValue = '';
+      mockGenerateIdentifier.mockResolvedValue({ data: { identifier: '10001V' } } as any);
+      const identifiers = await FormManager.savePatientIdentifiers(
+        true,
+        undefined,
+        formValues.identifiers,
+        {},
+        'Nyc',
+        new SavePatientTransactionManager(),
+      );
+      expect(mockGenerateIdentifier.mock.calls).toHaveLength(1);
+      expect(identifiers).toEqual([expect.objectContaining({ identifier: '10001V' })]);
+    });
   });
 
   describe('changing the preferred identifier of an existing patient', () => {

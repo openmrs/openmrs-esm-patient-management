@@ -9,8 +9,6 @@
   flex-wrap: wrap;
   gap: layout.$spacing-03;
   padding: layout.$spacing-04 layout.$spacing-05;
-  background: colors.$gray-10;
-  border-bottom: 1px solid colors.$gray-20;
 }
 
 .navigationSection {
@@ -22,7 +20,30 @@
 .navGroup {
   display: flex;
   align-items: center;
-  gap: layout.$spacing-05;
+  flex-wrap: wrap;
+  row-gap: layout.$spacing-03;
+  column-gap: layout.$spacing-05;
+}
+
+.backButton {
+  padding-left: layout.$spacing-02 !important;
+  padding-inline-start: layout.$spacing-02 !important;
+  padding-right: layout.$spacing-02 !important;
+  padding-inline-end: layout.$spacing-02 !important;
+
+  // render the icon before text
+  svg,
+  :global(.cds--btn__icon) {
+    order: 1;
+    margin-left: 0 !important;
+    margin-inline-start: 0 !important;
+    margin-right: layout.$spacing-03;
+    margin-inline-end: layout.$spacing-03;
+  }
+
+  span {
+    order: 2;
+  }
 }
 
 .navButtonGroup {
@@ -57,6 +78,12 @@
   white-space: nowrap;
 }
 
+.appointmentsCount {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  white-space: nowrap;
+}
+
 .switcherSection {
   display: flex;
   align-items: center;
@@ -76,7 +103,7 @@
     white-space: nowrap;
     min-width: fit-content;
     color: var(--brand-03);
-    border-color: var(--brand-03);
+    border-color: var(--brand-03) !important;
     &:focus {
       box-shadow: inset 0 0 0 2px var(--brand-03) !important;
       outline: none !important;

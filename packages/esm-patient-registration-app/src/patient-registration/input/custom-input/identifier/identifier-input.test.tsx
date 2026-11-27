@@ -18,7 +18,19 @@ import type {
   IdentifierSource,
   PatientIdentifierValue,
 } from '../../../patient-registration.types';
+import { createPatternRuleRegistry, PatternRulesProvider } from '../../../validation/pattern-rules';
+import { getValidationSchema } from '../../../validation/patient-registration-validation';
+import { validateRegistrationForm } from '../../../validation/validate-registration-form';
+
 import IdentifierInput, { promoteFallbackPreferredIdentifier } from './identifier-input.component';
+
+const validationConfig = {
+  freeTextFieldConceptUuid: 'free-text-uuid',
+  fieldConfigurations: {
+    gender: [{ label: 'M', value: 'male' }],
+    identifier: { allowPreferredSelection: false },
+  },
+} as unknown as RegistrationConfig;
 
 const mockIdentifierTypes = [
   {
@@ -99,7 +111,6 @@ const mockContextValues: PatientRegistrationContextProps = {
   setFieldValue: vi.fn(),
   setInitialFormValues: vi.fn(),
   setFieldTouched: vi.fn(),
-  validationSchema: null,
   values: mockInitialFormValues,
 };
 
@@ -115,6 +126,7 @@ function renderIdentifierInput(
   fieldName: string = 'openMrsId',
   initialValues: Record<string, any> = {},
   contextValues: Partial<PatientRegistrationContextProps> = {},
+  resources: Resources = mockResourcesContextValue,
 ) {
   return renderWithContext(
     <Formik initialValues={initialValues} onSubmit={vi.fn()}>
@@ -125,7 +137,7 @@ function renderIdentifierInput(
       </Form>
     </Formik>,
     ResourcesContextProvider,
-    mockResourcesContextValue,
+    resources,
   );
 }
 
@@ -153,6 +165,49 @@ describe('IdentifierInput component', () => {
     preferred: true,
     required: true,
   } as PatientIdentifierValue;
+
+  describe('Pattern rule', () => {
+    it('registers the format rule only while the input is visible', async () => {
+      const user = userEvent.setup();
+      const registry = createPatternRuleRegistry();
+      const ssn = {
+        identifierTypeUuid: 'a71403f3-8584-4289-ab41-2b4e5570bd45',
+        initialValue: 'A-1',
+        identifierValue: 'A-1',
+        identifierName: 'SSN',
+        autoGeneration: false,
+        preferred: false,
+        required: true,
+      } as PatientIdentifierValue;
+
+      renderWithContext(
+        <PatternRulesProvider registry={registry}>
+          <Formik initialValues={{}} onSubmit={vi.fn()}>
+            <Form>
+              <PatientRegistrationContextProvider value={mockContextValues}>
+                <IdentifierInput patientIdentifier={ssn} fieldName="ssn" />
+              </PatientRegistrationContextProvider>
+            </Form>
+          </Formik>
+        </PatternRulesProvider>,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
+
+      expect(registry.getRules()).toEqual([]);
+
+      await user.click(screen.getByTestId('edit-button'));
+
+      expect(registry.getRules()).toEqual([
+        {
+          path: 'identifiers.ssn.identifierValue',
+          pattern: '^[A-Z]{1}-[0-9]{7}$',
+          message: 'Identifier should be one letter, followed by a dash, and then 7 digits e.g. A-1234567',
+          onInvalidPattern: 'pass',
+        },
+      ]);
+    });
+  });
 
   describe('Rendering', () => {
     it('shows the identifier input', () => {
@@ -438,6 +493,74 @@ describe('IdentifierInput component', () => {
         expect(screen.getByText('Edit')).toBeInTheDocument();
       });
 
+      describe('required identifier', () => {
+        const manualEntrySource = {
+          ...openmrsID.selectedSource,
+          autoGenerationOption: { manualEntryEnabled: true, automaticGenerationEnabled: true },
+        } as IdentifierSource;
+        const savedIdentifier = {
+          ...openmrsID,
+          required: true,
+          autoGeneration: false,
+          selectedSource: null,
+          initialValue: '1002UU9',
+          identifierValue: '1002UU9',
+        } as PatientIdentifierValue;
+
+        it('shows the edit button for a new identifier', () => {
+          renderIdentifierInput({
+            ...openmrsID,
+            required: true,
+            autoGeneration: true,
+            selectedSource: manualEntrySource,
+          });
+          expect(screen.getByTestId('edit-button')).toBeInTheDocument();
+        });
+
+        it('does not mark the input as natively required for a new identifier, as an empty value is generated', async () => {
+          const user = userEvent.setup();
+          renderIdentifierInput({
+            ...openmrsID,
+            required: true,
+            autoGeneration: true,
+            selectedSource: manualEntrySource,
+          });
+
+          await user.click(screen.getByTestId('edit-button'));
+
+          expect(await screen.findByRole('textbox', { name: openmrsID.identifierName })).not.toBeRequired();
+        });
+
+        it('shows the edit button for a saved identifier when editing a patient', () => {
+          renderIdentifierInput(savedIdentifier, fieldName, {}, { inEditMode: true });
+          expect(screen.getByTestId('edit-button')).toBeInTheDocument();
+        });
+
+        it("hides the edit button for a saved identifier when the identifier type's source does not allow manual entry", () => {
+          renderIdentifierInput(
+            savedIdentifier,
+            fieldName,
+            {},
+            { inEditMode: true },
+            {
+              ...mockResourcesContextValue,
+              identifierTypes: mockIdentifierTypes.map((type) =>
+                type.fieldName === fieldName
+                  ? {
+                      ...type,
+                      identifierSources: type.identifierSources.map((source) => ({
+                        ...source,
+                        autoGenerationOption: { ...source.autoGenerationOption, manualEntryEnabled: false },
+                      })),
+                    }
+                  : type,
+              ),
+            },
+          );
+          expect(screen.queryByTestId('edit-button')).not.toBeInTheDocument();
+        });
+      });
+
       describe('Edit button interaction', () => {
         it('displays an empty input field when edit button is clicked', async () => {
           const user = userEvent.setup();
@@ -491,6 +614,43 @@ describe('IdentifierInput component', () => {
             expect(screen.getByLabelText(new RegExp(`${openmrsID.identifierName}`))).toHaveValue('10001V');
           });
         });
+
+        it('keeps the selected source when the identifier type has more than one source', async () => {
+          const user = userEvent.setup();
+          const setFieldValue = vi.fn();
+          const automaticOnlySource = {
+            uuid: 'automatic-only-source-uuid',
+            name: 'Automatic only',
+            autoGenerationOption: { manualEntryEnabled: false, automaticGenerationEnabled: true },
+          } as IdentifierSource;
+          const manualEntrySource = {
+            uuid: 'manual-entry-source-uuid',
+            name: 'Manual entry',
+            autoGenerationOption: { manualEntryEnabled: true, automaticGenerationEnabled: true },
+          } as IdentifierSource;
+
+          renderIdentifierInput(
+            { ...openmrsID, autoGeneration: true, selectedSource: manualEntrySource },
+            fieldName,
+            {},
+            { setFieldValue },
+            {
+              ...mockResourcesContextValue,
+              identifierTypes: mockIdentifierTypes.map((type) =>
+                type.fieldName === fieldName
+                  ? { ...type, identifierSources: [automaticOnlySource, manualEntrySource] }
+                  : type,
+              ),
+            },
+          );
+
+          await user.click(screen.getByTestId('edit-button'));
+
+          expect(setFieldValue).toHaveBeenCalledWith(
+            `identifiers.${fieldName}`,
+            expect.objectContaining({ selectedSource: manualEntrySource, autoGeneration: true, identifierValue: '' }),
+          );
+        });
       });
     });
   });
@@ -540,14 +700,29 @@ describe('IdentifierInput component', () => {
         },
       };
 
+      const registry = createPatternRuleRegistry();
       renderWithContext(
-        <Formik initialValues={initialValues} onSubmit={vi.fn()}>
-          <Form>
-            <PatientRegistrationContextProvider value={testContextValues}>
-              <IdentifierInput patientIdentifier={ssnIdentifier} fieldName={fieldName} />
-            </PatientRegistrationContextProvider>
-          </Form>
-        </Formik>,
+        <PatternRulesProvider registry={registry}>
+          <Formik
+            initialValues={initialValues}
+            onSubmit={vi.fn()}
+            validate={(values) =>
+              validateRegistrationForm(
+                getValidationSchema(
+                  validationConfig,
+                  (_key: string, defaultValue: string) => defaultValue,
+                  registry.getRules,
+                ),
+                values as FormValues,
+              )
+            }>
+            <Form>
+              <PatientRegistrationContextProvider value={testContextValues}>
+                <IdentifierInput patientIdentifier={ssnIdentifier} fieldName={fieldName} />
+              </PatientRegistrationContextProvider>
+            </Form>
+          </Formik>
+        </PatternRulesProvider>,
         ResourcesContextProvider,
         mockResourcesContextValue,
       );

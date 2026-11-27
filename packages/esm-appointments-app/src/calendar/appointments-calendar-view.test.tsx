@@ -4,8 +4,12 @@ import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { navigate } from '@openmrs/esm-framework';
+import { spaHomePage } from '../constants';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
+import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
+import { type Appointment } from '../types';
 
 vi.mock('../hooks/useAppointmentsCalendar', () => ({
   useAppointmentsCalendar: vi.fn().mockReturnValue({ calendarEvents: [], isLoading: false, error: null }),
@@ -24,6 +28,7 @@ vi.mock('../hooks/useAppointmentService', () => ({
 }));
 
 const mockUseAppointmentsCalendar = vi.mocked(useAppointmentsCalendar);
+const mockUseAppointmentsByDate = vi.mocked(useAppointmentsByDate);
 
 function renderCalendar() {
   return render(
@@ -146,6 +151,106 @@ describe('Appointment calendar view', () => {
     expect(lastCall?.[1]).toBe('daily');
   });
 
+  it('resets the calendar to the current month when Today is clicked', async () => {
+    const user = userEvent.setup();
+    renderCalendar();
+    const today = dayjs();
+
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    await user.click(screen.getByRole('button', { name: /^today$/i }));
+
+    expect(latestRequestedDate().isSame(today, 'day')).toBe(true);
+  });
+
+  it('sums appointment counts across all events and days, and shows the monthly total', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: '2026-08-14',
+          services: [
+            { serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 3 },
+            { serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', count: 5 },
+          ],
+        },
+        {
+          appointmentDate: '2026-08-20',
+          services: [{ serviceName: 'Outpatient', serviceUuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', count: 2 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+
+    renderCalendar();
+
+    expect(screen.getByText('10 appointments this month')).toBeInTheDocument();
+  });
+
+  it('uses the singular wording when there is exactly one appointment', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [
+        {
+          appointmentDate: '2026-08-14',
+          services: [{ serviceName: 'HIV Clinic', serviceUuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1', count: 1 }],
+        },
+      ],
+      isLoading: false,
+      error: null,
+    });
+
+    renderCalendar();
+
+    expect(screen.getByText('1 appointment this month')).toBeInTheDocument();
+    expect(screen.queryByText('1 appointments this month')).not.toBeInTheDocument();
+  });
+
+  it('shows a zero total when there are no appointments', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({ calendarEvents: [], isLoading: false, error: null });
+
+    renderCalendar();
+
+    expect(screen.getByText('0 appointments this month')).toBeInTheDocument();
+  });
+
+  it('does not show a count while the request is loading', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({ calendarEvents: [], isLoading: true, error: null });
+
+    renderCalendar();
+
+    expect(screen.queryByText(/appointments this month/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/0 appointments/i)).not.toBeInTheDocument();
+  });
+
+  it('does not show a zero count when the request fails', () => {
+    mockUseAppointmentsCalendar.mockReturnValue({
+      calendarEvents: [],
+      isLoading: false,
+      error: new Error('request failed'),
+    });
+
+    renderCalendar();
+
+    expect(screen.queryByText(/appointments this month/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/0 appointments/i)).not.toBeInTheDocument();
+  });
+
+  it('switches the count wording to the daily total when the Daily tab is selected', async () => {
+    const user = userEvent.setup();
+    mockUseAppointmentsByDate.mockReturnValue({
+      appointments: Array.from({ length: 4 }, (_, i) => ({ uuid: `appointment-${i}` }) as Appointment),
+      isLoading: false,
+      error: undefined,
+    });
+
+    renderCalendar();
+
+    await user.click(screen.getByRole('tab', { name: /daily/i }));
+
+    expect(screen.getByText('4 appointments today')).toBeInTheDocument();
+    expect(screen.queryByText(/appointments this month/i)).not.toBeInTheDocument();
+  });
+
   it('renders the services legend when services are present', () => {
     mockUseAppointmentsCalendar.mockReturnValue({
       calendarEvents: [
@@ -186,5 +291,21 @@ describe('Appointment calendar view', () => {
     expect(cellSwatch).toBeInTheDocument();
     expect(legendSwatch.style.backgroundColor).toBeTruthy();
     expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
+  });
+
+  describe('back button', () => {
+    it('renders a Back button', () => {
+      renderCalendar();
+      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+    });
+
+    it('navigates to the appointments dashboard when Back is clicked', async () => {
+      const user = userEvent.setup();
+      renderCalendar();
+
+      await user.click(screen.getByRole('button', { name: /back/i }));
+
+      expect(vi.mocked(navigate)).toHaveBeenCalledWith({ to: `${spaHomePage}/appointments` });
+    });
   });
 });

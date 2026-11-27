@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
-import { ChevronLeft, ChevronRight } from '@carbon/react/icons';
+import { ArrowLeft, ChevronLeft, ChevronRight } from '@carbon/react/icons';
 import { type CalendarViewMode } from '../../types';
 import { getCalendarFormat } from '../calendar-utils';
 import styles from './calendar-header.scss';
@@ -10,17 +10,23 @@ import styles from './calendar-header.scss';
 interface CalendarHeaderProps {
   viewMode: CalendarViewMode;
   calendarSelectedDate: Dayjs;
+  appointmentsCount: number | null;
   onViewModeChange: (mode: CalendarViewMode) => void;
+  onToday: () => void;
   onPrev: () => void;
   onNext: () => void;
+  onBack: () => void;
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   viewMode,
   calendarSelectedDate,
+  appointmentsCount,
   onViewModeChange,
+  onToday,
   onPrev,
   onNext,
+  onBack,
 }) => {
   const { t } = useTranslation();
   const { locale, calendar } = getCalendarFormat();
@@ -38,6 +44,28 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     );
   }, [viewMode, calendarSelectedDate, locale, calendar]);
 
+  const appointmentsCountLabel = useMemo(() => {
+    if (appointmentsCount === null) {
+      return null;
+    }
+    if (viewMode === 'monthly') {
+      return t('appointmentsThisMonthCount', '{{count}} appointments this month', {
+        count: appointmentsCount,
+        defaultValue_one: '{{count}} appointment this month',
+      });
+    }
+    if (calendarSelectedDate.isSame(dayjs(), 'day')) {
+      return t('appointmentsTodayCount', '{{count}} appointments today', {
+        count: appointmentsCount,
+        defaultValue_one: '{{count}} appointment today',
+      });
+    }
+    return t('appointmentsOnThisDayCount', '{{count}} appointments on this day', {
+      count: appointmentsCount,
+      defaultValue_one: '{{count}} appointment on this day',
+    });
+  }, [appointmentsCount, calendarSelectedDate, viewMode, t]);
+
   const viewModeIndex = viewMode === 'monthly' ? 0 : 1;
   const VIEW_MODES: CalendarViewMode[] = ['monthly', 'daily'];
 
@@ -45,6 +73,12 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     <div className={styles.calendarHeaderContainer}>
       <div className={styles.navigationSection}>
         <div className={styles.navGroup}>
+          <Button kind="ghost" size="sm" renderIcon={ArrowLeft} onClick={onBack} className={styles.backButton}>
+            <span>{t('back', 'Back')}</span>
+          </Button>
+          <Button kind="tertiary" size="sm" onClick={onToday}>
+            {t('today', 'Today')}
+          </Button>
           <div className={styles.navButtonGroup}>
             <Button
               hasIconOnly
@@ -65,6 +99,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             />
           </div>
           <span className={styles.dateLabel}>{dateLabel}</span>
+          {appointmentsCountLabel !== null && (
+            <span className={styles.appointmentsCount}>{appointmentsCountLabel}</span>
+          )}
         </div>
       </div>
       <div className={styles.switcherSection}>
