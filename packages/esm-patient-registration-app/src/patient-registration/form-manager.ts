@@ -329,7 +329,12 @@ export class FormManager {
         birthdate,
         birthdateEstimated: values.birthdateEstimated,
         attributes: FormManager.getPatientAttributes(values),
-        addresses: [values.address],
+        addresses: [
+          {
+            ...values.address,
+            ...(patientUuidMap?.preferredAddressUuid ? { uuid: patientUuidMap.preferredAddressUuid } : {}),
+          },
+        ],
         ...FormManager.getPatientDeathInfo(values, config),
       },
       identifiers,
