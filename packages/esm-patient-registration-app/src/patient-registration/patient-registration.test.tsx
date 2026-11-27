@@ -546,6 +546,82 @@ describe('Registering a new patient', () => {
     ]);
   });
 
+  it('lists obs pattern errors in form order with attribute and identifier errors, after schema errors', async () => {
+    const user = userEvent.setup();
+    const defaultConfig = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+    mockUseConfig.mockReturnValue({
+      ...defaultConfig,
+      ...mockOpenmrsConfig,
+      sectionDefinitions: [
+        {
+          id: 'demographics',
+          name: 'Demographics',
+          fields: ['name', 'gender', 'dob', 'chief complaint', 'nickname', 'id'],
+        },
+        { id: 'contact', name: 'Contact Info', fields: ['address'] },
+      ],
+      fieldDefinitions: [
+        {
+          id: 'chief complaint',
+          type: 'obs',
+          label: null,
+          uuid: 'chief-complaint-uuid',
+          placeholder: '',
+          validation: { required: false, matches: '^[A-Z]+$' },
+          answerConceptSetUuid: null,
+          customConceptAnswers: [],
+        },
+        {
+          id: 'nickname',
+          type: 'person attribute',
+          label: 'Nickname',
+          uuid: 'nickname-uuid',
+          placeholder: '',
+          validation: { required: false, matches: '^\\d+$' },
+          answerConceptSetUuid: null,
+          customConceptAnswers: [],
+        },
+      ],
+      defaultPatientIdentifierTypes: ['ssn-uuid'],
+      registrationObs: { ...mockOpenmrsConfig.registrationObs, encounterTypeUuid: 'reg-enc-uuid' },
+    } as RegistrationConfig);
+    renderWithContext(<PatientRegistration savePatientForm={vi.fn()} />, ResourcesContextProvider, {
+      ...mockResourcesContextValue,
+      identifierTypes: [
+        {
+          uuid: 'ssn-uuid',
+          name: 'SSN',
+          fieldName: 'ssn',
+          format: '^A-\\d+$',
+          formatDescription: 'SSN must look like A-123',
+          isPrimary: false,
+          required: false,
+          uniquenessBehavior: null,
+          identifierSources: [],
+        },
+      ],
+    });
+
+    await user.type(await screen.findByRole('textbox', { name: /chief complaint/i }), 'abc');
+    await user.type(await screen.findByRole('textbox', { name: /ssn/i }), 'B');
+    act(() => personAttributeTypeGate.release());
+    await user.type(await screen.findByRole('textbox', { name: /nickname/i }), 'abc');
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    await waitFor(() => expect(mockShowSnackbar).toHaveBeenCalled());
+    const { subtitle } = mockShowSnackbar.mock.calls.at(-1)[0];
+    render(<>{subtitle}</>);
+    expect(screen.getAllByRole('listitem').map((li) => li.textContent)).toEqual([
+      'givenName',
+      'familyName',
+      'gender',
+      'birthdate',
+      'obs',
+      'attributes',
+      'identifiers',
+    ]);
+  });
+
   it('shows the missing-value error as soon as an empty identifier is marked as preferred', async () => {
     const user = userEvent.setup();
     renderWithOptionalPreferredSsn();

@@ -1,11 +1,11 @@
 import React from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { Field } from '../../form-adapter';
 import { useTranslation } from 'react-i18next';
 import { Layer } from '@carbon/react';
 import { OpenmrsDatePicker } from '@openmrs/esm-framework';
-import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { useFormHelpers, useRegistrationField } from '../../form-adapter';
+import type { PersonAttributeTypeResponse } from '../../patient-registration.types';
 import styles from './../field.scss';
 
 export interface DatePersonAttributeFieldProps {
@@ -27,33 +27,31 @@ export function DatePersonAttributeField({
 }: DatePersonAttributeFieldProps) {
   const { t } = useTranslation();
   const fieldName = `attributes.${personAttributeType.uuid}`;
+  const {
+    field: { value },
+    error,
+  } = useRegistrationField<string>(fieldName);
+  const { setFieldValue, setFieldTouched } = useFormHelpers();
   const futureDatesAllowed = allowFutureDates ?? true;
   const pastDatesAllowed = allowPastDates ?? true;
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Layer>
-        <Field name={fieldName}>
-          {({ field, form: { touched, errors, setFieldValue, setFieldTouched }, meta }) => {
-            return (
-              <OpenmrsDatePicker
-                id={id}
-                isRequired={required}
-                labelText={label ?? personAttributeType?.display}
-                value={field.value ? dayjs(field.value).toDate() : null}
-                onChange={(date: Date) => {
-                  // Date attributes are saved in the YYYY-MM-DD format
-                  setFieldValue(fieldName, date ? dayjs(date).format('YYYY-MM-DD') : '');
-                  setFieldTouched(fieldName, true, false);
-                }}
-                isInvalid={errors[fieldName] && touched[fieldName]}
-                invalidText={t(meta.error)}
-                minDate={!pastDatesAllowed ? new Date() : undefined}
-                maxDate={!futureDatesAllowed ? new Date() : undefined}
-              />
-            );
+        <OpenmrsDatePicker
+          id={id}
+          isRequired={required}
+          labelText={label ?? personAttributeType?.display}
+          value={value ? dayjs(value).toDate() : null}
+          onChange={(date: Date) => {
+            // Date attributes are saved in the YYYY-MM-DD format
+            setFieldValue(fieldName, date ? dayjs(date).format('YYYY-MM-DD') : '');
+            setFieldTouched(fieldName, true, false);
           }}
-        </Field>
+          invalidText={t(error)}
+          minDate={!pastDatesAllowed ? new Date() : undefined}
+          maxDate={!futureDatesAllowed ? new Date() : undefined}
+        />
       </Layer>
     </div>
   );

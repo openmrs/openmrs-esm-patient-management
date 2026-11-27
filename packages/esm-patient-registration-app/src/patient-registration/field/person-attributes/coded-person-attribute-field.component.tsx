@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
+import { useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Field } from '../../form-adapter';
 import { Layer, Select, SelectItem } from '@carbon/react';
 import { reportError } from '@openmrs/esm-framework';
-import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { useFieldHandlers } from '../../form-adapter';
 import { useConceptAnswers } from '../field.resource';
+import type { FieldPath } from 'react-hook-form';
+import type { FormValues, PersonAttributeTypeResponse } from '../../patient-registration.types';
 import styles from './../field.scss';
 
 export interface CodedPersonAttributeFieldProps {
@@ -31,6 +33,10 @@ export function CodedPersonAttributeField({
 
   const { t } = useTranslation();
   const fieldName = `attributes.${personAttributeType.uuid}`;
+  // Not `useRegistrationField`: its error subscription would re-render this component, which also loads the answers,
+  // on every validation of the form.
+  const value = useWatch<FormValues>({ name: fieldName as FieldPath<FormValues> }) as string;
+  const handlers = useFieldHandlers(fieldName);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -93,26 +99,18 @@ export function CodedPersonAttributeField({
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
         <Layer>
-          <Field name={fieldName}>
-            {({ field, form: { touched, errors }, meta }) => {
-              return (
-                <>
-                  <Select
-                    id={id}
-                    name={`person-attribute-${personAttributeType.uuid}`}
-                    labelText={label ?? personAttributeType?.display}
-                    invalid={errors[fieldName] && touched[fieldName]}
-                    required={required}
-                    {...field}>
-                    <SelectItem value={''} text={t('selectAnOption', 'Select an option')} />
-                    {answers.map((answer) => (
-                      <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
-                    ))}
-                  </Select>
-                </>
-              );
-            }}
-          </Field>
+          <Select
+            id={id}
+            labelText={label ?? personAttributeType?.display}
+            required={required}
+            name={fieldName}
+            value={value}
+            {...handlers}>
+            <SelectItem value={''} text={t('selectAnOption', 'Select an option')} />
+            {answers.map((answer) => (
+              <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
+            ))}
+          </Select>
         </Layer>
       ) : null}
     </div>

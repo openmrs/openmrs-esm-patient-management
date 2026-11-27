@@ -2,9 +2,12 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
+import { reportError } from '@openmrs/esm-framework';
 import { useConceptAnswers } from '../field.resource';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
+import { Input } from '../../input/basic-input/input/input.component';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import type { RegistrationConfig } from '../../../config-schema';
 import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConceptAnswers = vi.mocked(useConceptAnswers);
@@ -96,6 +99,104 @@ describe('CodedPersonAttributeField', () => {
       expect(screen.queryByText(/Option 1/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/Option 2/i)).not.toBeInTheDocument();
     });
+  });
+
+  describe('Form binding', () => {
+    it('names the select after the form path of the attribute', () => {
+      renderCodedPersonAttributeFieldInForm();
+
+      expect(screen.getByRole('combobox', { name: /Referred by/i })).toHaveAttribute(
+        'name',
+        `attributes.${personAttributeType.uuid}`,
+      );
+    });
+
+    it('selects the initial value', () => {
+      renderCodedPersonAttributeFieldInForm({}, { attributes: { [personAttributeType.uuid]: '2' } });
+
+      expect((screen.getByRole('combobox', { name: /Referred by/i }) as HTMLSelectElement).value).toBe('2');
+    });
+
+    it('stores an empty string when "Select an option" is chosen', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderCodedPersonAttributeFieldInForm(
+        {},
+        { attributes: { [personAttributeType.uuid]: '1' } },
+      );
+
+      await user.selectOptions(screen.getByRole('combobox', { name: /Referred by/i }), 'Select an option');
+
+      await waitFor(() => expect(getValues().attributes[personAttributeType.uuid]).toBe(''));
+    });
+
+    it('touches the attribute path on blur', async () => {
+      const user = userEvent.setup();
+      const { getTouched } = renderCodedPersonAttributeFieldInForm();
+
+      await user.click(screen.getByRole('combobox', { name: /Referred by/i }));
+      await user.tab();
+
+      await waitFor(() => expect(getTouched()).toEqual({ attributes: { [personAttributeType.uuid]: true } }));
+    });
+  });
+
+  describe('Misconfiguration', () => {
+    beforeEach(() => {
+      vi.mocked(reportError).mockImplementation(() => {});
+    });
+
+    it('renders nothing when there are no answers and no answer concept set', async () => {
+      mockUseConceptAnswers.mockReturnValue({ data: null, isLoading: false, error: null });
+
+      renderCodedPersonAttributeFieldInForm({ answerConceptSetUuid: '' });
+
+      await waitFor(() => expect(screen.queryByRole('combobox')).not.toBeInTheDocument());
+      expect(reportError).toHaveBeenCalled();
+    });
+
+    it('renders nothing when the answer concept set has no answers', async () => {
+      mockUseConceptAnswers.mockReturnValue({ data: [], isLoading: false, error: null });
+
+      renderCodedPersonAttributeFieldInForm();
+
+      await waitFor(() => expect(screen.queryByRole('combobox')).not.toBeInTheDocument());
+    });
+  });
+
+  it('does not load the answers again when another field changes', async () => {
+    const user = userEvent.setup();
+    renderWithRegistrationForm(
+      <>
+        <Input id="givenName" name="givenName" labelText="Given name" />
+        <CodedPersonAttributeField
+          id="attributeId"
+          personAttributeType={personAttributeType}
+          answerConceptSetUuid={answerConceptSetUuid}
+          label={personAttributeType.display}
+          customConceptAnswers={[]}
+          required={false}
+        />
+      </>,
+      {
+        initialValues: { givenName: '', attributes: {} } as Partial<FormValues>,
+        withValidation: true,
+        config: {
+          freeTextFieldConceptUuid: 'free-text-uuid',
+          fieldConfigurations: {
+            gender: [{ label: 'M', value: 'male' }],
+            identifier: { allowPreferredSelection: false },
+          },
+        } as unknown as RegistrationConfig,
+      },
+    );
+    await screen.findByRole('combobox', { name: /Referred by/i });
+    const callsBefore = mockUseConceptAnswers.mock.calls.length;
+
+    await user.type(screen.getByRole('textbox', { name: /Given name/i }), 'abc');
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // The answers hook shows a snackbar on every render while its request fails
+    expect(mockUseConceptAnswers.mock.calls.length).toBe(callsBefore);
   });
 
   describe('User interaction', () => {

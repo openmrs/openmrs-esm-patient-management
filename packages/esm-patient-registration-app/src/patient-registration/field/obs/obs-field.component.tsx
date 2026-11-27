@@ -1,15 +1,17 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import { Field } from '../../form-adapter';
+import { useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
-import { type ConceptResponse } from '../../patient-registration.types';
-import { type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
+import { useFieldHandlers, useFormHelpers, useRegistrationField } from '../../form-adapter';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
-import { usePatientRegistrationContext } from '../../patient-registration-context';
-import { usePatternRule, type PatternRule } from '../../validation/pattern-rules';
+import { usePatternRule } from '../../validation/pattern-rules';
+import type { FieldPath } from 'react-hook-form';
+import type { ConceptResponse, FormValues } from '../../patient-registration.types';
+import type { FieldDefinition, RegistrationConfig } from '../../../config-schema';
+import type { PatternRule } from '../../validation/pattern-rules';
 import styles from './../field.scss';
 
 export interface ObsFieldProps {
@@ -105,19 +107,7 @@ function TextObsField({ concept, validationRegex, label, required }: TextObsFiel
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
-      <Field name={fieldName}>
-        {({ field, form: { touched, errors }, meta }) => {
-          return (
-            <Input
-              id={fieldName}
-              labelText={label ?? concept.display}
-              required={required}
-              invalid={errors[fieldName] && touched[fieldName]}
-              {...field}
-            />
-          );
-        }}
-      </Field>
+      <Input id={fieldName} name={fieldName} labelText={label ?? concept.display} required={required} />
     </div>
   );
 }
@@ -133,20 +123,7 @@ function NumericObsField({ concept, label, required }: NumericObsFieldProps) {
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
-      <Field name={fieldName}>
-        {({ field, form: { touched, errors }, meta }) => {
-          return (
-            <Input
-              id={fieldName}
-              labelText={label ?? concept.display}
-              required={required}
-              invalid={errors[fieldName] && touched[fieldName]}
-              type="number"
-              {...field}
-            />
-          );
-        }}
-      </Field>
+      <Input id={fieldName} name={fieldName} labelText={label ?? concept.display} required={required} type="number" />
     </div>
   );
 }
@@ -162,7 +139,8 @@ interface DateObsFieldProps {
 function DateObsField({ concept, label, required, allowPastDates, allowFutureDates }: DateObsFieldProps) {
   const { t } = useTranslation();
   const fieldName = `obs.${concept.uuid}`;
-  const { setFieldValue } = usePatientRegistrationContext();
+  const { field, error } = useRegistrationField<Date>(fieldName);
+  const { setFieldValue } = useFormHelpers();
   const futureDatesAllowed = allowFutureDates ?? true;
   const pastDatesAllowed = allowPastDates ?? true;
 
@@ -173,26 +151,18 @@ function DateObsField({ concept, label, required, allowPastDates, allowFutureDat
   return (
     <Layer>
       <div className={styles.dobField}>
-        <Field name={fieldName}>
-          {({ field, form: { touched, errors }, meta }) => {
-            return (
-              <>
-                <OpenmrsDatePicker
-                  id={fieldName}
-                  {...field}
-                  isRequired={required}
-                  onChange={onDateChange}
-                  labelText={label ?? concept.display}
-                  isInvalid={errors[fieldName] && touched[fieldName]}
-                  invalidText={t(meta.error)}
-                  value={field.value}
-                  minDate={!pastDatesAllowed ? new Date() : undefined}
-                  maxDate={!futureDatesAllowed ? new Date() : undefined}
-                />
-              </>
-            );
-          }}
-        </Field>
+        <OpenmrsDatePicker
+          id={fieldName}
+          name={field.name}
+          onBlur={field.onBlur}
+          isRequired={required}
+          onChange={onDateChange}
+          labelText={label ?? concept.display}
+          invalidText={t(error)}
+          value={field.value}
+          minDate={!pastDatesAllowed ? new Date() : undefined}
+          maxDate={!futureDatesAllowed ? new Date() : undefined}
+        />
       </div>
     </Layer>
   );
@@ -209,6 +179,10 @@ interface CodedObsFieldProps {
 function CodedObsField({ concept, answerConceptSetUuid, label, required, customConceptAnswers }: CodedObsFieldProps) {
   const { t } = useTranslation();
   const fieldName = `obs.${concept.uuid}`;
+  // Not `useRegistrationField`: its error subscription would re-render this component, which also loads the answers,
+  // on every validation of the form.
+  const value = useWatch<FormValues>({ name: fieldName as FieldPath<FormValues> }) as string;
+  const handlers = useFieldHandlers(fieldName);
 
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
     customConceptAnswers.length ? '' : (answerConceptSetUuid ?? concept.uuid),
@@ -227,30 +201,24 @@ function CodedObsField({ concept, answerConceptSetUuid, label, required, customC
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
-        <Field name={fieldName}>
-          {({ field, form: { touched, errors }, meta }) => {
-            return (
-              <Layer>
-                <Select
-                  id={fieldName}
-                  name={fieldName}
-                  labelText={label ?? concept?.display}
-                  required={required}
-                  invalid={errors[fieldName] && touched[fieldName]}
-                  {...field}>
-                  <SelectItem
-                    key={`no-answer-select-item-${fieldName}`}
-                    value={''}
-                    text={t('selectAnOption', 'Select an option')}
-                  />
-                  {answers.map((answer) => (
-                    <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
-                  ))}
-                </Select>
-              </Layer>
-            );
-          }}
-        </Field>
+        <Layer>
+          <Select
+            id={fieldName}
+            labelText={label ?? concept?.display}
+            required={required}
+            name={fieldName}
+            value={value}
+            {...handlers}>
+            <SelectItem
+              key={`no-answer-select-item-${fieldName}`}
+              value={''}
+              text={t('selectAnOption', 'Select an option')}
+            />
+            {answers.map((answer) => (
+              <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
+            ))}
+          </Select>
+        </Layer>
       ) : null}
     </div>
   );
