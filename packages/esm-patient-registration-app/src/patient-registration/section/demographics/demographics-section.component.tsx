@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { Field } from '../../field/field.component';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
@@ -9,6 +10,7 @@ export interface DemographicsSectionProps {
 }
 
 export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields }) => {
+  const { t } = useTranslation();
   const [field, meta] = useField('addNameInLocalLanguage');
   const { setFieldValue } = usePatientRegistrationContext();
 
@@ -21,7 +23,7 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields
   }, [field.value, meta.touched, setFieldValue]);
 
   return (
-    <section className={styles.formSection} aria-label="Demographics Section">
+    <section className={styles.formSection} aria-label={t('demographicsSectionLabel', 'Demographics Section')}>
       {fields.map((field) => (
         <Field key={`demographics-${field}`} name={field} />
       ))}
