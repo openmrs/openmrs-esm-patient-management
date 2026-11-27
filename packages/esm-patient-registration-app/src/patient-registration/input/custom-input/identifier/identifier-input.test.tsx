@@ -1,14 +1,17 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
+import { useFormContext, type UseFormReturn } from 'react-hook-form';
 import { getDefaultsFromConfigSchema, useConfig, userHasAccess, UserHasAccess } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
 import { ResourcesContextProvider } from '../../../../resources-context';
 import { createPatternRuleRegistry, PatternRulesProvider } from '../../../validation/pattern-rules';
+import { useFormHelpers } from '../../../form-adapter';
 import { renderWithRegistrationForm } from '../../../../test-utils/render-with-registration-form';
 import IdentifierInput, { promoteFallbackPreferredIdentifier } from './identifier-input.component';
 import type { Resources } from '../../../../registration.resource';
+import type * as RegistrationResolver from '../../../registration-resolver';
 import type { PatientRegistrationContextProps } from '../../../patient-registration-context';
 import type {
   AddressTemplate,
@@ -16,6 +19,23 @@ import type {
   IdentifierSource,
   PatientIdentifierValue,
 } from '../../../patient-registration.types';
+
+const resolverCalls = vi.hoisted(() => ({ count: 0 }));
+
+// Counts the validations of the form, so a test can show that a write did not validate again.
+vi.mock('../../../registration-resolver', async (importOriginal) => {
+  const actual = await importOriginal<typeof RegistrationResolver>();
+  return {
+    ...actual,
+    createRegistrationResolver: (...args: Parameters<typeof actual.createRegistrationResolver>) => {
+      const resolve = actual.createRegistrationResolver(...args);
+      return (...resolverArgs: Parameters<typeof resolve>) => {
+        resolverCalls.count++;
+        return resolve(...resolverArgs);
+      };
+    },
+  };
+});
 
 const validationConfig = {
   freeTextFieldConceptUuid: 'free-text-uuid',
@@ -95,16 +115,23 @@ const mockInitialFormValues = {
   relationships: [],
 } as FormValues;
 
-const mockContextValues: PatientRegistrationContextProps = {
+const mockContextValues = {
   currentPhoto: '',
   inEditMode: false,
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
   setCapturePhotoProps: vi.fn(),
-  setFieldValue: vi.fn(),
   setInitialFormValues: vi.fn(),
-  setFieldTouched: vi.fn(),
-  values: mockInitialFormValues,
+} as Partial<PatientRegistrationContextProps>;
+
+let formHelpers: ReturnType<typeof useFormHelpers>;
+let form: UseFormReturn<FormValues>;
+
+/** Gives the tests the form, to write other fields and to read errors. */
+const FormProbe: React.FC = () => {
+  formHelpers = useFormHelpers();
+  form = useFormContext<FormValues>();
+  return null;
 };
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
@@ -287,16 +314,21 @@ describe('IdentifierInput component', () => {
 
       it('shows a read-only preferred option when editing an existing patient', async () => {
         const user = userEvent.setup();
-        const setFieldValue = vi.fn();
+        const identifier = { ...openmrsID, preferred: false };
         enablePreferredSelection();
-        renderIdentifierInput({ ...openmrsID, preferred: false }, 'openMrsId', {}, { inEditMode: true, setFieldValue });
+        const { getValues } = renderIdentifierInput(
+          identifier,
+          'openMrsId',
+          { identifiers: { openMrsId: identifier } },
+          { inEditMode: true },
+        );
 
         const radio = screen.getByRole('radio', { name: /preferred/i });
         expect(radio).toBeDisabled();
         expect(radio).not.toBeChecked();
 
         await user.click(radio);
-        expect(setFieldValue).not.toHaveBeenCalled();
+        expect(getValues().identifiers).toEqual({ openMrsId: identifier });
       });
 
       it('shows which identifier is preferred in the read-only option', () => {
@@ -322,29 +354,35 @@ describe('IdentifierInput component', () => {
 
     it('marks the selected identifier as the only preferred identifier', async () => {
       const user = userEvent.setup();
-      const setFieldValue = vi.fn();
-      const setFieldTouched = vi.fn();
       const ssn = { ...openmrsID, identifierName: 'SSN', preferred: false };
       enablePreferredSelection();
-      renderIdentifierInput(
-        ssn,
-        'ssn',
-        {},
+      const { getValues, getTouched } = renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <IdentifierInput patientIdentifier={ssn} fieldName="ssn" />
+        </ResourcesContextProvider>,
         {
-          setFieldValue,
-          setFieldTouched,
-          values: { ...mockInitialFormValues, identifiers: { openMrsId: openmrsID, ssn } },
+          initialValues: { ...mockInitialFormValues, identifiers: { openMrsId: openmrsID, ssn } },
+          contextValues: mockContextValues,
+          withValidation: true,
         },
       );
+      const validationsBefore = resolverCalls.count;
 
       await user.click(screen.getByRole('radio', { name: /preferred/i }));
 
-      expect(setFieldValue).toHaveBeenCalledWith('identifiers', {
+      expect(getValues().identifiers).toEqual({
         openMrsId: { ...openmrsID, preferred: false },
         ssn: { ...ssn, preferred: true },
       });
       // Marking the value as touched shows the missing-value error without waiting for blur or submit
-      expect(setFieldTouched).toHaveBeenCalledWith('identifiers.ssn.identifierValue', true, false);
+      expect(getTouched().identifiers.ssn.identifierValue).toBe(true);
+      expect(await screen.findByText('Identifier value is required')).toBeInTheDocument();
+      // Only the new identifiers are validated: marking the value as touched does not validate again
+      await waitFor(() => expect(resolverCalls.count).toBe(validationsBefore + 1));
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      expect(resolverCalls.count).toBe(validationsBefore + 1);
     });
   });
 
@@ -410,7 +448,6 @@ describe('IdentifierInput component', () => {
       'when the preferred row is deleted (edit mode: $inEditMode, can edit identifiers: $canEditIdentifiers), promotes a fallback: $promotesFallback',
       async ({ inEditMode, canEditIdentifiers, promotesFallback }) => {
         const user = userEvent.setup();
-        const setFieldValue = vi.fn();
         const defaults = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
         mockUseConfig.mockReturnValue({
           ...defaults,
@@ -419,21 +456,17 @@ describe('IdentifierInput component', () => {
         mockUserHasAccessCheck.mockReturnValue(canEditIdentifiers);
         const other = optionalIdentifier('type-1', '111');
         const deleted = optionalIdentifier('type-2', '222', true);
-        renderIdentifierInput(
+        const { getValues } = renderIdentifierInput(
           deleted,
           'deleted',
-          {},
-          {
-            inEditMode,
-            setFieldValue,
-            values: { ...mockInitialFormValues, identifiers: { other, deleted } },
-          },
+          { identifiers: { other, deleted } },
+          { inEditMode },
         );
 
         await user.click(screen.getByRole('button', { name: 'Delete' }));
 
         // Without promotion, the backend picks the new preferred identifier when the deleted one is purged
-        expect(setFieldValue).toHaveBeenCalledWith('identifiers', { other: { ...other, preferred: promotesFallback } });
+        expect(getValues().identifiers).toEqual({ other: { ...other, preferred: promotesFallback } });
         expect(mockUserHasAccessCheck).toHaveBeenCalledWith('Edit Patient Identifiers', undefined);
       },
     );
@@ -573,22 +606,21 @@ describe('IdentifierInput component', () => {
 
         it('displays an input field with the identifier value if it exists', async () => {
           const user = userEvent.setup();
-          renderIdentifierInput(
-            {
-              ...openmrsID,
-              autoGeneration: true,
-              required: false,
-              selectedSource: {
-                ...openmrsID.selectedSource,
-                autoGenerationOption: {
-                  manualEntryEnabled: true,
-                  automaticGenerationEnabled: true,
-                },
-              } as IdentifierSource,
-            },
-            fieldName,
-            { identifiers: { [fieldName]: { identifierValue: '10001V' } } },
-          );
+          const identifier = {
+            ...openmrsID,
+            autoGeneration: true,
+            required: false,
+            initialValue: '10001V',
+            identifierValue: '10001V',
+            selectedSource: {
+              ...openmrsID.selectedSource,
+              autoGenerationOption: {
+                manualEntryEnabled: true,
+                automaticGenerationEnabled: true,
+              },
+            } as IdentifierSource,
+          };
+          renderIdentifierInput(identifier, fieldName, { identifiers: { [fieldName]: identifier } });
 
           const editButton = screen.getByTestId('edit-button');
           await user.click(editButton);
@@ -600,7 +632,6 @@ describe('IdentifierInput component', () => {
 
         it('keeps the selected source when the identifier type has more than one source', async () => {
           const user = userEvent.setup();
-          const setFieldValue = vi.fn();
           const automaticOnlySource = {
             uuid: 'automatic-only-source-uuid',
             name: 'Automatic only',
@@ -612,11 +643,12 @@ describe('IdentifierInput component', () => {
             autoGenerationOption: { manualEntryEnabled: true, automaticGenerationEnabled: true },
           } as IdentifierSource;
 
-          renderIdentifierInput(
-            { ...openmrsID, autoGeneration: true, selectedSource: manualEntrySource },
+          const identifier = { ...openmrsID, autoGeneration: true, selectedSource: manualEntrySource };
+          const { getValues } = renderIdentifierInput(
+            identifier,
             fieldName,
+            { identifiers: { [fieldName]: identifier } },
             {},
-            { setFieldValue },
             {
               ...mockResourcesContextValue,
               identifierTypes: mockIdentifierTypes.map((type) =>
@@ -629,12 +661,89 @@ describe('IdentifierInput component', () => {
 
           await user.click(screen.getByTestId('edit-button'));
 
-          expect(setFieldValue).toHaveBeenCalledWith(
-            `identifiers.${fieldName}`,
+          expect(getValues().identifiers[fieldName]).toEqual(
             expect.objectContaining({ selectedSource: manualEntrySource, autoGeneration: true, identifierValue: '' }),
           );
         });
       });
+    });
+  });
+
+  describe('Error display', () => {
+    it('shows the error of a hidden identifier only after its value is touched', async () => {
+      const name = `identifiers.${fieldName}.identifierValue`;
+      // Hidden because its value is the saved value; required, so the empty value is an error
+      const identifier = {
+        ...openmrsID,
+        autoGeneration: false,
+        required: true,
+        initialValue: '',
+        identifierValue: '',
+      } as PatientIdentifierValue;
+
+      renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <FormProbe />
+          <IdentifierInput patientIdentifier={identifier} fieldName={fieldName} />
+        </ResourcesContextProvider>,
+        {
+          initialValues: { ...mockInitialFormValues, identifiers: { [fieldName]: identifier } },
+          contextValues: mockContextValues,
+          withValidation: true,
+          config: validationConfig,
+        },
+      );
+      expect(screen.getByTestId('identifier-input')).toHaveAttribute('type', 'hidden');
+
+      // A change to another field validates the whole form
+      act(() => formHelpers.setFieldValue('givenName', 'Jane'));
+      await waitFor(() => expect(form.getFieldState(name).error?.message).toBe('Identifier value is required'));
+      expect(screen.queryByText('Identifier value is required')).not.toBeInTheDocument();
+
+      act(() => formHelpers.setFieldTouched(name, true));
+
+      expect(await screen.findByText('Identifier value is required')).toBeInTheDocument();
+    });
+
+    it('shows the format error of a visible identifier only after blur', async () => {
+      const user = userEvent.setup();
+      const name = 'identifiers.ssn.identifierValue';
+      const formatError = 'Identifier should be one letter, followed by a dash, and then 7 digits e.g. A-1234567';
+      const ssn = {
+        identifierTypeUuid: 'a71403f3-8584-4289-ab41-2b4e5570bd45',
+        identifierName: 'SSN',
+        initialValue: '',
+        identifierValue: 'A-12',
+        autoGeneration: false,
+        preferred: false,
+        required: false,
+      } as PatientIdentifierValue;
+
+      renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <FormProbe />
+          <IdentifierInput patientIdentifier={ssn} fieldName="ssn" />
+        </ResourcesContextProvider>,
+        {
+          initialValues: { ...mockInitialFormValues, identifiers: { ssn } },
+          contextValues: mockContextValues,
+          withValidation: true,
+          config: validationConfig,
+        },
+      );
+      const input = screen.getByRole('textbox', { name: /ssn/i });
+
+      // A change to another field validates the whole form, with the format rule of the visible input
+      act(() => formHelpers.setFieldValue('givenName', 'Jane'));
+      await waitFor(() => expect(form.getFieldState(name).error?.message).toBe(formatError));
+      expect(input).not.toHaveClass('cds--text-input--invalid');
+      expect(screen.queryByText(formatError)).not.toBeInTheDocument();
+
+      await user.click(input);
+      await user.tab();
+
+      await waitFor(() => expect(input).toHaveClass('cds--text-input--invalid'));
+      expect(screen.getByText(formatError)).toBeInTheDocument();
     });
   });
 
@@ -661,20 +770,6 @@ describe('IdentifierInput component', () => {
         } as IdentifierSource,
       };
 
-      const mockSetFieldTouched = vi.fn();
-      const mockSetFieldValue = vi.fn();
-      const testContextValues = {
-        ...mockContextValues,
-        setFieldTouched: mockSetFieldTouched,
-        setFieldValue: mockSetFieldValue,
-        values: {
-          ...mockInitialFormValues,
-          identifiers: {
-            [fieldName]: ssnIdentifier,
-          },
-        },
-      };
-
       const initialValues = {
         identifiers: {
           [fieldName]: {
@@ -689,7 +784,7 @@ describe('IdentifierInput component', () => {
         </ResourcesContextProvider>,
         {
           initialValues: initialValues as Partial<FormValues>,
-          contextValues: testContextValues,
+          contextValues: mockContextValues,
           withValidation: true,
           config: validationConfig,
         },

@@ -1,11 +1,12 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach, type Mock } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig, useLayoutType, isDesktop } from '@openmrs/esm-framework';
 import { mockPatient, mockSession } from '__mocks__';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../config-schema';
 import { ResourcesContextProvider } from '../../../resources-context';
+import { useFormHelpers } from '../../form-adapter';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import PatientIdentifierOverlay from './identifier-selection-overlay.component';
 import type { PatientRegistrationContextProps } from '../../patient-registration-context';
@@ -108,9 +109,7 @@ const mockContextValues: PatientRegistrationContextProps = {
   identifierTypes: [],
   initialFormValues: mockInitialFormValues,
   setCapturePhotoProps: vi.fn(),
-  setFieldValue: vi.fn(),
   setInitialFormValues: vi.fn(),
-  values: mockInitialFormValues,
 } as unknown as PatientRegistrationContextProps;
 
 /**
@@ -127,7 +126,7 @@ function renderIdentifierSelectionOverlay(
     <ResourcesContextProvider value={resourcesContextValue}>
       <PatientIdentifierOverlay setFieldValue={mockSetFieldValue} closeOverlay={mockCloseOverlay} />
     </ResourcesContextProvider>,
-    { contextValues },
+    { contextValues, initialValues: mockInitialFormValues },
   );
 
   return {
@@ -292,6 +291,41 @@ describe('PatientIdentifierOverlay component', () => {
 
       expect(mockSetFieldValue).toHaveBeenCalledWith('identifiers', expect.any(Object));
       expect(mockCloseOverlay).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps unconfirmed selections when another field changes', async () => {
+      const user = userEvent.setup();
+      const mockSetFieldValue = vi.fn();
+      let setFormValue: ReturnType<typeof useFormHelpers>['setFieldValue'];
+      const CaptureHelpers: React.FC = () => {
+        setFormValue = useFormHelpers().setFieldValue;
+        return null;
+      };
+
+      renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <CaptureHelpers />
+          <PatientIdentifierOverlay setFieldValue={mockSetFieldValue} closeOverlay={vi.fn()} />
+        </ResourcesContextProvider>,
+        { initialValues: mockInitialFormValues },
+      );
+
+      const passportCheckbox = screen.getByLabelText('Passport Number');
+      await user.click(passportCheckbox);
+      expect(passportCheckbox).toBeChecked();
+
+      await act(async () => {
+        setFormValue('givenName', 'Jane');
+      });
+
+      expect(screen.getByLabelText('Passport Number')).toBeChecked();
+
+      await user.click(screen.getByRole('button', { name: /configure identifiers/i }));
+
+      expect(mockSetFieldValue).toHaveBeenCalledWith(
+        'identifiers',
+        expect.objectContaining({ passportId: expect.any(Object) }),
+      );
     });
 
     it('calls closeOverlay when Cancel button is clicked', async () => {

@@ -2,11 +2,12 @@ import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Checkbox, Search, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { type FormValues, type PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration.types';
+import { useStableFormValues } from '../../form-adapter';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
-import { initializeIdentifier, setIdentifierSource } from './id-field.component';
 import { useResourcesContext } from '../../../resources-context';
 import Overlay from '../../ui-components/overlay/overlay.component';
+import { initializeIdentifier, setIdentifierSource } from './id-field.component';
+import type { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration.types';
 import styles from './identifier-selection.scss';
 
 interface PatientIdentifierOverlayProps {
@@ -17,7 +18,8 @@ interface PatientIdentifierOverlayProps {
 const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ closeOverlay, setFieldValue }) => {
   const layout = useLayoutType();
   const { identifierTypes } = useResourcesContext();
-  const { values, initialFormValues } = usePatientRegistrationContext();
+  const { initialFormValues } = usePatientRegistrationContext();
+  const values = useStableFormValues();
   const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<FormValues['identifiers']>(values.identifiers);
   const [searchString, setSearchString] = useState('');
   const { t } = useTranslation();

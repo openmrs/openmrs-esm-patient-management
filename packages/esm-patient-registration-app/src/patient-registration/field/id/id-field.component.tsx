@@ -3,17 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { Button, SkeletonText } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { useLayoutType, useConfig, isDesktop, UserHasAccess } from '@openmrs/esm-framework';
-import { type RegistrationConfig } from '../../../config-schema';
+import { useFormHelpers, useStableFormValues } from '../../form-adapter';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { useResourcesContext } from '../../../resources-context';
+import IdentifierInput from '../../input/custom-input/identifier/identifier-input.component';
+import IdentifierSelectionOverlay from './identifier-selection-overlay.component';
+import type { RegistrationConfig } from '../../../config-schema';
 import type {
   FormValues,
   IdentifierSource,
   PatientIdentifierType,
   PatientIdentifierValue,
 } from '../../patient-registration.types';
-import IdentifierInput from '../../input/custom-input/identifier/identifier-input.component';
-import IdentifierSelectionOverlay from './identifier-selection-overlay.component';
 import styles from '../field.scss';
 
 export function setIdentifierSource(
@@ -62,7 +63,9 @@ export function deleteIdentifierType(identifiers: FormValues['identifiers'], ide
 export const Identifiers: React.FC = () => {
   const { identifierTypes } = useResourcesContext();
   const isLoading = !identifierTypes?.length;
-  const { values, setFieldValue, initialFormValues } = usePatientRegistrationContext();
+  const { initialFormValues } = usePatientRegistrationContext();
+  const values = useStableFormValues();
+  const { setFieldValue } = useFormHelpers();
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);

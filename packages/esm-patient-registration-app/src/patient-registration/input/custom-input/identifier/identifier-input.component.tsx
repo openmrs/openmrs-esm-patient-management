@@ -1,17 +1,18 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { useField, Field } from '../../../form-adapter';
 import { Button, RadioButton } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
-import { type RegistrationConfig } from '../../../../config-schema';
 import { showModal, useConfig, userHasAccess, UserHasAccess, useSession } from '@openmrs/esm-framework';
+import { useFormHelpers, useRegistrationField, useStableFormValues } from '../../../form-adapter';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
 import { Input } from '../../basic-input/input/input.component';
 import { usePatientRegistrationContext } from '../../../patient-registration-context';
 import { useResourcesContext } from '../../../../resources-context';
+import { usePatternRule } from '../../../validation/pattern-rules';
+import type { RegistrationConfig } from '../../../../config-schema';
 import type { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../../patient-registration.types';
-import { usePatternRule, type PatternRule } from '../../../validation/pattern-rules';
+import type { PatternRule } from '../../../validation/pattern-rules';
 import styles from '../../input.scss';
 
 /**
@@ -59,7 +60,9 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   const { defaultPatientIdentifierTypes, fieldConfigurations } = useConfig<RegistrationConfig>();
   const allowPreferredSelection = Boolean(fieldConfigurations?.identifier?.allowPreferredSelection);
   const { identifierTypes } = useResourcesContext();
-  const { values, setFieldValue, setFieldTouched, initialFormValues, inEditMode } = usePatientRegistrationContext();
+  const { initialFormValues, inEditMode } = usePatientRegistrationContext();
+  const values = useStableFormValues();
+  const { setFieldValue, setFieldTouched } = useFormHelpers();
   const session = useSession();
   const canEditIdentifiers = userHasAccess('Edit Patient Identifiers', session?.user);
   const identifierType = useMemo(
@@ -73,7 +76,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     ?.manualEntryEnabled;
   const [hideInputField, setHideInputField] = useState(autoGeneration || initialValue === identifierValue);
   const name = `identifiers.${fieldName}.identifierValue`;
-  const [identifierField, identifierFieldMeta] = useField(name);
+  const { field: identifierField, error, touched } = useRegistrationField(name);
 
   const defaultPatientIdentifierTypesMap = useMemo(() => {
     const map = {};
@@ -191,21 +194,14 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   return (
     <div className={styles.IDInput}>
       {!hideInputField ? (
-        <Field name={name}>
-          {({ field, form: { touched, errors } }) => (
-            <Input
-              id={name}
-              labelText={identifierName}
-              name={name}
-              // A new auto-generated identifier left empty is generated on save, so the browser must not block it
-              required={required && !(autoGeneration && !initialValue)}
-              hideOptionalLabel={valueRequired}
-              invalid={errors[name] && touched[name]}
-              invalidText={errors[name] && t(errors[name])}
-              {...field}
-            />
-          )}
-        </Field>
+        <Input
+          id={name}
+          labelText={identifierName}
+          name={name}
+          // A new auto-generated identifier left empty is generated on save, so the browser must not block it
+          required={required && !(autoGeneration && !initialValue)}
+          hideOptionalLabel={valueRequired}
+        />
       ) : (
         <div className={styles.textID}>
           <p data-testid="identifier-label" className={styles.label}>
@@ -216,9 +212,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
           </p>
           <input data-testid="identifier-input" type="hidden" {...identifierField} disabled />
           {/* This is added for any error descriptions */}
-          {!!(identifierFieldMeta.touched && identifierFieldMeta.error) && (
-            <span className={styles.dangerLabel01}>{identifierFieldMeta.error && t(identifierFieldMeta.error)}</span>
-          )}
+          {!!(touched && error) && <span className={styles.dangerLabel01}>{error && t(error)}</span>}
         </div>
       )}
       <div className={styles.actionButtonContainer}>
