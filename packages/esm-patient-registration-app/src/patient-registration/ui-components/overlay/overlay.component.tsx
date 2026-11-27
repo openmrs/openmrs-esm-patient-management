@@ -31,7 +31,7 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup
           />
         </div>
       ) : (
-        <Header className={styles.tabletOverlayHeader} aria-label="Overlay header">
+        <Header className={styles.tabletOverlayHeader} aria-label={header}>
           <Button
             kind="ghost"
             onClick={close}

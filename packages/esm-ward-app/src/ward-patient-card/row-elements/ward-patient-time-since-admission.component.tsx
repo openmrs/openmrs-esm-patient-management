@@ -1,12 +1,7 @@
 import React from 'react';
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { useTranslation } from 'react-i18next';
+import { formatDurationBetween } from '@openmrs/esm-framework';
 import { type Encounter } from '../../types';
-
-dayjs.extend(duration);
-dayjs.extend(relativeTime);
 
 export interface WardPatientTimeSinceAdmissionProps {
   firstAdmissionOrTransferEncounter: Encounter;
@@ -21,9 +16,11 @@ const WardPatientTimeSinceAdmission: React.FC<WardPatientTimeSinceAdmissionProps
     return null;
   }
 
-  const timeSinceAdmission = dayjs(firstAdmissionOrTransferEncounter.encounterDatetime).fromNow();
+  const timeSinceAdmission = formatDurationBetween(firstAdmissionOrTransferEncounter.encounterDatetime, undefined, {
+    formatOptions: { style: 'long' },
+  });
 
-  return <div>{t('timeSinceAdmission', 'Admitted: {{timeSinceAdmission}}', { timeSinceAdmission })}</div>;
+  return <div>{t('timeSinceAdmission', 'Time since admission: {{timeSinceAdmission}}', { timeSinceAdmission })}</div>;
 };
 
 export default WardPatientTimeSinceAdmission;

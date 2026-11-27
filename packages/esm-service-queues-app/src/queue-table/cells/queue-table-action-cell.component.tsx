@@ -243,6 +243,7 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
   );
 
   const QueueTableActionCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+    const { t } = useTranslation();
     const layout = useLayoutType();
     const actionPropsByKey = useActionPropsByKey();
 
@@ -292,7 +293,11 @@ export const queueTableActionColumn: QueueTableColumnFunction = (key, header, co
       <div className={styles.actionsCell}>
         {buttonComponents}
 
-        <OverflowMenu aria-label="Actions menu" size={isDesktop(layout) ? 'sm' : 'lg'} align="left" flipped>
+        <OverflowMenu
+          aria-label={t('actionsMenu', 'Actions menu')}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+          align="left"
+          flipped>
           {overflowMenuComponents}
         </OverflowMenu>
       </div>
