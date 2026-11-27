@@ -91,7 +91,6 @@
   "showingLocations_other": "{{start}}-{{end}} dari {{count}} lokasi",
   "somePartsOfTheFormDidntLoad": "Beberapa bagian formulir tidak dimuat",
   "timeOnWard": "Waktu di bangsal ini: {{timeOnWard}}",
-  "timeSinceAdmission": "Diterima: {{timeSinceAdmission}}",
   "transfer": "Transfer",
   "transferElsewhere": "Transfer ke tempat lain",
   "transferPatient": "Transfer pasien",

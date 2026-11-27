@@ -100,7 +100,6 @@
   "showingLocations_other": "{{start}}-{{end}} de {{count}} unités",
   "somePartsOfTheFormDidntLoad": "Certaines parties du formulaire ne se sont pas chargées correctement",
   "timeOnWard": "Temps passé dans ce service : {{timeOnWard}}",
-  "timeSinceAdmission": "Admis : {{timeSinceAdmission}}",
   "transfer": "Transfert",
   "transferElsewhere": "Transférer vers une autre unité",
   "transferPatient": "Transférer le patient",

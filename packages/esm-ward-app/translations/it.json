@@ -96,7 +96,6 @@
   "showingLocations_other": "{{start}}-{{end}} di {{count}} posizioni",
   "somePartsOfTheFormDidntLoad": "Alcune parti del modulo non sono state caricate",
   "timeOnWard": "Tempo trascorso in questo reparto: {{timeOnWard}}",
-  "timeSinceAdmission": "Ricoverato: {{timeSinceAdmission}}",
   "transfer": "Trasferimento",
   "transferElsewhere": "Trasferisci altrove",
   "transferPatient": "Trasferisci paziente",
