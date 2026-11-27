@@ -61,7 +61,6 @@ const initialContextValues: PatientRegistrationContextProps = {
   setFieldValue: vi.fn(),
   setFieldTouched: vi.fn(),
   setInitialFormValues: vi.fn(),
-  validationSchema: null,
   values: mockInitialFormValues,
 };
 

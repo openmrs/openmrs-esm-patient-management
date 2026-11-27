@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { type z } from 'zod';
 import { getConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../config-schema';
 import { getValidationSchema } from './patient-registration-validation';
@@ -61,11 +62,13 @@ describe('Patient registration validation', () => {
     const mockT = (key: string, defaultValue: string) => defaultValue;
 
     const validationSchema = getValidationSchema(config, mockT);
-    try {
-      await validationSchema.validate(formValues, { abortEarly: false });
-    } catch (err) {
-      return err;
-    }
+    return errorsOf(validationSchema, formValues);
+  };
+
+  /** Parses the raw values and returns the messages, or undefined when the values are valid. */
+  const errorsOf = (validationSchema: z.ZodType<unknown>, formValues) => {
+    const result = validationSchema.safeParse(formValues);
+    return result.success ? undefined : { errors: result.error.issues.map((issue) => issue.message) };
   };
 
   it('should allow valid form values', async () => {
@@ -90,7 +93,7 @@ describe('Patient registration validation', () => {
       },
     };
 
-    await expect(validationSchema.validate(formValues, { abortEarly: false })).rejects.toMatchObject({
+    expect(errorsOf(validationSchema, formValues)).toMatchObject({
       errors: ['Identifier value is required'],
     });
   });
@@ -104,6 +107,41 @@ describe('Patient registration validation', () => {
       },
     });
     expect(validationError).toBeFalsy();
+  });
+
+  describe('required auto-generated identifier', () => {
+    it('should not require a value for a new identifier that will be generated', async () => {
+      const validationError = await validateFormValues({
+        ...validFormValues,
+        identifiers: {
+          ...validFormValues.identifiers,
+          openMrsId: { required: true, autoGeneration: true, initialValue: '', identifierValue: '' },
+        },
+      });
+      expect(validationError).toBeFalsy();
+    });
+
+    it('should require a value when a saved identifier is cleared', async () => {
+      const validationError = await validateFormValues({
+        ...validFormValues,
+        identifiers: {
+          ...validFormValues.identifiers,
+          openMrsId: { required: true, autoGeneration: true, initialValue: '1002UU9', identifierValue: '' },
+        },
+      });
+      expect(validationError.errors).toEqual(['Identifier value is required']);
+    });
+
+    it('should require a value when the identifier is not auto-generated', async () => {
+      const validationError = await validateFormValues({
+        ...validFormValues,
+        identifiers: {
+          ...validFormValues.identifiers,
+          openMrsId: { required: true, autoGeneration: false, initialValue: '', identifierValue: '' },
+        },
+      });
+      expect(validationError.errors).toEqual(['Identifier value is required']);
+    });
   });
 
   it('should require givenName', async () => {

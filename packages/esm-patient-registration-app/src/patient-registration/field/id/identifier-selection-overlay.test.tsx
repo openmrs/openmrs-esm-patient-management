@@ -114,7 +114,6 @@ const mockContextValues: PatientRegistrationContextProps = {
   setCapturePhotoProps: vi.fn(),
   setFieldValue: vi.fn(),
   setInitialFormValues: vi.fn(),
-  validationSchema: null,
   values: mockInitialFormValues,
 } as unknown as PatientRegistrationContextProps;
 

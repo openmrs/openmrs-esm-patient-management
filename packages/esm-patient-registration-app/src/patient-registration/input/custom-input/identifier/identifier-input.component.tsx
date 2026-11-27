@@ -11,6 +11,7 @@ import { Input } from '../../basic-input/input/input.component';
 import { usePatientRegistrationContext } from '../../../patient-registration-context';
 import { useResourcesContext } from '../../../../resources-context';
 import type { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../../patient-registration.types';
+import { usePatternRule, type PatternRule } from '../../../validation/pattern-rules';
 import styles from '../../input.scss';
 
 /**
@@ -67,7 +68,9 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   );
   const { autoGeneration, initialValue, identifierValue, identifierName, preferred, required, selectedSource } =
     patientIdentifier;
-  const manualEntryEnabled = selectedSource?.autoGenerationOption?.manualEntryEnabled;
+  // A saved identifier is loaded without its source, so fall back to the identifier type's source (as handleEdit does)
+  const manualEntryEnabled = (selectedSource ?? identifierType?.identifierSources?.[0])?.autoGenerationOption
+    ?.manualEntryEnabled;
   const [hideInputField, setHideInputField] = useState(autoGeneration || initialValue === identifierValue);
   const name = `identifiers.${fieldName}.identifierValue`;
   const [identifierField, identifierFieldMeta] = useField(name);
@@ -80,27 +83,18 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     return map;
   }, [defaultPatientIdentifierTypes]);
 
-  const validateInput = (value: string) => {
-    if (!value || value === '') {
-      return;
-    }
-
-    if (!identifierType?.format) {
-      return;
-    }
-
-    try {
-      const regex = new RegExp(identifierType.format);
-      if (regex.test(value)) {
-        return;
-      }
-
-      return identifierType.formatDescription ?? `Expected format: ${identifierType.format}`;
-    } catch (e) {
-      console.error('Invalid regex pattern:', identifierType.format);
-      return;
-    }
-  };
+  const identifierFormat = identifierType?.format;
+  const identifierFormatDescription = identifierType?.formatDescription;
+  const formatRule: PatternRule | null =
+    identifierFormat && !hideInputField
+      ? {
+          path: name,
+          pattern: identifierFormat,
+          message: identifierFormatDescription ?? `Expected format: ${identifierFormat}`,
+          onInvalidPattern: 'pass',
+        }
+      : null;
+  usePatternRule(formatRule);
 
   const handleReset = useCallback(() => {
     setHideInputField(true);
@@ -117,7 +111,7 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
     setHideInputField(false);
     setFieldValue(`identifiers.${fieldName}`, {
       ...patientIdentifier,
-      ...setIdentifierSource(identifierType?.identifierSources?.[0], initialValue, initialValue),
+      ...setIdentifierSource(selectedSource ?? identifierType?.identifierSources?.[0], initialValue, initialValue),
       ...(autoGeneration && manualEntryEnabled && { identifierValue: initialValue ?? '' }),
     });
   };
@@ -191,19 +185,20 @@ const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fi
   // A preferred identifier needs a value (see the validation schema), so it is not labelled as optional.
   const valueRequired = required || (allowPreferredSelection && preferred && !autoGeneration);
 
-  const showEditButton = !required && hideInputField && (!!initialValue || manualEntryEnabled);
+  const showEditButton = hideInputField && ((!required && !!initialValue) || manualEntryEnabled);
   const showResetButton =
     (!!initialValue && initialValue !== identifierValue) || (!hideInputField && manualEntryEnabled);
   return (
     <div className={styles.IDInput}>
       {!hideInputField ? (
-        <Field name={name} validate={validateInput}>
+        <Field name={name}>
           {({ field, form: { touched, errors } }) => (
             <Input
               id={name}
               labelText={identifierName}
               name={name}
-              required={required}
+              // A new auto-generated identifier left empty is generated on save, so the browser must not block it
+              required={required && !(autoGeneration && !initialValue)}
               hideOptionalLabel={valueRequired}
               invalid={errors[name] && touched[name]}
               invalidText={errors[name] && t(errors[name])}

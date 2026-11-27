@@ -6,7 +6,6 @@
   "dose": "Liều lượng",
   "encounterType": "Loại cuộc gặp",
   "endDate": "Ngày kết thúc",
-  "filterActiveVisits": "Filter active visits",
   "filterTable": "Bảng lọc",
   "indication": "Chỉ định",
   "medications": "Thuốc",
@@ -28,6 +27,5 @@
   "thereIsNoInformationToDisplayHere": "Không có thông tin nào hiển thị ở  đây",
   "time": "Thời gian",
   "totalVisits": "Tổng số lượt khám trong ngày",
-  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitSummary": "Tóm tắt lượt khám"
 }
