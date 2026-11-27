@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { navigate } from '@openmrs/esm-framework';
+import { spaHomePage } from '../constants';
 import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
@@ -35,6 +37,10 @@ const AppointmentsCalendarView: React.FC = () => {
 
   const handleToday = useCallback(() => {
     setCalendarSelectedDate(dayjs());
+  }, []);
+
+  const handleBack = useCallback(() => {
+    navigate({ to: `${spaHomePage}/appointments` });
   }, []);
 
   const handleViewModeChange = useCallback((mode: CalendarViewMode) => {
@@ -89,6 +95,7 @@ const AppointmentsCalendarView: React.FC = () => {
           onToday={handleToday}
           onPrev={handlePrev}
           onNext={handleNext}
+          onBack={handleBack}
         />
         {viewMode === 'monthly' && (
           <MonthlyCalendarView
