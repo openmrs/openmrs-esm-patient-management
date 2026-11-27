@@ -3,7 +3,6 @@ import { describe, it, expect, vi } from 'vitest';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import CalendarHeader from './calendar-header.component';
 
 const defaultProps = {
@@ -14,17 +13,11 @@ const defaultProps = {
   onToday: vi.fn(),
   onPrev: vi.fn(),
   onNext: vi.fn(),
+  onBack: vi.fn(),
 };
 
 function renderCalendarHeader(props = {}) {
-  return render(
-    <MemoryRouter initialEntries={['/calendar']}>
-      <Routes>
-        <Route path="/calendar" element={<CalendarHeader {...defaultProps} {...props} />} />
-        <Route path="/" element={<div>Appointments dashboard</div>} />
-      </Routes>
-    </MemoryRouter>,
-  );
+  return render(<CalendarHeader {...defaultProps} {...props} />);
 }
 
 describe('CalendarHeader', () => {
@@ -36,16 +29,7 @@ describe('CalendarHeader', () => {
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
   });
 
-  it('navigates to the appointments dashboard when Back is clicked', async () => {
-    const user = userEvent.setup();
-    renderCalendarHeader();
-
-    await user.click(screen.getByRole('button', { name: /back/i }));
-
-    expect(await screen.findByText('Appointments dashboard')).toBeInTheDocument();
-  });
-
-  it('calls custom onBack handler when provided', async () => {
+  it('calls onBack when Back is clicked', async () => {
     const user = userEvent.setup();
     const onBack = vi.fn();
     renderCalendarHeader({ onBack });
