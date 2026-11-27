@@ -4,6 +4,8 @@ import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { navigate } from '@openmrs/esm-framework';
+import { spaHomePage } from '../constants';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import { useAppointmentsByDate } from '../hooks/useAppointmentsByDate';
@@ -289,5 +291,21 @@ describe('Appointment calendar view', () => {
     expect(cellSwatch).toBeInTheDocument();
     expect(legendSwatch.style.backgroundColor).toBeTruthy();
     expect(legendSwatch.style.backgroundColor).toBe(cellSwatch.style.backgroundColor);
+  });
+
+  describe('back button', () => {
+    it('renders a Back button', () => {
+      renderCalendar();
+      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+    });
+
+    it('navigates to the appointments dashboard when Back is clicked', async () => {
+      const user = userEvent.setup();
+      renderCalendar();
+
+      await user.click(screen.getByRole('button', { name: /back/i }));
+
+      expect(vi.mocked(navigate)).toHaveBeenCalledWith({ to: `${spaHomePage}/appointments` });
+    });
   });
 });

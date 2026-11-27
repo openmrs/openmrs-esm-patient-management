@@ -200,11 +200,16 @@ describe('MonthlyWorkloadView', () => {
       />,
     );
 
+    // The row is tinted from --service-color in CSS, so only the swatch carries the solid color
     const serviceArea = screen.getByTestId('service-area-e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90');
-    expect(serviceArea.style.backgroundColor).toBeTruthy();
+    expect(serviceArea.style.getPropertyValue('--service-color')).toBe('#73A947');
+    expect(serviceArea).not.toHaveStyle({ backgroundColor: '#73A947' });
 
     const swatch = screen.getByTestId('service-swatch-e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90');
     expect(swatch).toHaveStyle({ backgroundColor: '#73A947' });
+
+    const uncoloredServiceArea = screen.getByTestId('service-area-53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1');
+    expect(uncoloredServiceArea.style.getPropertyValue('--service-color')).toBe('');
   });
 
   it('highlights today and styles dates outside the current month differently', () => {

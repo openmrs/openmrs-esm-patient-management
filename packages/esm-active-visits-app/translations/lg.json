@@ -6,7 +6,6 @@
   "dose": "Obuyinza bwa Ddagala",
   "encounterType": "Engeri y’Okukyala",
   "endDate": "Olunaku lw’Enkomerero",
-  "filterActiveVisits": "Filter active visits",
   "filterTable": "Fulumya Olukalala Olusengejjeddwa",
   "indication": "Ekigendererwa",
   "medications": "Eddagala",
@@ -28,6 +27,5 @@
   "thereIsNoInformationToDisplayHere": "Tewali kalonda kalabikako kuno",
   "time": "Ekiseera",
   "totalVisits": "Okukyala Okubala Olunaku Luno",
-  "viewPatientChartFor": "View patient chart for {{patientName}}",
   "visitSummary": "Okubala okw’Okukyala"
 }

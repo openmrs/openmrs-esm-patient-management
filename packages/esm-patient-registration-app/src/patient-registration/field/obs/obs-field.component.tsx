@@ -9,6 +9,7 @@ import { type FieldDefinition, type RegistrationConfig } from '../../../config-s
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
+import { usePatternRule, type PatternRule } from '../../validation/pattern-rules';
 import styles from './../field.scss';
 
 export interface ObsFieldProps {
@@ -94,22 +95,17 @@ interface TextObsFieldProps {
 function TextObsField({ concept, validationRegex, label, required }: TextObsFieldProps) {
   const { t } = useTranslation();
 
-  const validateInput = (value: string) => {
-    if (!value || !validationRegex || validationRegex === '' || typeof validationRegex !== 'string' || value === '') {
-      return;
-    }
-    const regex = new RegExp(validationRegex);
-    if (regex.test(value)) {
-      return;
-    } else {
-      return t('invalidInput', 'Invalid Input');
-    }
-  };
-
   const fieldName = `obs.${concept.uuid}`;
+  const invalidInputMessage = t('invalidInput', 'Invalid Input');
+  const regexRule: PatternRule | null =
+    validationRegex && typeof validationRegex === 'string'
+      ? { path: fieldName, pattern: validationRegex, message: invalidInputMessage, onInvalidPattern: 'throw' }
+      : null;
+  usePatternRule(regexRule);
+
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
-      <Field name={fieldName} validate={validateInput}>
+      <Field name={fieldName}>
         {({ field, form: { touched, errors }, meta }) => {
           return (
             <Input
@@ -215,7 +211,7 @@ function CodedObsField({ concept, answerConceptSetUuid, label, required, customC
   const fieldName = `obs.${concept.uuid}`;
 
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
-    customConceptAnswers.length ? '' : answerConceptSetUuid ?? concept.uuid,
+    customConceptAnswers.length ? '' : (answerConceptSetUuid ?? concept.uuid),
   );
 
   const answers = useMemo(
