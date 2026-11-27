@@ -664,13 +664,15 @@ describe('Registering a new patient', () => {
     });
 
     const navigateAway = () => {
+      const cancelNavigation = vi.fn();
       act(() => {
         window.dispatchEvent(
           new CustomEvent('single-spa:before-routing-event', {
-            detail: { navigationIsCanceled: false, cancelNavigation: vi.fn(), newUrl: '/elsewhere' },
+            detail: { navigationIsCanceled: false, cancelNavigation, newUrl: '/elsewhere' },
           }),
         );
       });
+      return cancelNavigation;
     };
 
     it('does not open when focusing and leaving fields or date pickers without changing values', async () => {
@@ -687,11 +689,13 @@ describe('Registering a new patient', () => {
       await user.tab();
 
       const datePickerProps = vi.mocked(OpenmrsDatePicker).mock.lastCall?.[0];
+      expect(datePickerProps?.onBlur).toEqual(expect.any(Function));
       act(() => {
-        datePickerProps?.onBlur?.({} as React.FocusEvent<HTMLInputElement>);
+        datePickerProps.onBlur({} as React.FocusEvent<HTMLInputElement>);
       });
 
-      navigateAway();
+      const cancelNavigation = navigateAway();
+      expect(cancelNavigation).not.toHaveBeenCalled();
       expect(mockShowModal).not.toHaveBeenCalled();
     });
 
@@ -707,13 +711,21 @@ describe('Registering a new patient', () => {
       const givenNameInput = await screen.findByLabelText(/first name/i);
       await user.type(givenNameInput, 'John');
 
-      navigateAway();
+      const firstCancel = navigateAway();
+      expect(firstCancel).toHaveBeenCalledTimes(1);
       expect(mockShowModal).toHaveBeenCalledWith('cancel-patient-edit-modal', expect.anything(), expect.anything());
+
+      // Run BeforeSavePrompt's onClose callback so its internal modal-open guard resets before the second navigation.
+      const onClose = mockShowModal.mock.calls[0][2];
+      act(() => {
+        onClose?.();
+      });
 
       mockShowModal.mockClear();
       await user.clear(givenNameInput);
 
-      navigateAway();
+      const secondCancel = navigateAway();
+      expect(secondCancel).not.toHaveBeenCalled();
       expect(mockShowModal).not.toHaveBeenCalled();
     });
   });

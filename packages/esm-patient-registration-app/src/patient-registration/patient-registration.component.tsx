@@ -58,15 +58,17 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
 
   // Tracks the form's baseline values (including mount-time defaults applied by child sections)
   // so BeforeSavePrompt only arms when the user actually changes data, not on focus/blur alone.
-  const baselineValuesRef = useRef<FormValues>(cloneDeep(initialFormValues));
-  const previousInitialValuesRef = useRef<FormValues>(initialFormValues);
-  if (!isEqual(previousInitialValuesRef.current, initialFormValues)) {
+  const baselineValuesRef = useRef<FormValues | null>(null);
+  const previousInitialValuesRef = useRef<FormValues | null>(null);
+  if (baselineValuesRef.current === null || !isEqual(previousInitialValuesRef.current, initialFormValues)) {
     previousInitialValuesRef.current = initialFormValues;
     baselineValuesRef.current = cloneDeep(initialFormValues);
   }
 
   const recordInitialFieldValue = useCallback((field: string, value: unknown) => {
-    set(baselineValuesRef.current, field, cloneDeep(value));
+    if (baselineValuesRef.current) {
+      set(baselineValuesRef.current, field, cloneDeep(value));
+    }
   }, []);
 
   const location = currentSession?.sessionLocation?.uuid;
