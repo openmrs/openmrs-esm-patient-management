@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { useField, useFormikContext } from '../../form-adapter';
+import { useWatch } from 'react-hook-form';
 import useSWRImmutable from 'swr/immutable';
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
+import { useFormHelpers } from '../../form-adapter';
+import type { FetchResponse } from '@openmrs/esm-framework';
+import type { FormValues } from '../../patient-registration.types';
 
 interface AddressFields {
   addressField: string;
@@ -106,8 +109,8 @@ export function useAddressEntries(fetchResults, searchString) {
  */
 export function useAddressEntryFetchConfig(addressField: string) {
   const { orderedFields, isLoadingFieldOrder } = useOrderedAddressHierarchyLevels();
-  const { setFieldValue } = useFormikContext();
-  const [, { value: addressValues }] = useField('address');
+  const { setFieldValue } = useFormHelpers();
+  const addressValues = useWatch<FormValues>({ name: 'address' });
 
   const index = useMemo(
     () => (!isLoadingFieldOrder ? (orderedFields?.findIndex((field) => field === addressField) ?? -1) : -1),

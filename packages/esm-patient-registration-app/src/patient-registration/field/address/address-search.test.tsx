@@ -154,6 +154,32 @@ describe('Testing address search bar', () => {
     }
   });
 
+  it('overwrites the remaining address levels with empty strings when the selected result has fewer parts than the layout', async () => {
+    const user = userEvent.setup();
+    mockUseAddressHierarchy.mockReturnValue({
+      addresses: mockedAddressOptions,
+      error: null,
+      isLoading: false,
+    });
+
+    const { getValues } = await renderAddressSearchInForm({
+      address: Object.fromEntries(allFields.map(({ name }) => [name, `Old ${name}`])),
+    });
+
+    await user.type(screen.getByRole('searchbox', { name: /search address/i }), 'nea');
+
+    const option = await screen.findByText('Cambodia > Banteay Meanchey > Mongkol Borei > Banteay Neang');
+    await user.click(option);
+
+    const selectedParts = ['Cambodia', 'Banteay Meanchey', 'Mongkol Borei', 'Banteay Neang'];
+    expect(allFields.length).toBeGreaterThan(selectedParts.length);
+    await waitFor(() => {
+      expect(getValues().address).toEqual(
+        Object.fromEntries(allFields.map(({ name }, index) => [name, selectedParts[index] ?? ''])),
+      );
+    });
+  });
+
   it('clears search results when user clicks outside the component', async () => {
     const user = userEvent.setup();
     mockUseAddressHierarchy.mockReturnValue({

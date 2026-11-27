@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { useFormikContext } from '../../form-adapter';
 import { useTranslation } from 'react-i18next';
 import { Search } from '@carbon/react';
+import { useFormHelpers } from '../../form-adapter';
 import { useAddressHierarchy } from './address-hierarchy.resource';
 import styles from './address-search.scss';
 
@@ -31,7 +31,7 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
     return [...options];
   }, [addresses, searchString]);
 
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue } = useFormHelpers();
 
   const handleInputChange = (e) => {
     setSearchString(e.target.value);
