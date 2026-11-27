@@ -1,11 +1,12 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import { RelationshipsSection } from './relationships-section.component';
 import { ResourcesContextProvider } from '../../../resources-context';
 import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import { initialFormValues } from '../../patient-registration.component';
+import { useFormHelpers } from '../../form-adapter';
 import type { Resources } from '../../../registration.resource';
 import type { FormValues } from '../../patient-registration.types';
 
@@ -421,6 +422,92 @@ describe('RelationshipsSection', () => {
       await waitFor(() => expect(getValues().relationships).toHaveLength(2));
       expect(getValues().relationships[0]).toMatchObject({ clientId: 'row-1', relationshipType: motherValue });
       expect(screen.getAllByRole('combobox', { name: /relationship/i })[0]).toHaveValue(motherValue);
+    });
+  });
+
+  describe('Writes through the form helpers', () => {
+    const mockResourcesContextValue = {
+      addressTemplate: null,
+      currentSession: {
+        authenticated: true,
+        sessionId: 'JSESSION',
+        currentProvider: { uuid: '45ce6c2e-dd5a-11e6-9d9c-0242ac150002', identifier: 'PRO-123' },
+      },
+      identifierTypes: [],
+      relationshipTypes: mockRelationshipTypes,
+    } as Resources;
+    const motherValue = '42ae5ce0-d64b-11ea-9064-5adc43bbdd34/aIsToB';
+    const fatherValue = '52ae5ce0-d64b-11ea-9064-5adc43bbdd24/aIsToB';
+    const savedRelationship = {
+      uuid: 'existing-relationship-uuid',
+      relatedPersonUuid: 'test-uuid',
+      relatedPersonName: 'Test Person',
+      relationshipType: motherValue,
+      initialrelationshipTypeValue: motherValue,
+    };
+
+    it('sets the action to UPDATE when the type of a saved relationship changes, and keeps it on a second change', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderRelationshipsSectionInForm(
+        { relationships: [{ ...savedRelationship }] },
+        mockResourcesContextValue,
+      );
+
+      await user.selectOptions(screen.getByRole('combobox', { name: /relationship/i }), fatherValue);
+      await waitFor(() => {
+        expect(getValues().relationships[0]).toMatchObject({ relationshipType: fatherValue, action: 'UPDATE' });
+      });
+
+      await user.selectOptions(screen.getByRole('combobox', { name: /relationship/i }), motherValue);
+      await waitFor(() => {
+        expect(getValues().relationships[0]).toMatchObject({ relationshipType: motherValue, action: 'UPDATE' });
+      });
+    });
+
+    it('restores a deleted saved relationship when the user clicks undo', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderRelationshipsSectionInForm(
+        { relationships: [{ ...savedRelationship }] },
+        mockResourcesContextValue,
+      );
+
+      await user.selectOptions(screen.getByRole('combobox', { name: /relationship/i }), fatherValue);
+      await waitFor(() => expect(getValues().relationships[0].action).toBe('UPDATE'));
+
+      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await waitFor(() => expect(getValues().relationships[0].action).toBe('DELETE'));
+      expect(screen.getByText(/relationship removed/i)).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /undo/i }));
+
+      await waitFor(() => expect(screen.queryByText(/relationship removed/i)).not.toBeInTheDocument());
+      expect(getValues().relationships[0].action).toBeUndefined();
+      expect(getValues().relationships[0].relationshipType).toBe(motherValue);
+      expect(screen.getByRole('combobox', { name: /relationship/i })).toHaveValue(motherValue);
+    });
+
+    it('shows a type written from outside the section in the row', () => {
+      const helpersRef: { current?: ReturnType<typeof useFormHelpers> } = {};
+      const Capture = () => {
+        helpersRef.current = useFormHelpers();
+        return null;
+      };
+      renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <RelationshipsSection />
+          <Capture />
+        </ResourcesContextProvider>,
+        {
+          initialValues: {
+            ...initialFormValues,
+            relationships: [{ clientId: 'row-1', action: 'ADD', relatedPersonUuid: '', relationshipType: '' }],
+          },
+        },
+      );
+
+      act(() => helpersRef.current.setFieldValue('relationships[0].relationshipType', fatherValue));
+
+      expect(screen.getByRole('combobox', { name: /relationship/i })).toHaveValue(fatherValue);
     });
   });
 });

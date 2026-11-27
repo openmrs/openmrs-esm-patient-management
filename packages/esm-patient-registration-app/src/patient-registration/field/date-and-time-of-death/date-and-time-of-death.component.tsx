@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { Layer, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
+import { useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useField } from '../../form-adapter';
+import { Layer, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import { OpenmrsDatePicker } from '@openmrs/esm-framework';
-import { usePatientRegistrationContext } from '../../patient-registration-context';
+import { useFormHelpers, useRegistrationField } from '../../form-adapter';
 import type { FormValues } from '../../patient-registration.types';
 import styles from '../field.scss';
 
@@ -24,8 +24,9 @@ export const DateAndTimeOfDeathField: React.FC = () => {
 };
 
 function DeathDateField() {
-  const { values, setFieldValue } = usePatientRegistrationContext();
-  const [deathDate, deathDateMeta] = useField<keyof FormValues>('deathDate');
+  const isDead = useWatch<FormValues, 'isDead'>({ name: 'isDead' });
+  const { setFieldValue } = useFormHelpers();
+  const { field: deathDate, error, touched } = useRegistrationField('deathDate');
   const { t } = useTranslation();
   const today = dayjs().hour(23).minute(59).second(59).toDate();
   const onDateChange = useCallback(
@@ -41,11 +42,13 @@ function DeathDateField() {
   return (
     <Layer>
       <OpenmrsDatePicker
-        {...deathDate}
+        name={deathDate.name}
+        value={deathDate.value}
+        onBlur={deathDate.onBlur}
         id="deathDate"
-        invalidText={t(deathDateMeta.error)}
-        invalid={!!(deathDateMeta.touched && deathDateMeta.error)}
-        isRequired={values.isDead}
+        invalidText={t(error)}
+        invalid={!!(touched && error)}
+        isRequired={isDead}
         labelText={t('deathDateInputLabel', 'Date of death')}
         maxDate={today}
         onChange={onDateChange}
@@ -56,8 +59,8 @@ function DeathDateField() {
 
 function DeathTimeField() {
   const { t } = useTranslation();
-  const [deathTimeField, deathTimeMeta] = useField<keyof FormValues>('deathTime');
-  const [deathTimeFormatField, deathTimeFormatMeta] = useField<keyof FormValues>('deathTimeFormat');
+  const { field: deathTimeField, error: deathTimeError, touched: deathTimeTouched } = useRegistrationField('deathTime');
+  const { field: deathTimeFormatField } = useRegistrationField('deathTimeFormat');
 
   return (
     <Layer>
@@ -67,8 +70,8 @@ function DeathTimeField() {
         labelText={t('timeOfDeathInputLabel', 'Time of death (hh:mm)')}
         className={styles.timeOfDeathField}
         pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-        invalid={!!(deathTimeMeta.touched && deathTimeMeta.error)}
-        invalidText={t(deathTimeMeta.error)}>
+        invalid={!!(deathTimeTouched && deathTimeError)}
+        invalidText={t(deathTimeError)}>
         <TimePickerSelect {...deathTimeFormatField} id="time-format-picker" aria-label={t('timeFormat', 'Time Format')}>
           <SelectItem value="AM" text="AM" />
           <SelectItem value="PM" text="PM" />
