@@ -28,7 +28,6 @@
   "deathDateRequired": "Требуется указать дату смерти",
   "deathdayBeforeBirthday": "Дата и время смерти не могут быть ранее даты рождения",
   "deathdayIsRequired": "Требуется указать дату смерти, если пациент отмечен как умерший.",
-  "deathdayNotInTheFuture": "",
   "deathSection": "Информация о смерти",
   "deathTimeFormatInvalid": "Неверный формат времени",
   "deathTimeFormatRequired": "Требуется указать формат времени",

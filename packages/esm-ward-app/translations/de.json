@@ -138,7 +138,6 @@
   "somePartsOfTheFormDidntLoad": "Einige Teile des Formulars wurden nicht geladen",
   "startedDatetime": "Begonnen am {{datetime}}",
   "timeOnWard": "Aufenthaltsdauer auf dieser Station: {{timeOnWard}}",
-  "timeSinceAdmission": "Aufgenommen seit: {{timeSinceAdmission}}",
   "totalBeds": "Gesamtzahl der Betten",
   "transfer": "Überweisung",
   "transferElsewhere": "An einen anderen Ort überweisen",

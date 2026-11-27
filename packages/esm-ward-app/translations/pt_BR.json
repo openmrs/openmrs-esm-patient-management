@@ -130,7 +130,6 @@
   "showingLocations_other": "{{start}}–{{end}} de {{count}} localizações",
   "somePartsOfTheFormDidntLoad": "Algumas partes do formulário não foram carregadas",
   "timeOnWard": "Tempo nesta enfermaria: {{timeOnWard}}",
-  "timeSinceAdmission": "Admitido(a): {{timeSinceAdmission}}",
   "totalBeds": "Total de leitos",
   "transfer": "Transferir",
   "transferElsewhere": "Transferir para outro local",

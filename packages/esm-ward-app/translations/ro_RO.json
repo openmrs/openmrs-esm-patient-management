@@ -91,7 +91,6 @@
   "showingLocations_other": "{{start}}-{{end}} din {{count}} locații",
   "somePartsOfTheFormDidntLoad": "Unele părți ale formularului nu au fost încărcate",
   "timeOnWard": "Timp petrecut în salon: {{timeOnWard}}",
-  "timeSinceAdmission": "Internat: {{timeSinceAdmission}}",
   "transfer": "Transfer",
   "transferElsewhere": "Transfer în altă parte",
   "transferPatient": "Transfer pacient",

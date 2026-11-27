@@ -73,7 +73,6 @@
   "selectALocation": "აირჩიეთ მდებარეობა",
   "showingLocations_one": "{{start}}-{{end}} {{count}} მდებარეობიდან",
   "showingLocations_other": "{{start}}-{{end}} {{count}} მდებარეობიდან",
-  "timeSinceAdmission": "მიღებიდან გავიდა: {{timeSinceAdmission}}",
   "transfer": "გადაყვანა",
   "transferElsewhere": "სხვაგან გადაყვანა",
   "transferPatient": "პაციენტის გადაყვანა",

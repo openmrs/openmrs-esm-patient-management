@@ -138,7 +138,6 @@
   "somePartsOfTheFormDidntLoad": "Некоторые части формы не загрузились",
   "startedDatetime": "Начало {{datetime}}",
   "timeOnWard": "Время в отделении: {{timeOnWard}}",
-  "timeSinceAdmission": "Госпитализирован: {{timeSinceAdmission}}",
   "totalBeds": "Всего коек",
   "transfer": "Перевести",
   "transferElsewhere": "Перевести в другое место",
