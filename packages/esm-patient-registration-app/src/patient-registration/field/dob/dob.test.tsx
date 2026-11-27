@@ -1,25 +1,20 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
-import { Formik, Form } from 'formik';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
 import { DobField } from './dob.component';
-import { type FormValues } from '../../patient-registration.types';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
- * Helper to render DobField with Formik render props for state-dependent tests.
- * Returns the render result and a ref to access form values.
+ * Helper to render DobField in a registration form for state-dependent tests.
  */
-const renderDobFieldWithFormik = (
-  initialValues: Partial<FormValues> = {},
-  options?: { enableReinitialize?: boolean },
-) => {
+const renderDobFieldInForm = (initialValues: Partial<FormValues> = {}) => {
   const defaultValues = {
     birthdate: '',
     birthdateEstimated: false,
@@ -28,41 +23,11 @@ const renderDobFieldWithFormik = (
     ...initialValues,
   };
 
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
-
-  const utils = render(
-    <Formik initialValues={defaultValues} onSubmit={() => {}} enableReinitialize={options?.enableReinitialize}>
-      {({ setFieldValue, values, setFieldTouched }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        return (
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                identifierTypes: [],
-                values: formValuesRef,
-                inEditMode: false,
-                setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: vi.fn(),
-                setFieldTouched: setFieldTouched as any,
-                currentPhoto: '',
-                initialFormValues: formValuesRef,
-              }}>
-              <DobField />
-            </PatientRegistrationContextProvider>
-          </Form>
-        );
-      }}
-    </Formik>,
-  );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-  };
+  return renderWithRegistrationForm(<DobField />, { initialValues: defaultValues });
 };
 
 /**
- * Helper to render DobField with mocked Formik functions (for simple rendering tests).
+ * Helper to render DobField with mocked form functions (for simple rendering tests).
  */
 const renderDobField = (initialValues: Partial<FormValues> = {}) => {
   const defaultValues = {
@@ -73,25 +38,15 @@ const renderDobField = (initialValues: Partial<FormValues> = {}) => {
     ...initialValues,
   };
 
-  return render(
-    <Formik initialValues={defaultValues} onSubmit={() => {}}>
-      <Form>
-        <PatientRegistrationContextProvider
-          value={{
-            identifierTypes: [],
-            values: { ...initialFormValues, ...defaultValues } as FormValues,
-            inEditMode: false,
-            setFieldValue: vi.fn().mockResolvedValue(undefined),
-            setCapturePhotoProps: vi.fn(),
-            setFieldTouched: vi.fn().mockResolvedValue(undefined),
-            currentPhoto: '',
-            initialFormValues: { ...initialFormValues, ...defaultValues } as FormValues,
-          }}>
-          <DobField />
-        </PatientRegistrationContextProvider>
-      </Form>
-    </Formik>,
-  );
+  return renderWithRegistrationForm(<DobField />, {
+    initialValues: defaultValues,
+    contextValues: {
+      values: { ...initialFormValues, ...defaultValues } as FormValues,
+      setFieldValue: vi.fn().mockResolvedValue(undefined),
+      setFieldTouched: vi.fn().mockResolvedValue(undefined),
+      initialFormValues: { ...initialFormValues, ...defaultValues } as FormValues,
+    },
+  });
 };
 
 describe('Dob', () => {
@@ -122,7 +77,7 @@ describe('Dob', () => {
   describe('Toggle functionality', () => {
     it('shows estimated age inputs when user selects "unknown"', async () => {
       const user = userEvent.setup();
-      renderDobFieldWithFormik({ birthdate: '', birthdateEstimated: false, yearsEstimated: 0, monthsEstimated: 0 });
+      renderDobFieldInForm({ birthdate: '', birthdateEstimated: false, yearsEstimated: 0, monthsEstimated: 0 });
 
       await user.click(screen.getByRole('tab', { name: /no/i }));
 
@@ -139,7 +94,7 @@ describe('Dob', () => {
 
     it('shows date picker when user selects "known"', async () => {
       const user = userEvent.setup();
-      renderDobFieldWithFormik({ birthdate: '', birthdateEstimated: true, yearsEstimated: 0, monthsEstimated: 0 });
+      renderDobFieldInForm({ birthdate: '', birthdateEstimated: true, yearsEstimated: 0, monthsEstimated: 0 });
 
       // First verify we're in unknown mode
       expect(screen.getByLabelText(/estimated age in years/i)).toBeInTheDocument();
@@ -173,7 +128,7 @@ describe('Dob', () => {
 
     it('accepts boundary value 0 for years', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDobFieldWithFormik({ birthdateEstimated: true, yearsEstimated: 25 });
+      const { getValues } = renderDobFieldInForm({ birthdateEstimated: true, yearsEstimated: 25 });
 
       const yearsInput = screen.getByLabelText(/estimated age in years/i) as HTMLInputElement;
       await user.clear(yearsInput);
@@ -182,12 +137,12 @@ describe('Dob', () => {
       await waitFor(() => {
         expect(yearsInput.value).toBe('0');
       });
-      expect(getFormValues().yearsEstimated).toBe(0);
+      expect(getValues().yearsEstimated).toBe(0);
     });
 
     it('accepts boundary value 139 for years', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDobFieldWithFormik({ birthdateEstimated: true });
+      const { getValues } = renderDobFieldInForm({ birthdateEstimated: true });
 
       const yearsInput = screen.getByLabelText(/estimated age in years/i) as HTMLInputElement;
       await user.clear(yearsInput);
@@ -196,15 +151,15 @@ describe('Dob', () => {
       await waitFor(() => {
         expect(yearsInput.value).toBe('139');
       });
-      expect(getFormValues().yearsEstimated).toBe(139);
+      expect(getValues().yearsEstimated).toBe(139);
     });
 
     it('does not update birthdate when years >= 140', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDobFieldWithFormik({ birthdateEstimated: true, yearsEstimated: 25 });
+      const { getValues } = renderDobFieldInForm({ birthdateEstimated: true, yearsEstimated: 25 });
 
       const yearsInput = screen.getByLabelText(/estimated age in years/i) as HTMLInputElement;
-      const initialBirthdate = getFormValues().birthdate;
+      const initialBirthdate = getValues().birthdate;
       await user.clear(yearsInput);
       await user.type(yearsInput, '150');
 
@@ -214,7 +169,7 @@ describe('Dob', () => {
         expect(yearsInput.value).toBe('150');
       });
       // Verify birthdate was not recalculated (it should remain unchanged or be cleared)
-      const finalBirthdate = getFormValues().birthdate;
+      const finalBirthdate = getValues().birthdate;
       // If birthdate was cleared, it should be empty string, not a Date
       // If it's a Date, it should be the same as initial (or approximately, accounting for time)
       if (initialBirthdate instanceof Date && finalBirthdate instanceof Date) {
@@ -226,10 +181,10 @@ describe('Dob', () => {
 
     it('does not accept negative values for years', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDobFieldWithFormik({ birthdateEstimated: true, yearsEstimated: 25 });
+      const { getValues } = renderDobFieldInForm({ birthdateEstimated: true, yearsEstimated: 25 });
 
       const yearsInput = screen.getByLabelText(/estimated age in years/i) as HTMLInputElement;
-      const initialBirthdate = getFormValues().birthdate;
+      const initialBirthdate = getValues().birthdate;
       await user.clear(yearsInput);
       await user.type(yearsInput, '-5');
 
@@ -239,7 +194,7 @@ describe('Dob', () => {
         expect(yearsInput.value).toBe('-5');
       });
       // Verify birthdate was not recalculated (it should remain unchanged)
-      const finalBirthdate = getFormValues().birthdate;
+      const finalBirthdate = getValues().birthdate;
       if (initialBirthdate instanceof Date && finalBirthdate instanceof Date) {
         // Birthdate should not have changed (component doesn't recalculate for negative years)
         const timeDiff = Math.abs(finalBirthdate.getTime() - initialBirthdate.getTime());
@@ -249,7 +204,7 @@ describe('Dob', () => {
 
     it('does not accept negative values for months', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDobFieldWithFormik({ birthdateEstimated: true, monthsEstimated: 6 });
+      const { getValues } = renderDobFieldInForm({ birthdateEstimated: true, monthsEstimated: 6 });
 
       const monthsInput = screen.getByLabelText(/estimated age in months/i) as HTMLInputElement;
       await user.clear(monthsInput);
@@ -261,7 +216,7 @@ describe('Dob', () => {
         expect(monthsInput.value).toBe('-3');
       });
       // Verify the component handles it (may or may not update form value)
-      const formValues = getFormValues();
+      const formValues = getValues();
       expect(typeof formValues.monthsEstimated).toBe('number');
     });
   });
@@ -269,10 +224,12 @@ describe('Dob', () => {
   describe('Birthdate calculation', () => {
     it('calculates birthdate when user enters estimated years', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDobFieldWithFormik(
-        { birthdateEstimated: true, yearsEstimated: 0, monthsEstimated: 0, birthdate: '' },
-        { enableReinitialize: true },
-      );
+      const { getValues } = renderDobFieldInForm({
+        birthdateEstimated: true,
+        yearsEstimated: 0,
+        monthsEstimated: 0,
+        birthdate: '',
+      });
 
       const yearsInput = screen.getByLabelText(/estimated age in years/i) as HTMLInputElement;
 
@@ -286,7 +243,7 @@ describe('Dob', () => {
       // Wait for form state to update - the birthdate should be calculated
       await waitFor(
         () => {
-          const formValues = getFormValues();
+          const formValues = getValues();
           // Wait for either birthdate to be a Date or yearsEstimated to be updated
           expect(formValues.birthdate instanceof Date || formValues.yearsEstimated === 25).toBe(true);
         },
@@ -294,7 +251,7 @@ describe('Dob', () => {
       );
 
       // Verify birthdate was calculated (observable through form values)
-      const formValues = getFormValues();
+      const formValues = getValues();
       // The birthdate should be approximately 25 years ago
       if (formValues.birthdate instanceof Date) {
         const yearsDiff = new Date().getFullYear() - formValues.birthdate.getFullYear();
@@ -308,10 +265,12 @@ describe('Dob', () => {
 
     it('calculates birthdate when user enters estimated months', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDobFieldWithFormik(
-        { birthdateEstimated: true, yearsEstimated: 25, monthsEstimated: 0, birthdate: '' },
-        { enableReinitialize: true },
-      );
+      const { getValues } = renderDobFieldInForm({
+        birthdateEstimated: true,
+        yearsEstimated: 25,
+        monthsEstimated: 0,
+        birthdate: '',
+      });
 
       const monthsInput = screen.getByLabelText(/estimated age in months/i) as HTMLInputElement;
 
@@ -325,7 +284,7 @@ describe('Dob', () => {
       // Wait for form state to update - the birthdate should be recalculated with months
       await waitFor(
         () => {
-          const formValues = getFormValues();
+          const formValues = getValues();
           // Wait for either birthdate to be a Date or monthsEstimated to be updated
           expect(formValues.birthdate instanceof Date || formValues.monthsEstimated === 6).toBe(true);
         },
@@ -333,7 +292,7 @@ describe('Dob', () => {
       );
 
       // Verify birthdate was recalculated with months included
-      const formValues = getFormValues();
+      const formValues = getValues();
       if (formValues.birthdate instanceof Date) {
         const yearsDiff = new Date().getFullYear() - formValues.birthdate.getFullYear();
         // Should be approximately 25 years and 6 months ago
@@ -347,10 +306,12 @@ describe('Dob', () => {
 
     it('normalizes months > 12 into years on blur', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDobFieldWithFormik(
-        { birthdateEstimated: true, yearsEstimated: 25, monthsEstimated: 0, birthdate: '' },
-        { enableReinitialize: true },
-      );
+      const { getValues } = renderDobFieldInForm({
+        birthdateEstimated: true,
+        yearsEstimated: 25,
+        monthsEstimated: 0,
+        birthdate: '',
+      });
 
       const monthsInput = screen.getByLabelText(/estimated age in months/i) as HTMLInputElement;
 
@@ -364,22 +325,19 @@ describe('Dob', () => {
       // Wait for normalization to occur - wait for years to update
       await waitFor(
         () => {
-          expect(getFormValues().yearsEstimated).toBe(26);
+          expect(getValues().yearsEstimated).toBe(26);
         },
         { timeout: 1000 },
       );
 
       // Verify months were normalized: 18 months = 1 year 6 months
-      expect(getFormValues().monthsEstimated).toBe(6);
+      expect(getValues().monthsEstimated).toBe(6);
     });
   });
 
   describe('Date picker interaction', () => {
     it('sets birthdate when user enters a date', async () => {
-      const { getFormValues } = renderDobFieldWithFormik(
-        { birthdate: '', birthdateEstimated: false },
-        { enableReinitialize: true },
-      );
+      const { getValues } = renderDobFieldInForm({ birthdate: '', birthdateEstimated: false });
 
       const dateOfBirthInput = screen.getByLabelText(/date of birth/i) as HTMLInputElement;
       const birthDateString = '1993-08-02';
@@ -393,7 +351,7 @@ describe('Dob', () => {
         () => {
           // Verify birthdate was set (observable through form values)
           // The value might be a Date object or string depending on how OpenmrsDatePicker handles it
-          expect(getFormValues().birthdate).toBeTruthy();
+          expect(getValues().birthdate).toBeTruthy();
         },
         { timeout: 1000 },
       );

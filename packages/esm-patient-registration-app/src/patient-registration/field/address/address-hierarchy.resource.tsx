@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { useField, useFormikContext } from 'formik';
+import { useField, useFormikContext } from '../../form-adapter';
 import useSWRImmutable from 'swr/immutable';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 

@@ -1,7 +1,7 @@
 import React, { type ChangeEvent, useCallback } from 'react';
 import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useField } from 'formik';
+import { useField } from '../../form-adapter';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { type RegistrationConfig } from '../../../config-schema';

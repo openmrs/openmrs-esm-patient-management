@@ -1,26 +1,23 @@
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SWRConfig } from 'swr';
-import { Formik, useFormikContext } from 'formik';
 import { getDefaultsFromConfigSchema, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
-import { type Resources } from '../../../registration.resource';
-import { type AddressTemplate } from '../../patient-registration.types';
-import {
-  PatientRegistrationContextProvider,
-  type PatientRegistrationContextProps,
-} from '../../patient-registration-context';
 import { ResourcesContextProvider } from '../../../resources-context';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import { AddressComponent } from './address-field.component';
+import type { Resources } from '../../../registration.resource';
+import type { AddressTemplate, FormValues } from '../../patient-registration.types';
+import type { PatientRegistrationContextProps } from '../../patient-registration-context';
 
 /**
  * Regression test for O3-5912.
  *
  * These tests render the real AddressComponent, drive the real combo inputs, and assert on the
- * resulting Formik values. Nothing in the hierarchy hooks is mocked: the data comes from `openmrsFetch`.
+ * resulting form values. Nothing in the hierarchy hooks is mocked: the data comes from `openmrsFetch`.
  */
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
@@ -54,33 +51,26 @@ const hierarchy: Record<string, Array<string>> = {
   'Kenya|Nairobi': ['Westlands', 'Kibera'],
 };
 
-function AddressValues() {
-  const { values } = useFormikContext<{ address: Record<string, string> }>();
-  return <output data-testid="address-values">{JSON.stringify(values.address)}</output>;
-}
+let getValues: () => FormValues;
 
 function getAddressValues() {
-  return JSON.parse(screen.getByTestId('address-values').textContent ?? '{}');
+  return getValues().address;
 }
 
 function renderAddress() {
   const contextValue = { setFieldValue: vi.fn(), values: {} } as unknown as PatientRegistrationContextProps;
 
-  return render(
+  const utils = renderWithRegistrationForm(
     // A fresh SWR cache per render, so hierarchy responses do not leak between tests.
     <SWRConfig value={{ provider: () => new Map() }}>
       <ResourcesContextProvider value={resources}>
-        <PatientRegistrationContextProvider value={contextValue}>
-          <Formik initialValues={{ address: {} }} onSubmit={() => {}}>
-            <>
-              <AddressComponent />
-              <AddressValues />
-            </>
-          </Formik>
-        </PatientRegistrationContextProvider>
+        <AddressComponent />
       </ResourcesContextProvider>
     </SWRConfig>,
+    { initialValues: { address: {} }, contextValues: contextValue },
   );
+  getValues = utils.getValues;
+  return utils;
 }
 
 async function choose(user: ReturnType<typeof userEvent.setup>, label: string, option: string) {

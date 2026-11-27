@@ -2,27 +2,20 @@ import React from 'react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
-import { Form, Formik } from 'formik';
 import { getDefaultsFromConfigSchema, useConfig, userHasAccess, UserHasAccess } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../../config-schema';
-import { renderWithContext } from 'tools';
 import { ResourcesContextProvider } from '../../../../resources-context';
-import { type Resources } from '../../../../registration.resource';
-import {
-  PatientRegistrationContextProvider,
-  type PatientRegistrationContextProps,
-} from '../../../patient-registration-context';
+import { createPatternRuleRegistry, PatternRulesProvider } from '../../../validation/pattern-rules';
+import { renderWithRegistrationForm } from '../../../../test-utils/render-with-registration-form';
+import IdentifierInput, { promoteFallbackPreferredIdentifier } from './identifier-input.component';
+import type { Resources } from '../../../../registration.resource';
+import type { PatientRegistrationContextProps } from '../../../patient-registration-context';
 import type {
   AddressTemplate,
   FormValues,
   IdentifierSource,
   PatientIdentifierValue,
 } from '../../../patient-registration.types';
-import { createPatternRuleRegistry, PatternRulesProvider } from '../../../validation/pattern-rules';
-import { getValidationSchema } from '../../../validation/patient-registration-validation';
-import { validateRegistrationForm } from '../../../validation/validate-registration-form';
-
-import IdentifierInput, { promoteFallbackPreferredIdentifier } from './identifier-input.component';
 
 const validationConfig = {
   freeTextFieldConceptUuid: 'free-text-uuid',
@@ -119,7 +112,7 @@ const mockUserHasAccess = vi.mocked(UserHasAccess);
 const mockUserHasAccessCheck = vi.mocked(userHasAccess);
 
 /**
- * Helper to render IdentifierInput component with Formik.
+ * Helper to render IdentifierInput component in a registration form.
  */
 function renderIdentifierInput(
   patientIdentifier: PatientIdentifierValue,
@@ -128,16 +121,11 @@ function renderIdentifierInput(
   contextValues: Partial<PatientRegistrationContextProps> = {},
   resources: Resources = mockResourcesContextValue,
 ) {
-  return renderWithContext(
-    <Formik initialValues={initialValues} onSubmit={vi.fn()}>
-      <Form>
-        <PatientRegistrationContextProvider value={{ ...mockContextValues, ...contextValues }}>
-          <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
-        </PatientRegistrationContextProvider>
-      </Form>
-    </Formik>,
-    ResourcesContextProvider,
-    resources,
+  return renderWithRegistrationForm(
+    <ResourcesContextProvider value={resources}>
+      <IdentifierInput patientIdentifier={patientIdentifier} fieldName={fieldName} />
+    </ResourcesContextProvider>,
+    { initialValues, contextValues: { ...mockContextValues, ...contextValues } },
   );
 }
 
@@ -180,18 +168,13 @@ describe('IdentifierInput component', () => {
         required: true,
       } as PatientIdentifierValue;
 
-      renderWithContext(
-        <PatternRulesProvider registry={registry}>
-          <Formik initialValues={{}} onSubmit={vi.fn()}>
-            <Form>
-              <PatientRegistrationContextProvider value={mockContextValues}>
-                <IdentifierInput patientIdentifier={ssn} fieldName="ssn" />
-              </PatientRegistrationContextProvider>
-            </Form>
-          </Formik>
-        </PatternRulesProvider>,
-        ResourcesContextProvider,
-        mockResourcesContextValue,
+      renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <PatternRulesProvider registry={registry}>
+            <IdentifierInput patientIdentifier={ssn} fieldName="ssn" />
+          </PatternRulesProvider>
+        </ResourcesContextProvider>,
+        { contextValues: mockContextValues },
       );
 
       expect(registry.getRules()).toEqual([]);
@@ -700,31 +683,16 @@ describe('IdentifierInput component', () => {
         },
       };
 
-      const registry = createPatternRuleRegistry();
-      renderWithContext(
-        <PatternRulesProvider registry={registry}>
-          <Formik
-            initialValues={initialValues}
-            onSubmit={vi.fn()}
-            validate={(values) =>
-              validateRegistrationForm(
-                getValidationSchema(
-                  validationConfig,
-                  (_key: string, defaultValue: string) => defaultValue,
-                  registry.getRules,
-                ),
-                values as FormValues,
-              )
-            }>
-            <Form>
-              <PatientRegistrationContextProvider value={testContextValues}>
-                <IdentifierInput patientIdentifier={ssnIdentifier} fieldName={fieldName} />
-              </PatientRegistrationContextProvider>
-            </Form>
-          </Formik>
-        </PatternRulesProvider>,
-        ResourcesContextProvider,
-        mockResourcesContextValue,
+      renderWithRegistrationForm(
+        <ResourcesContextProvider value={mockResourcesContextValue}>
+          <IdentifierInput patientIdentifier={ssnIdentifier} fieldName={fieldName} />
+        </ResourcesContextProvider>,
+        {
+          initialValues: initialValues as Partial<FormValues>,
+          contextValues: testContextValues,
+          withValidation: true,
+          config: validationConfig,
+        },
       );
 
       const input = screen.getByRole('textbox', {

@@ -2,14 +2,12 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
-import { Form, Formik } from 'formik';
-import { type Resources } from '../../../registration.resource';
-import { type FormValues } from '../../patient-registration.types';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { RelationshipsSection } from './relationships-section.component';
 import { ResourcesContextProvider } from '../../../resources-context';
-import { renderWithContext } from 'tools';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import { initialFormValues } from '../../patient-registration.component';
+import type { Resources } from '../../../registration.resource';
+import type { FormValues } from '../../patient-registration.types';
 
 vi.mock('../../patient-registration.resource', () => ({
   fetchPerson: vi.fn().mockResolvedValue([
@@ -38,51 +36,24 @@ const mockRelationshipTypes = {
 };
 
 /**
- * Helper to render RelationshipsSection with Formik for state-dependent tests.
+ * Helper to render RelationshipsSection in a registration form for state-dependent tests.
  */
-function renderRelationshipsSectionWithFormik(
-  initialValues: Partial<FormValues> = {},
-  resourcesContextValue: Resources,
-) {
+function renderRelationshipsSectionInForm(initialValues: Partial<FormValues> = {}, resourcesContextValue: Resources) {
   const defaultValues = {
     ...initialFormValues,
     relationships: [],
     ...initialValues,
   };
 
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
-
-  const utils = renderWithContext(
-    <Formik initialValues={defaultValues} onSubmit={() => {}}>
-      {({ setFieldValue, values }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        return (
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                identifierTypes: [],
-                values: formValuesRef,
-                inEditMode: false,
-                setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: vi.fn(),
-                setFieldTouched: vi.fn().mockResolvedValue(undefined),
-                currentPhoto: '',
-                initialFormValues: formValuesRef,
-              }}>
-              <RelationshipsSection />
-            </PatientRegistrationContextProvider>
-          </Form>
-        );
-      }}
-    </Formik>,
-    ResourcesContextProvider,
-    resourcesContextValue,
+  return renderWithRegistrationForm(
+    <ResourcesContextProvider value={resourcesContextValue}>
+      <RelationshipsSection />
+    </ResourcesContextProvider>,
+    {
+      initialValues: defaultValues,
+      contextValues: { setFieldTouched: vi.fn().mockResolvedValue(undefined) },
+    },
   );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-  };
 }
 
 describe('RelationshipsSection', () => {
@@ -111,7 +82,7 @@ describe('RelationshipsSection', () => {
         relationshipTypes: null,
       } as Resources;
 
-      renderRelationshipsSectionWithFormik({}, mockResourcesContextValue);
+      renderRelationshipsSectionInForm({}, mockResourcesContextValue);
 
       expect(screen.getByLabelText(/loading relationships section/i)).toBeInTheDocument();
       expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -132,7 +103,7 @@ describe('RelationshipsSection', () => {
         relationshipTypes: mockRelationshipTypes,
       } as Resources;
 
-      renderRelationshipsSectionWithFormik({}, mockResourcesContextValue);
+      renderRelationshipsSectionInForm({}, mockResourcesContextValue);
 
       expect(screen.getByLabelText(/relationships section/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /add relationship/i })).toBeInTheDocument();
@@ -150,7 +121,7 @@ describe('RelationshipsSection', () => {
         relationshipTypes: mockRelationshipTypes,
       } as Resources;
 
-      renderRelationshipsSectionWithFormik(
+      renderRelationshipsSectionInForm(
         {
           relationships: [
             {
@@ -183,7 +154,7 @@ describe('RelationshipsSection', () => {
         relationshipTypes: mockRelationshipTypes,
       } as Resources;
 
-      renderRelationshipsSectionWithFormik(
+      renderRelationshipsSectionInForm(
         {
           relationships: [
             { clientId: 'new-relationship-1', action: 'ADD', relatedPersonUuid: '', relationshipType: '' },
@@ -212,7 +183,7 @@ describe('RelationshipsSection', () => {
         relationshipTypes: mockRelationshipTypes,
       } as Resources;
 
-      const { getFormValues } = renderRelationshipsSectionWithFormik({}, mockResourcesContextValue);
+      const { getValues } = renderRelationshipsSectionInForm({}, mockResourcesContextValue);
 
       const addButton = screen.getByRole('button', { name: /add relationship/i });
       expect(addButton).toBeInTheDocument();
@@ -220,12 +191,12 @@ describe('RelationshipsSection', () => {
       await user.click(addButton);
 
       await waitFor(() => {
-        const formValues = getFormValues();
+        const formValues = getValues();
         expect(formValues.relationships.length).toBe(1);
       });
 
       await waitFor(() => {
-        const formValues = getFormValues();
+        const formValues = getValues();
         expect(formValues.relationships[0]?.action).toBe('ADD');
       });
 
@@ -246,7 +217,7 @@ describe('RelationshipsSection', () => {
         relationshipTypes: mockRelationshipTypes,
       } as Resources;
 
-      const { getFormValues } = renderRelationshipsSectionWithFormik(
+      const { getValues } = renderRelationshipsSectionInForm(
         {
           relationships: [
             {
@@ -261,7 +232,7 @@ describe('RelationshipsSection', () => {
         mockResourcesContextValue,
       );
 
-      expect(getFormValues().relationships.length).toBe(1);
+      expect(getValues().relationships.length).toBe(1);
 
       const deleteButton = screen.getByRole('button', { name: /delete/i });
       expect(deleteButton).toBeInTheDocument();
@@ -270,7 +241,7 @@ describe('RelationshipsSection', () => {
 
       // For new relationships (action: 'ADD'), clicking delete removes them from the array
       await waitFor(() => {
-        const formValues = getFormValues();
+        const formValues = getValues();
         expect(formValues.relationships.length).toBe(0);
       });
     });
@@ -288,7 +259,7 @@ describe('RelationshipsSection', () => {
         relationshipTypes: mockRelationshipTypes,
       } as Resources;
 
-      const { getFormValues } = renderRelationshipsSectionWithFormik(
+      const { getValues } = renderRelationshipsSectionInForm(
         {
           relationships: [
             {
@@ -309,7 +280,7 @@ describe('RelationshipsSection', () => {
 
       // For existing relationships (with uuid, no action), clicking delete sets action to 'DELETE'
       await waitFor(() => {
-        const formValues = getFormValues();
+        const formValues = getValues();
         expect(formValues.relationships[0]?.action).toBe('DELETE');
       });
 
@@ -336,7 +307,7 @@ describe('RelationshipsSection', () => {
         relationshipTypes: mockRelationshipTypes,
       } as Resources;
 
-      const { getFormValues } = renderRelationshipsSectionWithFormik({}, mockResourcesContextValue);
+      const { getValues } = renderRelationshipsSectionInForm({}, mockResourcesContextValue);
 
       const addButton = screen.getByRole('button', { name: /add relationship/i });
       await user.click(addButton);
@@ -356,7 +327,7 @@ describe('RelationshipsSection', () => {
       await user.selectOptions(selects[1], fatherValue);
 
       await waitFor(() => {
-        const { relationships } = getFormValues();
+        const { relationships } = getValues();
         expect(relationships[0]).toMatchObject({ relatedPersonUuid: person1Uuid, relationshipType: motherValue });
         expect(relationships[1]).toMatchObject({ relatedPersonUuid: person2Uuid, relationshipType: fatherValue });
       });
@@ -364,7 +335,7 @@ describe('RelationshipsSection', () => {
       await user.click(screen.getAllByRole('button', { name: /delete/i })[0]);
 
       await waitFor(() => {
-        const { relationships } = getFormValues();
+        const { relationships } = getValues();
         expect(relationships).toHaveLength(1);
         expect(relationships[0]).toMatchObject({
           action: 'ADD',
@@ -374,6 +345,82 @@ describe('RelationshipsSection', () => {
       });
       expect(screen.getByRole('searchbox', { name: /full name/i })).toHaveValue('Person 2');
       expect(screen.getByRole('combobox', { name: /relationship/i })).toHaveValue(fatherValue);
+    });
+  });
+
+  describe('Rows', () => {
+    const mockResourcesContextValue = {
+      addressTemplate: null,
+      currentSession: {
+        authenticated: true,
+        sessionId: 'JSESSION',
+        currentProvider: { uuid: '45ce6c2e-dd5a-11e6-9d9c-0242ac150002', identifier: 'PRO-123' },
+      },
+      identifierTypes: [],
+      relationshipTypes: mockRelationshipTypes,
+    } as Resources;
+    const motherValue = '42ae5ce0-d64b-11ea-9064-5adc43bbdd34/aIsToB';
+    const fatherValue = '52ae5ce0-d64b-11ea-9064-5adc43bbdd24/aIsToB';
+
+    it('appends a row after the existing rows', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderRelationshipsSectionInForm(
+        {
+          relationships: [{ clientId: 'row-1', action: 'ADD', relatedPersonUuid: '', relationshipType: motherValue }],
+        },
+        mockResourcesContextValue,
+      );
+
+      await user.click(screen.getByRole('button', { name: /add relationship/i }));
+
+      await waitFor(() => expect(screen.getAllByRole('combobox', { name: /relationship/i })).toHaveLength(2));
+      const { relationships } = getValues();
+      expect(relationships).toHaveLength(2);
+      expect(relationships[0]).toMatchObject({ clientId: 'row-1', relationshipType: motherValue });
+      expect(relationships[1]).toMatchObject({ action: 'ADD', relatedPersonUuid: '' });
+      expect(relationships[1].clientId).toEqual(expect.any(String));
+      expect(relationships[1].clientId).not.toBe('row-1');
+    });
+
+    it('removes the deleted row and keeps the type selected in the next row', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderRelationshipsSectionInForm(
+        {
+          relationships: [
+            { clientId: 'row-1', action: 'ADD', relatedPersonUuid: '', relationshipType: '' },
+            { clientId: 'row-2', action: 'ADD', relatedPersonUuid: '', relationshipType: '' },
+          ],
+        },
+        mockResourcesContextValue,
+      );
+
+      await user.selectOptions(screen.getAllByRole('combobox', { name: /relationship/i })[1], fatherValue);
+      await waitFor(() => expect(getValues().relationships[1].relationshipType).toBe(fatherValue));
+
+      await user.click(screen.getAllByRole('button', { name: /delete/i })[0]);
+
+      await waitFor(() => expect(getValues().relationships).toHaveLength(1));
+      expect(getValues().relationships[0]).toMatchObject({ clientId: 'row-2', relationshipType: fatherValue });
+      expect(screen.getByRole('combobox', { name: /relationship/i })).toHaveValue(fatherValue);
+    });
+
+    it('keeps a value written in the first row when a row is appended', async () => {
+      const user = userEvent.setup();
+      const { getValues } = renderRelationshipsSectionInForm(
+        {
+          relationships: [{ clientId: 'row-1', action: 'ADD', relatedPersonUuid: '', relationshipType: '' }],
+        },
+        mockResourcesContextValue,
+      );
+
+      await user.selectOptions(screen.getByRole('combobox', { name: /relationship/i }), motherValue);
+      await waitFor(() => expect(getValues().relationships[0].relationshipType).toBe(motherValue));
+
+      await user.click(screen.getByRole('button', { name: /add relationship/i }));
+
+      await waitFor(() => expect(getValues().relationships).toHaveLength(2));
+      expect(getValues().relationships[0]).toMatchObject({ clientId: 'row-1', relationshipType: motherValue });
+      expect(screen.getAllByRole('combobox', { name: /relationship/i })[0]).toHaveValue(motherValue);
     });
   });
 });

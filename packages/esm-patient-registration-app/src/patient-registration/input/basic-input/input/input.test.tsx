@@ -1,12 +1,13 @@
 import React from 'react';
 import { vi, describe, it, expect, test } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Formik, Form } from 'formik';
+import { renderWithRegistrationForm } from '../../../../test-utils/render-with-registration-form';
 import { Input } from './input.component';
+import type { FormValues } from '../../../patient-registration.types';
 
 /**
- * Helper to render Input component with Formik.
+ * Helper to render Input component in a registration form.
  */
 function renderInput(
   props: {
@@ -28,13 +29,9 @@ function renderInput(
     ...props,
   };
 
-  return render(
-    <Formik initialValues={{ text: '', ...initialValues }} onSubmit={() => {}}>
-      <Form>
-        <Input {...defaultProps} />
-      </Form>
-    </Formik>,
-  );
+  return renderWithRegistrationForm(<Input {...defaultProps} />, {
+    initialValues: { text: '', ...initialValues } as Partial<FormValues>,
+  });
 }
 
 describe('Input component', () => {
@@ -82,26 +79,16 @@ describe('Input component', () => {
 
     it('updates form values when user types', async () => {
       const user = userEvent.setup();
-      let formValues: Record<string, string> = {};
-
-      render(
-        <Formik initialValues={{ text: '' }} onSubmit={() => {}}>
-          {({ values }) => {
-            formValues = values as Record<string, string>;
-            return (
-              <Form>
-                <Input id="text" name="text" labelText="Text" required />
-              </Form>
-            );
-          }}
-        </Formik>,
-      );
+      const { getValues } = renderWithRegistrationForm(<Input id="text" name="text" labelText="Text" required />, {
+        initialValues: { text: '' } as Partial<FormValues>,
+      });
+      const formValues = () => getValues() as unknown as Record<string, string>;
 
       const input = screen.getByLabelText('Text') as HTMLInputElement;
       await user.type(input, 'typed value');
 
       await waitFor(() => {
-        expect(formValues.text).toBe('typed value');
+        expect(formValues().text).toBe('typed value');
       });
     });
   });

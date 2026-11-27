@@ -3005,10 +3005,11 @@ __metadata:
   resolution: "@openmrs/esm-patient-registration-app@workspace:packages/esm-patient-registration-app"
   dependencies:
     "@carbon/react": "npm:^1.83.0"
+    "@hookform/resolvers": "npm:^3.9.1"
     classnames: "npm:^2.3.2"
-    formik: "npm:^2.1.5"
     lodash-es: "npm:^4.17.15"
     openmrs: "npm:next"
+    react-hook-form: "npm:^7.54.0"
     uuid: "npm:^8.3.2"
     vitest: "npm:^4.1.2"
     zod: "npm:^3.24.1"
@@ -9389,7 +9390,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"formik@npm:^2.1.5, formik@npm:^2.2.9":
+"formik@npm:^2.2.9":
   version: 2.4.6
   resolution: "formik@npm:2.4.6"
   dependencies:

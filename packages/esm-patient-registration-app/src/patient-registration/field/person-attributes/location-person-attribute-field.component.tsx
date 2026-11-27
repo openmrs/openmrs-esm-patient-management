@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classNames from 'classnames';
 import { ComboBox, InlineLoading, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Field, useField } from 'formik';
+import { Field, useField } from '../../form-adapter';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
 import { useLocations } from './location-person-attribute-field.resource';
 import styles from './../field.scss';

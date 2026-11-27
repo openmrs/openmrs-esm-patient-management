@@ -1,24 +1,19 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { Formik, Form } from 'formik';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
-import { initialFormValues } from '../../patient-registration.component';
 import { DateAndTimeOfDeathField } from './date-and-time-of-death.component';
-import { type FormValues } from '../../patient-registration.types';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
- * Helper to render DateAndTimeOfDeathField with Formik render props for state-dependent tests.
+ * Helper to render DateAndTimeOfDeathField in a registration form for state-dependent tests.
  */
-const renderDateAndTimeOfDeathFieldWithFormik = (
-  initialValues: Partial<FormValues> = {},
-  options?: { enableReinitialize?: boolean },
-) => {
+const renderDateAndTimeOfDeathFieldInForm = (initialValues: Partial<FormValues> = {}, withValidation = false) => {
   const defaultValues = {
     deathDate: '',
     deathTime: '',
@@ -27,37 +22,7 @@ const renderDateAndTimeOfDeathFieldWithFormik = (
     ...initialValues,
   };
 
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
-
-  const utils = render(
-    <Formik initialValues={defaultValues} onSubmit={() => {}} enableReinitialize={options?.enableReinitialize}>
-      {({ setFieldValue, values, setFieldTouched }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        return (
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                identifierTypes: [],
-                values: formValuesRef,
-                inEditMode: false,
-                setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: vi.fn(),
-                setFieldTouched: setFieldTouched as any,
-                currentPhoto: '',
-                initialFormValues: formValuesRef,
-              }}>
-              <DateAndTimeOfDeathField />
-            </PatientRegistrationContextProvider>
-          </Form>
-        );
-      }}
-    </Formik>,
-  );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-  };
+  return renderWithRegistrationForm(<DateAndTimeOfDeathField />, { initialValues: defaultValues, withValidation });
 };
 
 describe('DateAndTimeOfDeathField', () => {
@@ -68,7 +33,7 @@ describe('DateAndTimeOfDeathField', () => {
   });
 
   it('renders the date and time of death field with label', () => {
-    renderDateAndTimeOfDeathFieldWithFormik();
+    renderDateAndTimeOfDeathFieldInForm();
 
     expect(screen.getByRole('heading', { name: /date of death/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/date of death/i)).toBeInTheDocument();
@@ -77,7 +42,7 @@ describe('DateAndTimeOfDeathField', () => {
 
   describe('Date of death', () => {
     it('sets death date when user enters a date', async () => {
-      const { getFormValues } = renderDateAndTimeOfDeathFieldWithFormik({ isDead: true });
+      const { getValues } = renderDateAndTimeOfDeathFieldInForm({ isDead: true });
 
       const dateInput = screen.getByLabelText(/date of death/i) as HTMLInputElement;
       const deathDateString = '2020-01-15';
@@ -86,12 +51,46 @@ describe('DateAndTimeOfDeathField', () => {
       fireEvent.blur(dateInput);
 
       await waitFor(() => {
-        expect(getFormValues().deathDate).toBeTruthy();
+        expect(getValues().deathDate).toBeTruthy();
       });
     });
 
+    it('does not show the required error when a date segment is blurred, as under Formik', async () => {
+      // The framework mock of OpenmrsDatePicker drops `onBlur`. The real picker passes it to its date segments, which
+      // have a generated id and no name.
+      const originalImplementation = vi.mocked(OpenmrsDatePicker).getMockImplementation();
+      vi.mocked(OpenmrsDatePicker).mockImplementation(
+        ({
+          onBlur,
+          invalid,
+          invalidText,
+        }: {
+          onBlur?: (event: unknown) => void;
+          invalid?: boolean;
+          invalidText?: string;
+        }) => (
+          <>
+            <span role="spinbutton" aria-label="day" id="react-aria-segment" tabIndex={0} onBlur={onBlur} />
+            {invalid && <span>{invalidText}</span>}
+          </>
+        ),
+      );
+      try {
+        const user = userEvent.setup();
+        renderDateAndTimeOfDeathFieldInForm({ isDead: true }, true);
+
+        await user.click(screen.getByRole('spinbutton', { name: 'day' }));
+        await user.tab();
+
+        await waitFor(() => expect(screen.getByRole('spinbutton', { name: 'day' })).not.toHaveFocus());
+        expect(screen.queryByText(/death date is required/i)).not.toBeInTheDocument();
+      } finally {
+        vi.mocked(OpenmrsDatePicker).mockImplementation(originalImplementation);
+      }
+    });
+
     it('renders date picker when isDead is true', () => {
-      renderDateAndTimeOfDeathFieldWithFormik({ isDead: true });
+      renderDateAndTimeOfDeathFieldInForm({ isDead: true });
 
       // Verify date picker is rendered (OpenmrsDatePicker uses isRequired prop, not HTML required attribute)
       const dateInput = screen.getByLabelText(/date of death/i);
@@ -99,7 +98,7 @@ describe('DateAndTimeOfDeathField', () => {
     });
 
     it('renders date picker when isDead is false', () => {
-      renderDateAndTimeOfDeathFieldWithFormik({ isDead: false });
+      renderDateAndTimeOfDeathFieldInForm({ isDead: false });
 
       const dateInput = screen.getByLabelText(/date of death/i);
       expect(dateInput).toBeInTheDocument();
@@ -109,31 +108,31 @@ describe('DateAndTimeOfDeathField', () => {
   describe('Time of death', () => {
     it('allows user to enter time of death', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDateAndTimeOfDeathFieldWithFormik();
+      const { getValues } = renderDateAndTimeOfDeathFieldInForm();
 
       const timeInput = screen.getByLabelText(/time of death/i) as HTMLInputElement;
       await user.type(timeInput, '10:30');
 
       await waitFor(() => {
-        expect(getFormValues().deathTime).toBe('10:30');
+        expect(getValues().deathTime).toBe('10:30');
       });
     });
 
     it('allows user to select AM/PM format', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderDateAndTimeOfDeathFieldWithFormik();
+      const { getValues } = renderDateAndTimeOfDeathFieldInForm();
 
       // TimePickerSelect uses aria-label, find by that
       const formatSelect = screen.getByLabelText(/time format/i) as HTMLSelectElement;
       await user.selectOptions(formatSelect, 'PM');
 
       await waitFor(() => {
-        expect(getFormValues().deathTimeFormat).toBe('PM');
+        expect(getValues().deathTimeFormat).toBe('PM');
       });
     });
 
     it('displays the initial time format value correctly', () => {
-      renderDateAndTimeOfDeathFieldWithFormik({ deathTimeFormat: 'PM' });
+      renderDateAndTimeOfDeathFieldInForm({ deathTimeFormat: 'PM' });
 
       const formatSelect = screen.getByLabelText(/time format/i) as HTMLSelectElement;
       expect(formatSelect.value).toBe('PM');

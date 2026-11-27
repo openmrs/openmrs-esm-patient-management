@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useField } from 'formik';
+import { useField } from '../../form-adapter';
 import { Field } from '../../field/field.component';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import styles from './../section.scss';

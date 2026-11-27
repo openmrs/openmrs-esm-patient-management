@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import { Field, useField } from 'formik';
+import { Field, useField } from '../../form-adapter';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem, SelectSkeleton, TextInput } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';

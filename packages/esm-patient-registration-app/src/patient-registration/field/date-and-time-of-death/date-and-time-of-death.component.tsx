@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { Layer, SelectItem, TimePicker, TimePickerSelect } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useField } from 'formik';
+import { useField } from '../../form-adapter';
 import { OpenmrsDatePicker } from '@openmrs/esm-framework';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import type { FormValues } from '../../patient-registration.types';

@@ -1,12 +1,13 @@
 import React from 'react';
 import { vi, describe, it, expect } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Formik, Form } from 'formik';
+import { renderWithRegistrationForm } from '../../../../test-utils/render-with-registration-form';
 import { SelectInput } from './select-input.component';
+import type { FormValues } from '../../../patient-registration.types';
 
 /**
- * Helper to render SelectInput component with Formik.
+ * Helper to render SelectInput component in a registration form.
  */
 function renderSelectInput(
   props: {
@@ -25,13 +26,9 @@ function renderSelectInput(
     ...props,
   };
 
-  return render(
-    <Formik initialValues={{ select: '', ...initialValues }} onSubmit={() => {}}>
-      <Form>
-        <SelectInput {...defaultProps} />
-      </Form>
-    </Formik>,
-  );
+  return renderWithRegistrationForm(<SelectInput {...defaultProps} />, {
+    initialValues: { select: '', ...initialValues } as Partial<FormValues>,
+  });
 }
 
 describe('SelectInput component', () => {
@@ -84,26 +81,17 @@ describe('SelectInput component', () => {
 
     it('updates form values when user selects an option', async () => {
       const user = userEvent.setup();
-      let formValues: Record<string, string> = {};
-
-      render(
-        <Formik initialValues={{ select: '' }} onSubmit={() => {}}>
-          {({ values }) => {
-            formValues = values as Record<string, string>;
-            return (
-              <Form>
-                <SelectInput name="select" label="Select" options={['A Option', 'B Option']} required />
-              </Form>
-            );
-          }}
-        </Formik>,
+      const { getValues } = renderWithRegistrationForm(
+        <SelectInput name="select" label="Select" options={['A Option', 'B Option']} required />,
+        { initialValues: { select: '' } as Partial<FormValues> },
       );
+      const formValues = () => getValues() as unknown as Record<string, string>;
 
       const select = await screen.findByRole('combobox');
       await user.selectOptions(select, 'B Option');
 
       await waitFor(() => {
-        expect(formValues.select).toBe('B Option');
+        expect(formValues().select).toBe('B Option');
       });
     });
 

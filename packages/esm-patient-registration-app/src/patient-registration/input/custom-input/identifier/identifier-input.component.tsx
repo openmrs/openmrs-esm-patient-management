@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { useField, Field } from 'formik';
+import { useField, Field } from '../../../form-adapter';
 import { Button, RadioButton } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
 import { type RegistrationConfig } from '../../../../config-schema';

@@ -1,24 +1,19 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { Formik, Form } from 'formik';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
-import { initialFormValues } from '../../patient-registration.component';
 import { NameField, unidentifiedPatientAttributeTypeUuid } from './name-field.component';
-import { type FormValues } from '../../patient-registration.types';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
- * Helper to render NameField with Formik render props for state-dependent tests.
+ * Helper to render NameField in a registration form for state-dependent tests.
  */
-const renderNameFieldWithFormik = (
-  initialValues: Partial<FormValues> = {},
-  options?: { enableReinitialize?: boolean },
-) => {
+const renderNameFieldInForm = (initialValues: Partial<FormValues> = {}) => {
   const defaultValues: Partial<FormValues> = {
     givenName: '',
     familyName: '',
@@ -30,37 +25,7 @@ const renderNameFieldWithFormik = (
     ...initialValues,
   };
 
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
-
-  const utils = render(
-    <Formik initialValues={defaultValues} onSubmit={() => {}} enableReinitialize={options?.enableReinitialize}>
-      {({ setFieldValue, values, setFieldTouched }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        return (
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                identifierTypes: [],
-                values: formValuesRef,
-                inEditMode: false,
-                setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: vi.fn(),
-                setFieldTouched: setFieldTouched as any,
-                currentPhoto: '',
-                initialFormValues: formValuesRef,
-              }}>
-              <NameField />
-            </PatientRegistrationContextProvider>
-          </Form>
-        );
-      }}
-    </Formik>,
-  );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-  };
+  return renderWithRegistrationForm(<NameField />, { initialValues: defaultValues });
 };
 
 describe('NameField', () => {
@@ -81,7 +46,7 @@ describe('NameField', () => {
   });
 
   it('renders the name field with all inputs', () => {
-    renderNameFieldWithFormik();
+    renderNameFieldInForm();
 
     expect(screen.getByRole('heading', { name: /full name/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/first name/i)).toBeInTheDocument();
@@ -91,7 +56,7 @@ describe('NameField', () => {
 
   describe('Unidentified patient toggle', () => {
     it('shows toggle when allowUnidentifiedPatients is enabled', () => {
-      renderNameFieldWithFormik();
+      renderNameFieldInForm();
 
       expect(screen.getByText(/patient's name is known\?/i)).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /yes/i })).toBeInTheDocument();
@@ -100,7 +65,7 @@ describe('NameField', () => {
 
     it('hides name inputs when patient is unknown', async () => {
       const user = userEvent.setup();
-      renderNameFieldWithFormik({
+      renderNameFieldInForm({
         attributes: {
           [unidentifiedPatientAttributeTypeUuid]: 'false',
         },
@@ -115,7 +80,7 @@ describe('NameField', () => {
     });
 
     it('shows name inputs when patient is known', () => {
-      renderNameFieldWithFormik({
+      renderNameFieldInForm({
         attributes: {
           [unidentifiedPatientAttributeTypeUuid]: 'false',
         },
@@ -127,16 +92,13 @@ describe('NameField', () => {
 
     it('sets unknown name values when user selects unknown', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderNameFieldWithFormik(
-        {
-          attributes: {
-            [unidentifiedPatientAttributeTypeUuid]: 'false',
-          },
-          givenName: 'John',
-          familyName: 'Doe',
+      const { getValues } = renderNameFieldInForm({
+        attributes: {
+          [unidentifiedPatientAttributeTypeUuid]: 'false',
         },
-        { enableReinitialize: true },
-      );
+        givenName: 'John',
+        familyName: 'Doe',
+      });
 
       await user.click(screen.getByRole('tab', { name: /no/i }));
 
@@ -147,28 +109,25 @@ describe('NameField', () => {
 
       // Verify name values were set to UNKNOWN (user-visible through form state)
       await waitFor(() => {
-        const formValues = getFormValues();
+        const formValues = getValues();
         expect(formValues.givenName).toBe('UNKNOWN');
       });
-      const formValues = getFormValues();
+      const formValues = getValues();
       expect(formValues.familyName).toBe('UNKNOWN');
     });
 
     it('shows name inputs when user switches from unknown to known', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderNameFieldWithFormik(
-        {
-          attributes: {
-            [unidentifiedPatientAttributeTypeUuid]: 'true',
-          },
-          givenName: 'UNKNOWN',
-          familyName: 'UNKNOWN',
+      const { getValues } = renderNameFieldInForm({
+        attributes: {
+          [unidentifiedPatientAttributeTypeUuid]: 'true',
         },
-        { enableReinitialize: true },
-      );
+        givenName: 'UNKNOWN',
+        familyName: 'UNKNOWN',
+      });
 
       // Verify initial state - patient is unknown
-      const initialValues = getFormValues();
+      const initialValues = getValues();
       expect(initialValues.attributes?.[unidentifiedPatientAttributeTypeUuid]).toBe('true');
 
       // When patient is unknown, name inputs should be hidden (component logic: !isPatientUnknown)
@@ -187,37 +146,37 @@ describe('NameField', () => {
   describe('Name input', () => {
     it('allows user to enter first name', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderNameFieldWithFormik();
+      const { getValues } = renderNameFieldInForm();
 
       const firstNameInput = screen.getByLabelText(/first name/i) as HTMLInputElement;
       await user.type(firstNameInput, 'John');
 
       await waitFor(() => {
-        expect(getFormValues().givenName).toBe('John');
+        expect(getValues().givenName).toBe('John');
       });
     });
 
     it('allows user to enter family name', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderNameFieldWithFormik();
+      const { getValues } = renderNameFieldInForm();
 
       const familyNameInput = screen.getByLabelText(/family name/i) as HTMLInputElement;
       await user.type(familyNameInput, 'Doe');
 
       await waitFor(() => {
-        expect(getFormValues().familyName).toBe('Doe');
+        expect(getValues().familyName).toBe('Doe');
       });
     });
 
     it('allows user to enter middle name when displayMiddleName is enabled', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderNameFieldWithFormik();
+      const { getValues } = renderNameFieldInForm();
 
       const middleNameInput = screen.getByLabelText(/middle name/i) as HTMLInputElement;
       await user.type(middleNameInput, 'Michael');
 
       await waitFor(() => {
-        expect(getFormValues().middleName).toBe('Michael');
+        expect(getValues().middleName).toBe('Michael');
       });
     });
 
@@ -236,7 +195,7 @@ describe('NameField', () => {
         } as RegistrationConfig['fieldConfigurations'],
       });
 
-      renderNameFieldWithFormik();
+      renderNameFieldInForm();
 
       expect(screen.queryByLabelText(/middle name/i)).not.toBeInTheDocument();
     });
@@ -244,7 +203,7 @@ describe('NameField', () => {
 
   describe('Field order', () => {
     it('renders fields in default order when displayReverseFieldOrder is false', () => {
-      renderNameFieldWithFormik();
+      renderNameFieldInForm();
 
       const inputs = screen.getAllByRole('textbox');
       const firstNameIndex = inputs.findIndex((input) => (input as HTMLInputElement).id === 'givenName');
@@ -268,7 +227,7 @@ describe('NameField', () => {
         } as RegistrationConfig['fieldConfigurations'],
       });
 
-      renderNameFieldWithFormik();
+      renderNameFieldInForm();
 
       const inputs = screen.getAllByRole('textbox');
       const familyNameIndex = inputs.findIndex((input) => (input as HTMLInputElement).id === 'familyName');

@@ -12,6 +12,7 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
+  showModal,
   showSnackbar,
   useConfig,
   usePatient,
@@ -28,6 +29,7 @@ import { ResourcesContextProvider } from '../resources-context';
 
 const mockSaveEncounter = vi.mocked(saveEncounter);
 const mockSavePatient = vi.mocked(savePatient);
+const mockShowModal = vi.mocked(showModal);
 const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 const mockUsePatient = vi.mocked(usePatient);
@@ -320,6 +322,17 @@ const fillRequiredFields = async () => {
   await user.click(genderInput);
 };
 
+/** Asks the form to let the user leave the page, as single-spa does before a route change. */
+const navigateAway = () => {
+  act(() => {
+    window.dispatchEvent(
+      new CustomEvent('single-spa:before-routing-event', {
+        detail: { navigationIsCanceled: false, cancelNavigation: vi.fn(), newUrl: '/elsewhere' },
+      }),
+    );
+  });
+};
+
 const renderWithOptionalPreferredSsn = (
   savePatientForm: SavePatientForm = vi.fn(),
   ssnFormat: { format: string; formatDescription: string } = { format: null, formatDescription: null },
@@ -549,6 +562,45 @@ describe('Registering a new patient', () => {
     expect(ssnInput).not.toHaveAttribute('aria-invalid', 'true');
   });
 
+  it('keeps unsaved identifier selections while another field changes', async () => {
+    const user = userEvent.setup();
+    const identifierType = {
+      format: null,
+      formatDescription: null,
+      isPrimary: false,
+      required: false,
+      uniquenessBehavior: null,
+      identifierSources: [],
+    };
+    const defaultConfig = getDefaultsFromConfigSchema<RegistrationConfig>(esmPatientRegistrationSchema);
+    mockUseConfig.mockReturnValue({
+      ...defaultConfig,
+      ...mockOpenmrsConfig,
+      sectionDefinitions: [
+        { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob', 'id'] },
+        { id: 'contact', name: 'Contact Info', fields: ['address'] },
+      ],
+      defaultPatientIdentifierTypes: ['ssn-uuid'],
+    });
+    renderWithContext(<PatientRegistration savePatientForm={vi.fn()} />, ResourcesContextProvider, {
+      ...mockResourcesContextValue,
+      identifierTypes: [
+        { uuid: 'ssn-uuid', name: 'SSN', fieldName: 'ssn', ...identifierType },
+        { uuid: 'passport-uuid', name: 'Passport', fieldName: 'passport', ...identifierType },
+      ],
+    });
+
+    await user.click(await screen.findByRole('button', { name: /configure/i }));
+    await user.click(screen.getByRole('checkbox', { name: 'Passport' }));
+    expect(screen.getByRole('checkbox', { name: 'Passport' })).toBeChecked();
+
+    await user.type(screen.getByLabelText(/first name/i), 'Paul');
+    await user.tab();
+
+    await waitFor(() => expect(screen.getByLabelText(/first name/i)).toHaveValue('Paul'));
+    expect(screen.getByRole('checkbox', { name: 'Passport' })).toBeChecked();
+  });
+
   it('explains on the field why an empty preferred identifier blocks registration', async () => {
     const user = userEvent.setup();
     const mockSavePatientForm = vi.fn();
@@ -653,6 +705,185 @@ describe('Registering a new patient', () => {
     expect(mockSaveEncounter).toHaveBeenCalledTimes(2);
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' }));
+  });
+
+  it('does not send empty obs fields when saving', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+    mockUseConfig.mockReturnValue(configWithObs);
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    await fillRequiredFields();
+    // Visit an obs field and leave it empty.
+    await user.click(within(screen.getByLabelText('Custom Section')).getByLabelText('Weight (kg) (optional)'));
+    await user.tab();
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    await waitFor(() => expect(mockSavePatientForm).toHaveBeenCalled());
+    expect(Object.keys(mockSavePatientForm.mock.calls[0][1].obs ?? {})).toEqual([]);
+  });
+
+  it('does not mark fields touched when native validation blocks the submit', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    await screen.findByRole('heading', { name: /create new patient/i });
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    await waitFor(() => expect(mockShowSnackbar).toHaveBeenCalled());
+    expect(screen.getByLabelText(/first name/i)).not.toHaveAttribute('aria-invalid', 'true');
+    expect(screen.queryByText('Given name is required')).not.toBeInTheDocument();
+    expect(screen.queryByText('Gender is required')).not.toBeInTheDocument();
+    navigateAway();
+    expect(mockShowModal).not.toHaveBeenCalled();
+    expect(mockSavePatientForm).not.toHaveBeenCalled();
+  });
+
+  it('marks all fields touched after a failed submit', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    // Fill the natively required fields, so that the form submits, but leave the sex, which only the schema needs.
+    const demographicsSection = await screen.findByLabelText('Demographics Section');
+    await user.type(within(demographicsSection).getByLabelText(/first/i), 'Paul');
+    await user.type(within(demographicsSection).getByLabelText(/family/i), 'Gaihre');
+    const dateOfBirthInput = within(demographicsSection).getByLabelText(/date of birth/i);
+    fireEvent.change(dateOfBirthInput, { target: { value: '1993-08-02' } });
+    fireEvent.blur(dateOfBirthInput);
+    await user.click(screen.getByRole('button', { name: /register patient/i }));
+
+    expect(await screen.findByText('Gender is required')).toBeInTheDocument();
+    navigateAway();
+    expect(mockShowModal).toHaveBeenCalledWith('cancel-patient-edit-modal', expect.anything(), expect.anything());
+    expect(mockSavePatientForm).not.toHaveBeenCalled();
+  });
+
+  // No field is registered with React Hook Form, so this test cannot fail today; it guards against future focus logic.
+  it('does not move focus to the first error after a failed submit', async () => {
+    const user = userEvent.setup();
+
+    renderWithContext(<PatientRegistration savePatientForm={vi.fn()} />, ResourcesContextProvider, {
+      ...mockResourcesContextValue,
+    });
+
+    const demographicsSection = await screen.findByLabelText('Demographics Section');
+    await user.type(within(demographicsSection).getByLabelText(/first/i), 'Paul');
+    await user.type(within(demographicsSection).getByLabelText(/family/i), 'Gaihre');
+    const dateOfBirthInput = within(demographicsSection).getByLabelText(/date of birth/i);
+    fireEvent.change(dateOfBirthInput, { target: { value: '1993-08-02' } });
+    fireEvent.blur(dateOfBirthInput);
+    const registerButton = screen.getByRole('button', { name: /register patient/i });
+    await user.click(registerButton);
+
+    expect(await screen.findByText('Gender is required')).toBeInTheDocument();
+    expect(registerButton).toHaveFocus();
+  });
+
+  it('shows the error of an empty field after blur without typing', async () => {
+    const user = userEvent.setup();
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={vi.fn()} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    const givenNameInput = await screen.findByLabelText(/first name/i);
+    await user.click(givenNameInput);
+    await user.tab();
+
+    await waitFor(() => expect(givenNameInput).toHaveAttribute('aria-invalid', 'true'));
+    expect(screen.getByText('Given name is required')).toBeInTheDocument();
+  });
+
+  it('shows the name errors at once after the name-known toggle goes back to yes', async () => {
+    const user = userEvent.setup();
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={vi.fn()} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    const demographicsSection = await screen.findByLabelText('Demographics Section');
+    const [nameKnownToggle] = within(demographicsSection).getAllByRole('tablist');
+    await user.click(within(nameKnownToggle).getByRole('tab', { name: 'No' }));
+    await user.click(within(nameKnownToggle).getByRole('tab', { name: 'Yes' }));
+
+    expect(await screen.findByText('Given name is required')).toBeInTheDocument();
+    expect(screen.getByText('Family name is required')).toBeInTheDocument();
+  });
+
+  it('marks the birthdate invalid at once after the birthdate-known toggle goes back to yes', async () => {
+    const user = userEvent.setup();
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={vi.fn()} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    const demographicsSection = await screen.findByLabelText('Demographics Section');
+    const dobToggle = within(demographicsSection).getAllByRole('tablist')[1];
+    await user.click(within(dobToggle).getByRole('tab', { name: 'No' }));
+    await user.type(within(demographicsSection).getByLabelText(/estimated age in years/i), '30');
+    await user.tab();
+    await user.click(within(dobToggle).getByRole('tab', { name: 'Yes' }));
+
+    await waitFor(() => expect(within(demographicsSection).getByLabelText(/date of birth/i)).toBeInTheDocument());
+    expect(await screen.findByText('Birthday is required')).toBeInTheDocument();
+  });
+
+  it('arms the unsaved-changes prompt after a blur only', async () => {
+    const user = userEvent.setup();
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={vi.fn()} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    await user.click(await screen.findByLabelText(/first name/i));
+    await user.tab();
+
+    await waitFor(() => expect(screen.getByLabelText(/first name/i)).toHaveAttribute('aria-invalid', 'true'));
+    navigateAway();
+    expect(mockShowModal).toHaveBeenCalledWith('cancel-patient-edit-modal', expect.anything(), expect.anything());
+  });
+
+  it('re-enables the submit button after a successful save', async () => {
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn<SavePatientForm>().mockResolvedValue(undefined);
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    await fillRequiredFields();
+    const registerButton = screen.getByRole('button', { name: /register patient/i });
+    await user.click(registerButton);
+
+    await waitFor(() => expect(mockSavePatientForm).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByRole('button', { name: /register patient/i })).toBeEnabled());
   });
 });
 
@@ -819,6 +1050,91 @@ describe('Updating an existing patient record', () => {
       expect.anything(),
       { patientSaved: false, generatedIdentifiers: {}, addedIdentifiers: {} },
     );
+  });
+
+  it('keeps a loaded person attribute without a value, so the save deletes it', async () => {
+    // A concept attribute whose concept no longer exists loads with a `null` value, which becomes `undefined`.
+    const user = userEvent.setup();
+    const mockSavePatientForm = vi.fn();
+    const [patientValues] = mockUseInitialFormValues(mockPatient, mockPatient.id);
+    mockUseInitialFormValues.mockReturnValue([
+      { ...patientValues, attributes: { 'missing-concept-attribute-type-uuid': undefined } },
+      vi.fn(),
+    ]);
+
+    renderWithContext(
+      <PatientRegistration savePatientForm={mockSavePatientForm} />,
+      ResourcesContextProvider,
+      mockResourcesContextValue,
+    );
+
+    await screen.findByRole('heading', { name: /edit patient details/i });
+    await user.click(screen.getByRole('button', { name: /update patient/i }));
+
+    await waitFor(() => expect(mockSavePatientForm).toHaveBeenCalled());
+    const savedAttributes = mockSavePatientForm.mock.calls[0][1].attributes;
+    expect(Object.keys(savedAttributes)).toEqual(['missing-concept-attribute-type-uuid']);
+  });
+
+  it('resets values and touched state when initial values change', async () => {
+    const user = userEvent.setup();
+    const [patientValues] = mockUseInitialFormValues(mockPatient, mockPatient.id);
+    const emptyValues = { ...patientValues, givenName: '', familyName: '', gender: '', birthdate: '', identifiers: {} };
+    let patientLoaded = false;
+    mockUsePatient.mockImplementation(() => ({
+      error: null,
+      isLoading: !patientLoaded,
+      patient: patientLoaded ? mockPatient : undefined,
+      patientUuid: mockPatient.id,
+    }));
+    mockUseInitialFormValues.mockImplementation((patient) => [patient ? patientValues : emptyValues, vi.fn()]);
+    const renderForm = () => (
+      <ResourcesContextProvider value={mockResourcesContextValue}>
+        <PatientRegistration savePatientForm={vi.fn()} />
+      </ResourcesContextProvider>
+    );
+    const { rerender } = render(renderForm());
+
+    await user.type(screen.getByLabelText(/first name/i), 'Typed before load');
+    await user.tab();
+
+    patientLoaded = true;
+    rerender(renderForm());
+
+    await waitFor(() => expect(screen.getByLabelText(/first name/i)).toHaveValue(mockPatient.name[0].given[0]));
+    navigateAway();
+    expect(mockShowModal).not.toHaveBeenCalled();
+  });
+
+  it('keeps a cleared field empty and shows its error after the patient data loads', async () => {
+    const user = userEvent.setup();
+    const [patientValues] = mockUseInitialFormValues(mockPatient, mockPatient.id);
+    const emptyValues = { ...patientValues, givenName: '', familyName: '', gender: '', birthdate: '', identifiers: {} };
+    let patientLoaded = false;
+    mockUsePatient.mockImplementation(() => ({
+      error: null,
+      isLoading: !patientLoaded,
+      patient: patientLoaded ? mockPatient : undefined,
+      patientUuid: mockPatient.id,
+    }));
+    mockUseInitialFormValues.mockImplementation((patient) => [patient ? patientValues : emptyValues, vi.fn()]);
+    const renderForm = () => (
+      <ResourcesContextProvider value={mockResourcesContextValue}>
+        <PatientRegistration savePatientForm={vi.fn()} />
+      </ResourcesContextProvider>
+    );
+    const { rerender } = render(renderForm());
+
+    patientLoaded = true;
+    rerender(renderForm());
+
+    const givenNameInput = screen.getByLabelText(/first name/i);
+    await waitFor(() => expect(givenNameInput).toHaveValue(mockPatient.name[0].given[0]));
+    await user.clear(givenNameInput);
+    await user.tab();
+
+    expect(givenNameInput).toHaveValue('');
+    expect(await screen.findByText('Given name is required')).toBeInTheDocument();
   });
 
   it.each(['another-patient-uuid', undefined])(

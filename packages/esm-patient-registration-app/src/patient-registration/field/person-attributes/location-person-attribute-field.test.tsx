@@ -1,11 +1,12 @@
 import React from 'react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SWRConfig } from 'swr';
-import { Formik, useFormikContext } from 'formik';
 import { openmrsFetch } from '@openmrs/esm-framework';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import { LocationPersonAttributeField } from './location-person-attribute-field.component';
+import type { FormValues } from '../../patient-registration.types';
 
 const mockOpenmrsFetch = vi.mocked(openmrsFetch);
 
@@ -27,15 +28,10 @@ const allLocations = [
   { id: 'kitale-uuid', name: 'Kitale Clinic' },
 ];
 
-function AttributeValue() {
-  const { values } = useFormikContext<{ attributes: Record<string, unknown> }>();
-  return (
-    <output data-testid="attribute-value">{JSON.stringify(values.attributes[personAttributeType.uuid] ?? null)}</output>
-  );
-}
+let getValues: () => FormValues;
 
 function getAttributeValue() {
-  return JSON.parse(screen.getByTestId('attribute-value').textContent ?? 'null');
+  return getValues().attributes?.[personAttributeType.uuid] ?? null;
 }
 
 function locationsResponse(url: string) {
@@ -47,22 +43,20 @@ function locationsResponse(url: string) {
 }
 
 function renderField(initialValue: unknown = savedLocation) {
-  return render(
+  const utils = renderWithRegistrationForm(
     <SWRConfig value={{ provider: () => new Map() }}>
-      <Formik initialValues={{ attributes: { [personAttributeType.uuid]: initialValue } }} onSubmit={() => {}}>
-        <>
-          <LocationPersonAttributeField
-            id="healthCenter"
-            label="Health Center"
-            locationTag="Login Location"
-            personAttributeType={personAttributeType}
-          />
-          <AttributeValue />
-          <button type="button">Next field</button>
-        </>
-      </Formik>
+      <LocationPersonAttributeField
+        id="healthCenter"
+        label="Health Center"
+        locationTag="Login Location"
+        personAttributeType={personAttributeType}
+      />
+      <button type="button">Next field</button>
     </SWRConfig>,
+    { initialValues: { attributes: { [personAttributeType.uuid]: initialValue } } as Partial<FormValues> },
   );
+  getValues = utils.getValues;
+  return utils;
 }
 
 describe('LocationPersonAttributeField', () => {

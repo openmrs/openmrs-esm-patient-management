@@ -1,20 +1,19 @@
 import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { Formik, Form } from 'formik';
+import { screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { initialFormValues } from '../../patient-registration.component';
-import { type FormValues } from '../../patient-registration.types';
 import { DemographicsSection } from './demographics-section.component';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
 /**
- * Helper to render DemographicsSection with Formik for state-dependent tests.
+ * Helper to render DemographicsSection in a registration form for state-dependent tests.
  */
-function renderDemographicsSectionWithFormik(
+function renderDemographicsSectionInForm(
   fields: string[] = ['name', 'gender', 'dob'],
   initialValues: Partial<FormValues> = {},
 ) {
@@ -23,37 +22,10 @@ function renderDemographicsSectionWithFormik(
     ...initialValues,
   };
 
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
-
-  const utils = render(
-    <Formik initialValues={defaultValues} onSubmit={() => {}}>
-      {({ setFieldValue, values }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        return (
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                identifierTypes: [],
-                values: formValuesRef,
-                inEditMode: false,
-                setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: vi.fn(),
-                setFieldTouched: vi.fn().mockResolvedValue(undefined),
-                currentPhoto: '',
-                initialFormValues: formValuesRef,
-              }}>
-              <DemographicsSection fields={fields} />
-            </PatientRegistrationContextProvider>
-          </Form>
-        );
-      }}
-    </Formik>,
-  );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-  };
+  return renderWithRegistrationForm(<DemographicsSection fields={fields} />, {
+    initialValues: defaultValues,
+    contextValues: { setFieldTouched: vi.fn().mockResolvedValue(undefined) },
+  });
 }
 
 describe('Demographics section', () => {
@@ -86,13 +58,13 @@ describe('Demographics section', () => {
 
   describe('Rendering', () => {
     it('renders the demographics section', () => {
-      renderDemographicsSectionWithFormik();
+      renderDemographicsSectionInForm();
 
       expect(screen.getByRole('region', { name: /demographics section/i })).toBeInTheDocument();
     });
 
     it('renders all specified fields', () => {
-      renderDemographicsSectionWithFormik(['name', 'gender', 'dob']);
+      renderDemographicsSectionInForm(['name', 'gender', 'dob']);
 
       expect(screen.getByRole('region', { name: /demographics section/i })).toBeInTheDocument();
       // Name field should be rendered (checking for first name input)
@@ -103,7 +75,7 @@ describe('Demographics section', () => {
     });
 
     it('renders date of birth inputs with yes/no tabs', () => {
-      renderDemographicsSectionWithFormik(['dob']);
+      renderDemographicsSectionInForm(['dob']);
 
       expect(screen.getByText(/date of birth known\?/i)).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /yes/i })).toBeInTheDocument();
@@ -114,7 +86,7 @@ describe('Demographics section', () => {
 
   describe('Additional name fields behavior', () => {
     it('clears additional name fields when addNameInLocalLanguage is unchecked after being touched', async () => {
-      const { getFormValues } = renderDemographicsSectionWithFormik(['name'], {
+      const { getValues } = renderDemographicsSectionInForm(['name'], {
         addNameInLocalLanguage: true,
         additionalGivenName: 'Local Given',
         additionalMiddleName: 'Local Middle',
@@ -122,7 +94,7 @@ describe('Demographics section', () => {
       });
 
       // Simulate the field being touched and then unchecked
-      const formValues = getFormValues();
+      const formValues = getValues();
       expect(formValues.addNameInLocalLanguage).toBe(true);
       expect(formValues.additionalGivenName).toBe('Local Given');
 
@@ -133,7 +105,7 @@ describe('Demographics section', () => {
     });
 
     it('does not clear additional name fields if addNameInLocalLanguage was never touched', () => {
-      const { getFormValues } = renderDemographicsSectionWithFormik(['name'], {
+      const { getValues } = renderDemographicsSectionInForm(['name'], {
         addNameInLocalLanguage: false,
         additionalGivenName: 'Local Given',
         additionalMiddleName: 'Local Middle',
@@ -141,7 +113,7 @@ describe('Demographics section', () => {
       });
 
       // Fields should remain unchanged if toggle was never touched
-      const formValues = getFormValues();
+      const formValues = getValues();
       expect(formValues.additionalGivenName).toBe('Local Given');
       expect(formValues.additionalMiddleName).toBe('Local Middle');
       expect(formValues.additionalFamilyName).toBe('Local Family');

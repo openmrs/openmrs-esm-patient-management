@@ -1,15 +1,13 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { Formik, Form } from 'formik';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { useConceptAnswers } from '../field.resource';
 import { CauseOfDeathField } from './cause-of-death.component';
-import { PatientRegistrationContextProvider } from '../../patient-registration-context';
-import { initialFormValues } from '../../patient-registration.component';
-import { type FormValues } from '../../patient-registration.types';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
+import type { FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 const mockUseConceptAnswers = vi.mocked(useConceptAnswers);
@@ -26,49 +24,16 @@ const mockConceptAnswers = [
 ];
 
 /**
- * Helper to render CauseOfDeathField with Formik render props for state-dependent tests.
+ * Helper to render CauseOfDeathField in a registration form for state-dependent tests.
  */
-const renderCauseOfDeathFieldWithFormik = (
-  initialValues: Partial<FormValues> = {},
-  options?: { enableReinitialize?: boolean },
-) => {
+const renderCauseOfDeathFieldInForm = (initialValues: Partial<FormValues> = {}) => {
   const defaultValues = {
     deathCause: '',
     nonCodedCauseOfDeath: '',
     ...initialValues,
   };
 
-  let formValuesRef: FormValues = { ...initialFormValues, ...defaultValues } as FormValues;
-
-  const utils = render(
-    <Formik initialValues={defaultValues} onSubmit={() => {}} enableReinitialize={options?.enableReinitialize}>
-      {({ setFieldValue, values, setFieldTouched }) => {
-        formValuesRef = { ...initialFormValues, ...values } as FormValues;
-        return (
-          <Form>
-            <PatientRegistrationContextProvider
-              value={{
-                identifierTypes: [],
-                values: formValuesRef,
-                inEditMode: false,
-                setFieldValue: setFieldValue as any,
-                setCapturePhotoProps: vi.fn(),
-                setFieldTouched: setFieldTouched as any,
-                currentPhoto: '',
-                initialFormValues: formValuesRef,
-              }}>
-              <CauseOfDeathField />
-            </PatientRegistrationContextProvider>
-          </Form>
-        );
-      }}
-    </Formik>,
-  );
-
-  return {
-    ...utils,
-    getFormValues: () => formValuesRef,
-  };
+  return renderWithRegistrationForm(<CauseOfDeathField />, { initialValues: defaultValues });
 };
 
 describe('CauseOfDeathField', () => {
@@ -91,7 +56,7 @@ describe('CauseOfDeathField', () => {
   });
 
   it('renders the cause of death field with label', () => {
-    renderCauseOfDeathFieldWithFormik();
+    renderCauseOfDeathFieldInForm();
 
     expect(screen.getByRole('heading', { name: /cause of death/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /cause of death/i })).toBeInTheDocument();
@@ -104,7 +69,7 @@ describe('CauseOfDeathField', () => {
       error: null,
     });
 
-    renderCauseOfDeathFieldWithFormik();
+    renderCauseOfDeathFieldInForm();
 
     // SelectSkeleton renders as a skeleton element, check for the skeleton class
     expect(screen.getByText(/cause of death/i)).toBeInTheDocument();
@@ -122,7 +87,7 @@ describe('CauseOfDeathField', () => {
       } as RegistrationConfig['fieldConfigurations'],
     });
 
-    renderCauseOfDeathFieldWithFormik();
+    renderCauseOfDeathFieldInForm();
 
     expect(screen.getByText(/error fetching coded causes of death/i)).toBeInTheDocument();
   });
@@ -134,14 +99,14 @@ describe('CauseOfDeathField', () => {
       error: new Error('Failed to load'),
     });
 
-    renderCauseOfDeathFieldWithFormik();
+    renderCauseOfDeathFieldInForm();
 
     expect(screen.getByText(/error fetching coded causes of death/i)).toBeInTheDocument();
   });
 
   describe('Cause of death selection', () => {
     it('renders all available cause of death options', () => {
-      renderCauseOfDeathFieldWithFormik();
+      renderCauseOfDeathFieldInForm();
 
       expect(screen.getByRole('option', { name: /cardiac arrest/i })).toBeInTheDocument();
       expect(screen.getByRole('option', { name: /pneumonia/i })).toBeInTheDocument();
@@ -150,26 +115,26 @@ describe('CauseOfDeathField', () => {
 
     it('updates form value when user selects a cause of death', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderCauseOfDeathFieldWithFormik();
+      const { getValues } = renderCauseOfDeathFieldInForm();
 
       const select = screen.getByRole('combobox', { name: /cause of death/i }) as HTMLSelectElement;
       await user.selectOptions(select, 'cardiac-uuid');
 
       await waitFor(() => {
-        expect(getFormValues().deathCause).toBe('cardiac-uuid');
+        expect(getValues().deathCause).toBe('cardiac-uuid');
       });
       expect(select.value).toBe('cardiac-uuid');
     });
 
     it('shows non-coded cause of death input when "Other" is selected', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderCauseOfDeathFieldWithFormik();
+      const { getValues } = renderCauseOfDeathFieldInForm();
 
       const select = screen.getByRole('combobox', { name: /cause of death/i }) as HTMLSelectElement;
       await user.selectOptions(select, 'other-uuid');
 
       await waitFor(() => {
-        expect(getFormValues().deathCause).toBe('other-uuid');
+        expect(getValues().deathCause).toBe('other-uuid');
       });
 
       await waitFor(() => {
@@ -179,10 +144,7 @@ describe('CauseOfDeathField', () => {
 
     it('hides non-coded cause of death input when non-other option is selected', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderCauseOfDeathFieldWithFormik(
-        { deathCause: 'other-uuid' },
-        { enableReinitialize: true },
-      );
+      const { getValues } = renderCauseOfDeathFieldInForm({ deathCause: 'other-uuid' });
 
       // Wait for non-coded input to appear (component checks deathCause.value)
       await waitFor(() => {
@@ -194,7 +156,7 @@ describe('CauseOfDeathField', () => {
       await user.selectOptions(select, 'cardiac-uuid');
 
       await waitFor(() => {
-        expect(getFormValues().deathCause).toBe('cardiac-uuid');
+        expect(getValues().deathCause).toBe('cardiac-uuid');
       });
 
       // Non-coded input should be hidden
@@ -205,17 +167,14 @@ describe('CauseOfDeathField', () => {
 
     it('allows user to enter non-coded cause of death text', async () => {
       const user = userEvent.setup();
-      const { getFormValues } = renderCauseOfDeathFieldWithFormik(
-        { deathCause: 'other-uuid' },
-        { enableReinitialize: true },
-      );
+      const { getValues } = renderCauseOfDeathFieldInForm({ deathCause: 'other-uuid' });
 
       // Wait for non-coded input to appear
       const textInput = await screen.findByRole('textbox', { name: /non-coded cause of death/i });
       await user.type(textInput, 'Unknown cause');
 
       await waitFor(() => {
-        expect(getFormValues().nonCodedCauseOfDeath).toBe('Unknown cause');
+        expect(getValues().nonCodedCauseOfDeath).toBe('Unknown cause');
       });
     });
   });
@@ -233,14 +192,14 @@ describe('CauseOfDeathField', () => {
         freeTextFieldConceptUuid: 'other-uuid',
       } as RegistrationConfig);
 
-      renderCauseOfDeathFieldWithFormik();
+      renderCauseOfDeathFieldInForm();
 
       const select = screen.getByRole('combobox', { name: /cause of death/i });
       expect(select).toBeRequired();
     });
 
     it('renders as optional when not required', () => {
-      renderCauseOfDeathFieldWithFormik();
+      renderCauseOfDeathFieldInForm();
 
       const select = screen.getByRole('combobox', { name: /cause of death/i });
       expect(select).not.toBeRequired();

@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Field } from 'formik';
+import { Field } from '../../form-adapter';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../input/basic-input/input/input.component';
 import { type PersonAttributeTypeResponse } from '../../patient-registration.types';

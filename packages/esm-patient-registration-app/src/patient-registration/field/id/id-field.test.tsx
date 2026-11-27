@@ -1,20 +1,16 @@
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { Form, Formik } from 'formik';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { type AddressTemplate, type IdentifierSource } from '../../patient-registration.types';
 import { mockIdentifierTypes, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
-import { renderWithContext } from 'tools';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../config-schema';
-import { type Resources } from '../../../registration.resource';
-import {
-  PatientRegistrationContextProvider,
-  type PatientRegistrationContextProps,
-} from '../../patient-registration-context';
+import { renderWithRegistrationForm } from '../../../test-utils/render-with-registration-form';
 import { Identifiers, setIdentifierSource } from './id-field.component';
 import { ResourcesContextProvider } from '../../../resources-context';
+import type { AddressTemplate, IdentifierSource } from '../../patient-registration.types';
+import type { Resources } from '../../../registration.resource';
+import type { PatientRegistrationContextProps } from '../../patient-registration-context';
 
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 
@@ -60,22 +56,17 @@ const mockContextValues: PatientRegistrationContextProps = {
 } as unknown as PatientRegistrationContextProps;
 
 /**
- * Helper to render Identifiers component with Formik.
+ * Helper to render Identifiers component in a registration form.
  */
 function renderIdentifiers(
   contextValues: PatientRegistrationContextProps = mockContextValues,
   resourcesContextValue: Resources = mockResourcesContextValue,
 ) {
-  return renderWithContext(
-    <Formik initialValues={{}} onSubmit={() => {}}>
-      <Form>
-        <PatientRegistrationContextProvider value={contextValues}>
-          <Identifiers />
-        </PatientRegistrationContextProvider>
-      </Form>
-    </Formik>,
-    ResourcesContextProvider,
-    resourcesContextValue,
+  return renderWithRegistrationForm(
+    <ResourcesContextProvider value={resourcesContextValue}>
+      <Identifiers />
+    </ResourcesContextProvider>,
+    { contextValues },
   );
 }
 
