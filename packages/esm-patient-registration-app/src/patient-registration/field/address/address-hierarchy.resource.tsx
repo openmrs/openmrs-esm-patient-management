@@ -135,10 +135,12 @@ export function useAddressEntryFetchConfig(addressField: string) {
     if (isLoadingFieldOrder) {
       return;
     }
-    orderedFields?.slice(index + 1).map((fieldName) => {
-      setFieldValue(`address.${fieldName}`, '');
+    orderedFields?.slice(index + 1).forEach((fieldName) => {
+      if (addressValues?.[fieldName]) {
+        setFieldValue(`address.${fieldName}`, '');
+      }
     });
-  }, [index, isLoadingFieldOrder, orderedFields, setFieldValue]);
+  }, [index, isLoadingFieldOrder, orderedFields, addressValues, setFieldValue]);
 
   const results = useMemo(
     () => ({
