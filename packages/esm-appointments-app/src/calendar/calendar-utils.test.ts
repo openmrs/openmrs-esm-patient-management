@@ -1,18 +1,45 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import dayjs from 'dayjs';
+import { getDefaultCalendar } from '@openmrs/esm-framework';
 import { monthDays } from '../helpers';
 import {
   addCalendarMonths,
   formatInCalendar,
+  getCalendarFormat,
   getCalendarDayOfMonth,
   getCalendarMonthRange,
   getMonthGridDays,
   isSameCalendarMonth,
 } from './calendar-utils';
 
+vi.mock('@openmrs/esm-framework', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  getDefaultCalendar: vi.fn(),
+}));
+
+const mockGetDefaultCalendar = vi.mocked(getDefaultCalendar);
+
 const isoDates = (days: Array<dayjs.Dayjs>) => days.map((day) => day.format('YYYY-MM-DD'));
 
 describe('calendar-utils', () => {
+  describe('getCalendarFormat', () => {
+    it('uses the calendar the locale is configured with', () => {
+      mockGetDefaultCalendar.mockReturnValue('ethiopic');
+      expect(getCalendarFormat()).toEqual({ locale: 'en', calendar: 'ethiopic' });
+
+      mockGetDefaultCalendar.mockReturnValue(undefined);
+      expect(getCalendarFormat().calendar).toBe('gregory');
+    });
+
+    it.each(['islamic', 'islamic-rgsa', 'islamicc', 'chinese', 'dangi'])(
+      'falls back to Gregorian for %s, which the date library cannot lay out, so the title matches the grid',
+      (calendar) => {
+        mockGetDefaultCalendar.mockReturnValue(calendar as ReturnType<typeof getDefaultCalendar>);
+        expect(getCalendarFormat().calendar).toBe('gregory');
+      },
+    );
+  });
+
   describe('with the Gregorian calendar', () => {
     it('lays out every month exactly as before', () => {
       for (let month = dayjs('2000-01-15'); month.isBefore('2040-01-01'); month = month.add(1, 'month')) {

@@ -54,6 +54,15 @@ describe('CalendarHeader', () => {
     expect(screen.getByRole('tab', { name: /daily/i })).toBeInTheDocument();
   });
 
+  it('shows a Gregorian title when the configured calendar is one the month grid cannot lay out', () => {
+    mockGetDefaultCalendar.mockReturnValue('islamic');
+
+    renderCalendarHeader();
+
+    expect(screen.getByText('September 2026')).toBeInTheDocument();
+    expect(screen.queryByText(/1448/)).not.toBeInTheDocument();
+  });
+
   it('shows the period in the Ethiopic calendar, without the era, when the locale uses it', () => {
     mockGetDefaultCalendar.mockReturnValue('ethiopic');
 

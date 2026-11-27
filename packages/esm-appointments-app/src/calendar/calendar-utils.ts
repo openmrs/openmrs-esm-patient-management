@@ -16,10 +16,13 @@ const gregorianCalendar = new GregorianCalendar();
 /**
  * The user's locale and the calendar it uses. The calendar comes from the framework, where the app shell
  * registers the implementation's `preferredCalendar` setting at startup (for example, Amharic to Ethiopic).
+ * `@internationalized/date` has no implementation of some calendars that browsers know (e.g. `islamic` or
+ * `chinese`) and falls back to Gregorian for them, so the calendar it resolved is used everywhere, keeping the
+ * month grid and the titles in the same calendar.
  */
 export function getCalendarFormat(): { locale: string; calendar: string } {
   const locale = getLocale() || 'en';
-  const calendar = getDefaultCalendar(locale) ?? 'gregory';
+  const calendar = createCalendar((getDefaultCalendar(locale) ?? 'gregory') as CalendarIdentifier).identifier;
   return { locale, calendar };
 }
 
