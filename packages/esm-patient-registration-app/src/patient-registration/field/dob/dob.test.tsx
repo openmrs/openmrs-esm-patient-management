@@ -374,6 +374,47 @@ describe('Dob', () => {
     });
   });
 
+  describe('Leaving estimated age inputs', () => {
+    it('keeps an existing estimated age and birthdate when the inputs are focused and left without editing', async () => {
+      const user = userEvent.setup();
+      const birthdate = new Date(1990, 2, 15);
+      const { getFormValues } = renderDobFieldWithFormik({
+        birthdateEstimated: true,
+        yearsEstimated: 36,
+        monthsEstimated: 0,
+        birthdate,
+      });
+
+      await user.click(screen.getByLabelText(/estimated age in years/i));
+      await user.tab();
+      await user.tab();
+
+      expect(getFormValues().birthdate).toEqual(birthdate);
+      expect(getFormValues().yearsEstimated).toBe(36);
+      expect(getFormValues().monthsEstimated).toBe(0);
+    });
+
+    it('recalculates an existing birthdate when the estimated age is edited', async () => {
+      const user = userEvent.setup();
+      const { getFormValues } = renderDobFieldWithFormik({
+        birthdateEstimated: true,
+        yearsEstimated: 36,
+        monthsEstimated: 0,
+        birthdate: new Date(1990, 2, 15),
+      });
+
+      const yearsInput = screen.getByLabelText(/estimated age in years/i);
+      await user.clear(yearsInput);
+      await user.type(yearsInput, '40');
+      await user.tab();
+
+      // The suite's useEstimatedDateOfBirth config (month 0, day 0) resolves to 31 December of the previous year
+      await waitFor(() => {
+        expect(getFormValues().birthdate).toEqual(new Date(new Date().getFullYear() - 40, 0, 0));
+      });
+    });
+  });
+
   describe('Date picker interaction', () => {
     it('sets birthdate when user enters a date', async () => {
       const { getFormValues } = renderDobFieldWithFormik(
