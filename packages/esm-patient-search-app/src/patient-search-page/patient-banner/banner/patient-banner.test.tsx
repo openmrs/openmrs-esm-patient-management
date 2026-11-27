@@ -142,6 +142,36 @@ describe('PatientBanner with a select patient button', () => {
     );
   });
 
+  it.each([
+    { description: 'no active visit', visit: null },
+    { description: 'an active visit', visit: activeVisit },
+  ])('fetches visits for a required selection button without a Start visit action: $description', ({ visit }) => {
+    mockUseVisit.mockReturnValue({ ...noVisitState, activeVisit: visit });
+    renderBanner({
+      onPatientSelected: vi.fn(),
+      selectPatientButton: { text: 'Admit', requiresActiveVisit: true },
+    });
+
+    expect(mockUseVisit).toHaveBeenCalledWith(patient.uuid, expect.any(String));
+    expect(screen.queryByRole('button', { name: 'Start visit' })).not.toBeInTheDocument();
+    if (visit) {
+      expect(screen.getByRole('button', { name: 'Admit' })).toBeEnabled();
+    } else {
+      expect(screen.getByRole('button', { name: 'Admit' })).toBeDisabled();
+    }
+  });
+
+  it('does not fetch visits for a selection button that does not require an active visit', () => {
+    renderBanner({
+      onPatientSelected: vi.fn(),
+      selectPatientButton: { text: 'Select patient' },
+    });
+
+    expect(mockUseVisit).toHaveBeenCalledWith(null, expect.any(String));
+    expect(screen.getByRole('button', { name: 'Select patient' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Start visit' })).not.toBeInTheDocument();
+  });
+
   it('does not make the patient card clickable when a select button is configured', () => {
     renderBanner(makeContext2({ selectPatientButton: { text: 'Admit', requiresActiveVisit: true } }));
 

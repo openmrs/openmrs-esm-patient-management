@@ -56,6 +56,7 @@ describe('standalone patient search', () => {
       vi.mocked(useLayoutType).mockReturnValue(layout);
       render(<PatientSearchPage />);
 
+      expect(useVisit).toHaveBeenCalledWith(null, expect.any(String));
       expect(screen.getByRole('link')).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Start visit' })).not.toBeInTheDocument();
       expect(launchWorkspace2).not.toHaveBeenCalled();
@@ -68,6 +69,7 @@ describe('standalone patient search', () => {
     const closeSearch = vi.fn();
     render(<PatientSearchOverlay query="Joseph" onClose={closeSearch} patientClickSideEffect={closeSearch} />);
 
+    expect(useVisit).toHaveBeenCalledWith(null, expect.any(String));
     expect(screen.queryByRole('button', { name: 'Start visit' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('link'));
 
@@ -104,6 +106,7 @@ describe('embedded patient search', () => {
         />,
       );
 
+      expect(useVisit).toHaveBeenCalledWith(patient.uuid, expect.any(String));
       await user.click(screen.getByRole('button', { name: 'Start visit' }));
 
       expect(launchChildWorkspace).toHaveBeenCalledWith('queue-start-visit', {

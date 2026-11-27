@@ -42,7 +42,6 @@ const PatientBanner = React.memo(
   ({ patient, patientUuid, hideActionsOverflow: hideActionsOverflowProp }: PatientBannerProps) => {
     const layout = useLayoutType();
     const isTablet = layout === 'tablet';
-    const { activeVisit } = useVisit(patientUuid, activeVisitRepresentation);
     const context2 = usePatientSearchContext2();
     const {
       onPatientSelected,
@@ -52,6 +51,11 @@ const PatientBanner = React.memo(
       startVisitWorkspaceName,
       selectPatientButton,
     } = context2 ?? {};
+
+    const needsActiveVisit = Boolean(
+      (launchChildWorkspace && startVisitWorkspaceName) || selectPatientButton?.requiresActiveVisit,
+    );
+    const { activeVisit } = useVisit(needsActiveVisit ? patientUuid : null, activeVisitRepresentation);
 
     const hideActionsOverflow = hideActionsOverflowProp ?? Boolean(onPatientSelected);
 
