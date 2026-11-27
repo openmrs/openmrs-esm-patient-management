@@ -13,6 +13,8 @@ export interface PatientRegistrationContextProps {
   setFieldTouched: FormikHelpers<FormValues>['setFieldTouched'];
   setFieldValue: FormikHelpers<FormValues>['setFieldValue'];
   setInitialFormValues?: React.Dispatch<SetStateAction<FormValues>>;
+  /** Records a programmatically applied default value in the unsaved-changes baseline. */
+  recordInitialFieldValue?: (field: string, value: unknown) => void;
   values: FormValues;
 }
 

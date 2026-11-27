@@ -12,6 +12,8 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
+  showModal,
   showSnackbar,
   useConfig,
   usePatient,
@@ -28,6 +30,7 @@ import { ResourcesContextProvider } from '../resources-context';
 
 const mockSaveEncounter = vi.mocked(saveEncounter);
 const mockSavePatient = vi.mocked(savePatient);
+const mockShowModal = vi.mocked(showModal);
 const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 const mockUsePatient = vi.mocked(usePatient);
@@ -653,6 +656,66 @@ describe('Registering a new patient', () => {
     expect(mockSaveEncounter).toHaveBeenCalledTimes(2);
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' }));
+  });
+
+  describe('Unsaved-changes prompt', () => {
+    beforeEach(() => {
+      mockShowModal.mockClear();
+    });
+
+    const navigateAway = () => {
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent('single-spa:before-routing-event', {
+            detail: { navigationIsCanceled: false, cancelNavigation: vi.fn(), newUrl: '/elsewhere' },
+          }),
+        );
+      });
+    };
+
+    it('does not open when focusing and leaving fields or date pickers without changing values', async () => {
+      const user = userEvent.setup();
+
+      renderWithContext(
+        <PatientRegistration savePatientForm={vi.fn()} />,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
+
+      const givenNameInput = await screen.findByLabelText(/first name/i);
+      await user.click(givenNameInput);
+      await user.tab();
+
+      const datePickerProps = vi.mocked(OpenmrsDatePicker).mock.lastCall?.[0];
+      act(() => {
+        datePickerProps?.onBlur?.({} as React.FocusEvent<HTMLInputElement>);
+      });
+
+      navigateAway();
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    it('opens when a field value changes and disarms if the change is reverted', async () => {
+      const user = userEvent.setup();
+
+      renderWithContext(
+        <PatientRegistration savePatientForm={vi.fn()} />,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
+
+      const givenNameInput = await screen.findByLabelText(/first name/i);
+      await user.type(givenNameInput, 'John');
+
+      navigateAway();
+      expect(mockShowModal).toHaveBeenCalledWith('cancel-patient-edit-modal', expect.anything(), expect.anything());
+
+      mockShowModal.mockClear();
+      await user.clear(givenNameInput);
+
+      navigateAway();
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
   });
 });
 

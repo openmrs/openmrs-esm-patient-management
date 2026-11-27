@@ -13,7 +13,7 @@ import styles from '../field.scss';
 export const AddressComponent: React.FC = () => {
   const config = useConfig();
   const { t } = useTranslation();
-  const { setFieldValue } = usePatientRegistrationContext();
+  const { setFieldValue, recordInitialFieldValue } = usePatientRegistrationContext();
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   const {
@@ -48,10 +48,11 @@ export const AddressComponent: React.FC = () => {
   useEffect(() => {
     if (addressTemplate?.elementDefaults) {
       Object.entries(addressTemplate.elementDefaults).forEach(([name, defaultValue]) => {
+        recordInitialFieldValue?.(`address.${name}`, defaultValue);
         setFieldValue(`address.${name}`, defaultValue);
       });
     }
-  }, [addressTemplate, setFieldValue]);
+  }, [addressTemplate, setFieldValue, recordInitialFieldValue]);
 
   const orderedAddressFields = useMemo(() => {
     if (isLoadingFieldOrder || errorFetchingFieldOrder) {
