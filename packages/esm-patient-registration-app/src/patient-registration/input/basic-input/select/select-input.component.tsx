@@ -1,7 +1,7 @@
 import React from 'react';
-import { Layer, Select, SelectItem } from '@carbon/react';
-import { useField } from '../../../form-adapter';
 import { useTranslation } from 'react-i18next';
+import { Layer, Select, SelectItem } from '@carbon/react';
+import { useRegistrationField } from '../../../form-adapter';
 
 interface SelectInputProps {
   name: string;
@@ -11,7 +11,7 @@ interface SelectInputProps {
 }
 
 export const SelectInput: React.FC<SelectInputProps> = ({ name, options, label, required }) => {
-  const [field] = useField(name);
+  const { field } = useRegistrationField<string | undefined>(name);
   const { t } = useTranslation();
   const selectOptions = [
     <SelectItem disabled hidden text={`Select ${label}`} key="" value="" />,

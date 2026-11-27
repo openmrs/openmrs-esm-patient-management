@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, TextInput } from '@carbon/react';
-import { useField } from '../../../form-adapter';
+import { useRegistrationField } from '../../../form-adapter';
 
 export type TextInputProps = React.ComponentProps<typeof TextInput>;
 
@@ -12,7 +12,7 @@ interface InputProps extends TextInputProps {
 }
 
 export const Input: React.FC<InputProps> = ({ checkWarning, hideOptionalLabel, ...props }) => {
-  const [field, meta] = useField(props.name);
+  const { field, error, touched } = useRegistrationField(props.name);
   const { t } = useTranslation();
 
   /*
@@ -36,7 +36,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, hideOptionalLabel, .
   */
 
   const value = field.value || '';
-  const invalidText = meta.error || '';
+  const invalidText = error || '';
   const warnText = useMemo(() => {
     if (!invalidText && typeof checkWarning === 'function') {
       const warning = checkWarning(value);
@@ -56,7 +56,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, hideOptionalLabel, .
           {...props}
           {...field}
           labelText={labelText}
-          invalid={!!(meta.touched && meta.error)}
+          invalid={!!(touched && error)}
           invalidText={invalidText}
           warn={!!warnText}
           warnText={warnText}

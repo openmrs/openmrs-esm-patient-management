@@ -1,11 +1,13 @@
 import React, { useCallback } from 'react';
+import { useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
-import { useField } from '../../form-adapter';
 import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
-import { type RegistrationConfig } from '../../../config-schema';
+import { useFormHelpers } from '../../form-adapter';
 import { usePatientRegistrationContext } from '../../patient-registration-context';
 import { Input } from '../../input/basic-input/input/input.component';
+import type { RegistrationConfig } from '../../../config-schema';
+import type { FormValues } from '../../patient-registration.types';
 import styles from '../field.scss';
 
 export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
@@ -36,9 +38,10 @@ export const NameField = () => {
     },
   } = useConfig<RegistrationConfig>();
 
-  const [{ value: isPatientUnknownValue }, , { setValue: setUnknownPatient }] = useField<string>(
-    `attributes.${unidentifiedPatientAttributeTypeUuid}`,
-  );
+  const unknownPatientPath = `attributes.${unidentifiedPatientAttributeTypeUuid}` as const;
+  const isPatientUnknownValue = useWatch<FormValues>({ name: unknownPatientPath }) as string | undefined;
+  const { setFieldValue: setFormFieldValue } = useFormHelpers();
+  const setUnknownPatient = (value: string) => setFormFieldValue(unknownPatientPath, value);
 
   const isPatientUnknown = isPatientUnknownValue === 'true';
 
@@ -67,7 +70,7 @@ export const NameField = () => {
     }
     setFieldTouched('givenName', true);
     setFieldTouched('familyName', true);
-    setFieldTouched(`attributes.${unidentifiedPatientAttributeTypeUuid}`, true, false);
+    setFieldTouched(unknownPatientPath, true, false);
   };
 
   const firstNameField = (

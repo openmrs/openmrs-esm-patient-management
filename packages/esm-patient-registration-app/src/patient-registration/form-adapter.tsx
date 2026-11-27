@@ -9,6 +9,10 @@ import { keepUnchangedObjects } from './form-values-utils';
  * The fields are not registered with React Hook Form: values are read with `useWatch`, written with `setValue`,
  * and `useRevalidateOnChange` validates the whole form after every change, as Formik's validateOnChange and
  * validateOnBlur did.
+ *
+ * It also holds the helpers that fields reading React Hook Form directly use: `useRegistrationField` (field state
+ * with Formik's change and blur handlers), `useFormHelpers` and `useRevalidateOnChange`. The Formik-shaped parts
+ * (`useField`, `Field` and `useFormikContext`) go when no field uses them.
  */
 
 export interface FieldInputProps<V = any> {
@@ -132,28 +136,53 @@ export function useFormikContext(): { values: FormValues } & FormHelpers {
   return { values, ...helpers };
 }
 
-export function useField<V = any>(name: string): [FieldInputProps<V>, FieldMetaProps<V>, FieldHelperProps<V>] {
-  const { control } = useFormContext<FormValues>();
-  const path = name as FieldPath<FormValues>;
-  const value = useWatch({ control, name: path }) as V;
-  const { errors, touchedFields, defaultValues } = useFormState({ control, name: path });
+/** Formik's change and blur handlers for the field `name`: `handleChange` stores the event's value, `handleBlur` touches the blurred element. */
+export function useFieldHandlers(name: string): Pick<FieldInputProps, 'onChange' | 'onBlur'> {
   const { setFieldValue, setFieldTouched } = useFormHelpers();
-
   const onChange = useCallback(
     (eventOrValue: unknown) => setFieldValue(name, getChangeValue(eventOrValue)),
     [name, setFieldValue],
   );
-  // As Formik's `handleBlur`: the blurred element's name, else its id. Without an event, the field itself.
   const onBlur = useCallback(
     (event?: unknown) => {
-      const target = (event as { target?: { name?: string; id?: string } } | undefined)?.target;
-      const touchedName = target ? target.name || target.id : name;
+      const touchedName = getBlurName(event, name);
       if (touchedName) {
         setFieldTouched(touchedName, true);
       }
     },
     [name, setFieldTouched],
   );
+
+  return useMemo(() => ({ onChange, onBlur }), [onChange, onBlur]);
+}
+
+/**
+ * The state of the field `name` read from React Hook Form, with Formik's change and blur handlers. The field is not
+ * registered: a registered field shows its value from mount once its value becomes undefined, and writes that value
+ * back into the form after a reset.
+ */
+export function useRegistrationField<V = any>(
+  name: string,
+): { field: FieldInputProps<V>; error?: string; touched: boolean } {
+  const path = name as FieldPath<FormValues>;
+  const value = useWatch<FormValues>({ name: path }) as V;
+  const { errors, touchedFields } = useFormState<FormValues>({ name: path });
+  const handlers = useFieldHandlers(name);
+
+  return {
+    field: { name, value, ...handlers },
+    error: getMessage(get(errors, name)),
+    touched: !!get(touchedFields, name),
+  };
+}
+
+export function useField<V = any>(name: string): [FieldInputProps<V>, FieldMetaProps<V>, FieldHelperProps<V>] {
+  const { control } = useFormContext<FormValues>();
+  const path = name as FieldPath<FormValues>;
+  const value = useWatch({ control, name: path }) as V;
+  const { errors, touchedFields, defaultValues } = useFormState({ control, name: path });
+  const { setFieldValue, setFieldTouched } = useFormHelpers();
+  const { onChange, onBlur } = useFieldHandlers(name);
   const helpers = useMemo<FieldHelperProps<V>>(
     () => ({
       setValue: (newValue, shouldValidate) => setFieldValue(name, newValue, shouldValidate),
@@ -196,7 +225,7 @@ export const Field: React.FC<{
 };
 
 /** The value Formik's `handleChange` takes from an event, or the value itself when it is not an event. */
-function getChangeValue(eventOrValue: unknown): unknown {
+export function getChangeValue(eventOrValue: unknown): unknown {
   const target = (eventOrValue as { target?: HTMLInputElement })?.target;
   if (!target || typeof eventOrValue !== 'object') {
     return eventOrValue;
@@ -213,8 +242,14 @@ function getChangeValue(eventOrValue: unknown): unknown {
   return value;
 }
 
+/** The name Formik's `handleBlur` touches: the blurred element's name, else its id. Without an event, the field itself. */
+export function getBlurName(event: unknown, fieldName: string): string | undefined {
+  const target = (event as { target?: { name?: string; id?: string } } | undefined)?.target;
+  return target ? target.name || target.id : fieldName;
+}
+
 /** The message of a React Hook Form error. An object node, which holds the errors of its children, has none. */
-function getMessage(error: unknown): string | undefined {
+export function getMessage(error: unknown): string | undefined {
   const message = (error as { message?: unknown })?.message;
   return typeof message === 'string' ? message : undefined;
 }

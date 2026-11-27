@@ -114,4 +114,22 @@ describe('SelectInput component', () => {
       });
     });
   });
+
+  describe('Form state', () => {
+    it('stores the selected option and marks the field touched on blur', async () => {
+      const user = userEvent.setup();
+      const { getValues, getTouched } = renderSelectInput({ required: true });
+      const formValues = () => getValues() as unknown as Record<string, string>;
+
+      const select = await screen.findByRole('combobox', { name: /^select$/i });
+      await user.selectOptions(select, 'B Option');
+
+      expect(formValues().select).toBe('B Option');
+      expect(getTouched().select).toBeUndefined();
+
+      await user.tab();
+
+      expect(getTouched().select).toBe(true);
+    });
+  });
 });
