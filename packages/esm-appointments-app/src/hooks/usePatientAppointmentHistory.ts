@@ -9,6 +9,7 @@ export function usePatientAppointmentHistory(patientUuid: string) {
   const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
 
   const selectedDate = useSelectedDate();
+  const startDate = dayjs(selectedDate).startOf('day').toISOString();
 
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {
@@ -19,12 +20,12 @@ export function usePatientAppointmentHistory(patientUuid: string) {
       },
       body: {
         patientUuid: patientUuid,
-        startDate: selectedDate,
+        startDate,
       },
     });
 
   const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
-    patientUuid ? [appointmentsSearchUrl, patientUuid, selectedDate] : null,
+    patientUuid ? [appointmentsSearchUrl, patientUuid, startDate] : null,
     fetcher,
   );
 
