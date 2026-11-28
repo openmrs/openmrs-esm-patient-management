@@ -11,6 +11,7 @@ import {
   type AttributeValue,
   type CapturePhotoProps,
   type Encounter,
+  extraNameProperties,
   type FormValues,
   type Patient,
   type PatientIdentifier,
@@ -337,13 +338,18 @@ export class FormManager {
   }
 
   static getNames(values: FormValues, patientUuidMap: PatientUuidMapType) {
-    const names = [
+    // Name parts that only a name template shows are sent when the form has them, so they are left alone otherwise
+    const extraNameParts = Object.fromEntries(
+      extraNameProperties.filter((name) => values[name] !== undefined).map((name) => [name, values[name]]),
+    );
+    const names: Patient['person']['names'] = [
       {
         uuid: patientUuidMap.preferredNameUuid,
         preferred: true,
         givenName: values.givenName,
         middleName: values.middleName,
         familyName: values.familyName,
+        ...extraNameParts,
       },
     ];
 

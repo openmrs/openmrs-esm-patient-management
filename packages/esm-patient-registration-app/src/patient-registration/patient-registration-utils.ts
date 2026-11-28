@@ -2,6 +2,8 @@ import camelCase from 'lodash-es/camelCase';
 import { parseDate } from '@openmrs/esm-framework';
 import {
   type Encounter,
+  type ExtraNameProperty,
+  extraNameProperties,
   type FormValues,
   type PatientIdentifierValue,
   type PatientUuidMapType,
@@ -19,6 +21,21 @@ export function cancelRegistration() {
   window.history.back();
 }
 
+const openmrsNameExtensionUrl = 'http://fhir.openmrs.org/ext/name';
+
+/**
+ * Reads the name parts that FHIR has no field for, such as `familyName2`, from the OpenMRS name extension, where each
+ * part is a sub-extension whose url ends in `#<part>`.
+ */
+export function getExtraNamePartsFromFhirName(name: fhir.HumanName): Partial<Record<ExtraNameProperty, string>> {
+  const nameExtension = name?.extension?.find(({ url }) => url === openmrsNameExtensionUrl);
+  return Object.fromEntries(
+    (nameExtension?.extension ?? [])
+      .map(({ url, valueString }) => [url.split('#')[1], valueString] as const)
+      .filter(([part]) => (extraNameProperties as ReadonlyArray<string>).includes(part)),
+  );
+}
+
 export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
   const result = {} as FormValues;
   const patientName = patient.name[0];
@@ -28,6 +45,7 @@ export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
   result.givenName = patientName?.given[0];
   result.middleName = patientName?.given[1];
   result.familyName = patientName?.family;
+  Object.assign(result, getExtraNamePartsFromFhirName(patientName));
   result.addNameInLocalLanguage = !!additionalPatientName ? true : undefined;
   result.additionalGivenName = additionalPatientName?.given[0];
   result.additionalMiddleName = additionalPatientName?.given[1];
