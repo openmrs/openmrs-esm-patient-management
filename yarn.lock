@@ -2708,6 +2708,7 @@ __metadata:
   dependencies:
     "@carbon/react": "npm:^1.83.0"
     "@hookform/resolvers": "npm:^3.9.1"
+    "@internationalized/date": "npm:^3.12.4"
     classnames: "npm:^2.3.2"
     lodash-es: "npm:^4.17.15"
     openmrs: "npm:next"
