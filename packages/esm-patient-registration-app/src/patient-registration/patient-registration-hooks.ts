@@ -31,12 +31,19 @@ interface DeathInfoResults {
   uuid: string;
 }
 
+interface PersonBirthdateResult {
+  uuid: string;
+  birthdate: string | null;
+  birthdateEstimated: boolean;
+}
+
 export function useInitialFormValues(
   patientToEdit: fhir.Patient,
   patientUuid: string,
 ): [FormValues, Dispatch<FormValues>] {
   const { freeTextFieldConceptUuid } = useConfig<RegistrationConfig>();
   const { data: deathInfo, isLoading: isLoadingDeathInfo } = useInitialPersonDeathInfo(patientUuid);
+  const { data: personBirthdate } = useInitialPersonBirthdate(patientUuid);
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
   const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
@@ -86,6 +93,20 @@ export function useInitialFormValues(
       }));
     }
   }, [patientToEdit]);
+
+  // FHIR returns estimated birthdates with reduced precision (year only, or year and month),
+  // which parses to 1 January / the 1st of the month. The REST API returns the stored date, so
+  // prefer it to avoid overwriting the real birthdate when the patient is saved.
+  useEffect(() => {
+    if (patientToEdit && personBirthdate?.birthdate) {
+      // Take only the calendar date so the timezone offset cannot shift the day.
+      const storedBirthdate = dayjs(personBirthdate.birthdate.slice(0, 10)).toDate();
+      setInitialFormValues((currentValues) => ({
+        ...currentValues,
+        birthdate: storedBirthdate,
+      }));
+    }
+  }, [patientToEdit, personBirthdate?.birthdate]);
 
   // Set initial patient death info
   useEffect(() => {
@@ -270,6 +291,21 @@ function useInitialPersonDeathInfo(personUuid: string) {
     !!personUuid
       ? `${restBaseUrl}/person/${personUuid}?v=custom:(uuid,display,causeOfDeath,dead,deathDate,causeOfDeathNonCoded)`
       : null,
+    openmrsFetch,
+  );
+
+  const result = useMemo(() => {
+    return {
+      data: data?.data,
+      isLoading,
+    };
+  }, [data?.data, isLoading]);
+  return result;
+}
+
+function useInitialPersonBirthdate(personUuid: string) {
+  const { data, isLoading } = useSWR<FetchResponse<PersonBirthdateResult>, Error>(
+    !!personUuid ? `${restBaseUrl}/person/${personUuid}?v=custom:(uuid,birthdate,birthdateEstimated)` : null,
     openmrsFetch,
   );
 
