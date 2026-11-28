@@ -5,7 +5,6 @@ import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { configSchema, type PatientSearchConfig } from '../config-schema';
-import { PatientSearchContext } from '../patient-search-context';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 
 // The virtualizer measures a 0px scroll element under happy-dom, so it would render no rows.
@@ -168,9 +167,5 @@ describe('RecentlySearchedPatients', () => {
 });
 
 function renderRecentlySearchedPatients(props = {}) {
-  render(
-    <PatientSearchContext.Provider value={{}}>
-      <RecentlySearchedPatients {...defaultProps} {...props} />
-    </PatientSearchContext.Provider>,
-  );
+  render(<RecentlySearchedPatients {...defaultProps} {...props} />);
 }

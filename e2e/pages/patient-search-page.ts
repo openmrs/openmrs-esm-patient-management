@@ -13,6 +13,16 @@ export class PatientSearchPage {
   readonly applyFiltersButton = () => this.page.getByRole('button', { name: /apply/i });
   readonly resetFiltersButton = () => this.page.getByRole('button', { name: /reset fields/i });
 
+  /** Scope assertions to search results when a chart workspace is also open. */
+  readonly results = () => this.page.locator('[data-openmrs-role="Search Results"]');
+  readonly startVisitButton = () => this.results().getByRole('button', { name: /start visit/i });
+  readonly noResultsMessage = () => this.page.getByText(/no patient charts were found/i);
+
+  /** Header of the tablet overlay. The desktop page has no such header. */
+  readonly overlayHeader = () => this.page.getByText('Search results', { exact: true });
+  readonly overlayCloseButton = () =>
+    this.page.getByRole('banner', { name: 'Close overlay' }).getByRole('button', { name: 'Close', exact: true });
+
   async goto(query: string) {
     await this.page.goto(`search?query=${encodeURIComponent(query)}`);
   }

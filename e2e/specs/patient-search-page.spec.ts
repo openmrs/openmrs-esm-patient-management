@@ -91,3 +91,49 @@ test('Refine patient search results by sex and year of birth', async ({ page, pa
     await expect(searchPage.patientResultLink(firstName)).toBeVisible();
   });
 });
+
+test('Show an empty state when no patient matches the search', async ({ page }) => {
+  const searchPage = new PatientSearchPage(page);
+
+  await test.step('When I visit the search page with a query that matches no patient', async () => {
+    await searchPage.goto('zzzznomatchzzzz');
+  });
+
+  await test.step('Then I should see no results and the empty state', async () => {
+    await expect(searchPage.resultsCount(0)).toBeVisible();
+    await expect(searchPage.noResultsMessage()).toBeVisible();
+  });
+});
+
+test.describe('Visit actions on the search page', () => {
+  test('Open the chart to start a visit for a patient without an active visit', async ({ page, patient }) => {
+    const { firstName, fullName } = getPatientNames(patient);
+    const searchPage = new PatientSearchPage(page);
+
+    await test.step('When I visit the search page with a query for the patient', async () => {
+      await searchPage.goto(fullName);
+    });
+
+    await test.step('Then I should see the patient without a Start visit button', async () => {
+      await expect(searchPage.patientResultLink(firstName)).toBeVisible();
+      await expect(searchPage.startVisitButton()).toBeHidden();
+    });
+
+    await test.step('When I click on the patient result', async () => {
+      await searchPage.patientResultLink(firstName).click();
+    });
+
+    await test.step("Then I should be on the patient's chart page", async () => {
+      await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/patient-summary`);
+    });
+
+    await test.step('When I click Add visit in the Actions menu', async () => {
+      await page.getByRole('button', { name: 'Actions', exact: true }).click();
+      await page.getByRole('menuitem', { name: 'Add visit', exact: true }).click();
+    });
+
+    await test.step('Then I should see the start visit form', async () => {
+      await expect(page.getByRole('button', { name: 'Start visit', exact: true })).toBeVisible();
+    });
+  });
+});

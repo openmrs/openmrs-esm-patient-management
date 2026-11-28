@@ -142,6 +142,36 @@ describe('PatientBanner with a select patient button', () => {
     );
   });
 
+  it.each([
+    { description: 'no active visit', visit: null },
+    { description: 'an active visit', visit: activeVisit },
+  ])('fetches visits for a required selection button without a Start visit action: $description', ({ visit }) => {
+    mockUseVisit.mockReturnValue({ ...noVisitState, activeVisit: visit });
+    renderBanner({
+      onPatientSelected: vi.fn(),
+      selectPatientButton: { text: 'Admit', requiresActiveVisit: true },
+    });
+
+    expect(mockUseVisit).toHaveBeenCalledWith(patient.uuid, expect.any(String));
+    expect(screen.queryByRole('button', { name: 'Start visit' })).not.toBeInTheDocument();
+    if (visit) {
+      expect(screen.getByRole('button', { name: 'Admit' })).toBeEnabled();
+    } else {
+      expect(screen.getByRole('button', { name: 'Admit' })).toBeDisabled();
+    }
+  });
+
+  it('does not fetch visits for a selection button that does not require an active visit', () => {
+    renderBanner({
+      onPatientSelected: vi.fn(),
+      selectPatientButton: { text: 'Select patient' },
+    });
+
+    expect(mockUseVisit).toHaveBeenCalledWith(null, expect.any(String));
+    expect(screen.getByRole('button', { name: 'Select patient' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Start visit' })).not.toBeInTheDocument();
+  });
+
   it('does not make the patient card clickable when a select button is configured', () => {
     renderBanner(makeContext2({ selectPatientButton: { text: 'Admit', requiresActiveVisit: true } }));
 
@@ -166,24 +196,50 @@ describe('PatientBanner with a select patient button', () => {
   });
 });
 
-describe('PatientBanner without the workspace v2 context', () => {
+describe('PatientBanner visit actions and patient mapping', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema));
     mockUseVisit.mockReturnValue(noVisitState);
     mockExtensionSlot.mockImplementation(() => null);
   });
 
-  it('passes patientUuid and the mapped FHIR patient to the legacy start visit button slot', () => {
-    render(<PatientBanner patient={patient} patientUuid={patient.uuid} />);
+  it('passes patientUuid, the mapped FHIR patient and the start visit workspace to the start visit button slot', () => {
+    const context = makeContext2({ onPatientSelected: undefined });
+    renderBanner(context);
 
-    const legacySlotCall = mockExtensionSlot.mock.calls.find(([props]) => props?.name === 'start-visit-button-slot');
-    expect(legacySlotCall).toBeDefined();
-    expect(legacySlotCall[0].state).toEqual(
+    const slotCall = mockExtensionSlot.mock.calls.find(([props]) => props?.name === 'start-visit-button-slot2');
+    expect(slotCall).toBeDefined();
+    expect(slotCall[0].state).toEqual(
       expect.objectContaining({
         patientUuid: patient.uuid,
         patient: expect.objectContaining({ id: patient.uuid, birthDate: patient.person.birthdate }),
+        launchChildWorkspace: context.launchChildWorkspace,
+        startVisitWorkspaceName: 'start-visit-workspace',
       }),
     );
+  });
+
+  it('calls onBeforeNavigateToPatient before following the link to the patient chart', async () => {
+    const user = userEvent.setup();
+    const onBeforeNavigateToPatient = vi.fn();
+    renderBanner({ onBeforeNavigateToPatient });
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props?.name === 'start-visit-button-slot2')).toBe(false);
+    await user.click(screen.getByRole('link'));
+    expect(onBeforeNavigateToPatient).toHaveBeenCalledWith(patient.uuid, expect.objectContaining({ id: patient.uuid }));
+  });
+
+  it('does not offer Start visit for a deceased patient in embedded search', () => {
+    render(
+      <PatientSearchContext2.Provider value={makeContext2()}>
+        <PatientBanner
+          patient={{ ...patient, person: { ...patient.person, dead: true, deathDate: '2025-01-01' } }}
+          patientUuid={patient.uuid}
+        />
+      </PatientSearchContext2.Provider>,
+    );
+
+    expect(mockExtensionSlot.mock.calls.some(([props]) => props?.name === 'start-visit-button-slot2')).toBe(false);
   });
 
   it('maps an estimated birthdate with day precision to the year for patients aged one or older', () => {
@@ -209,13 +265,15 @@ describe('PatientBanner without the workspace v2 context', () => {
 
 function getMappedBirthDate({ birthdate, age }: { birthdate: string; age: number }) {
   render(
-    <PatientBanner
-      patient={{ ...patient, person: { ...patient.person, age, birthdate, birthdateEstimated: true } }}
-      patientUuid={patient.uuid}
-    />,
+    <PatientSearchContext2.Provider value={makeContext2({ onPatientSelected: undefined })}>
+      <PatientBanner
+        patient={{ ...patient, person: { ...patient.person, age, birthdate, birthdateEstimated: true } }}
+        patientUuid={patient.uuid}
+      />
+    </PatientSearchContext2.Provider>,
   );
 
-  const legacySlotCall = mockExtensionSlot.mock.calls.find(([props]) => props?.name === 'start-visit-button-slot');
-  const mappedPatient = legacySlotCall?.[0].state.patient as { birthDate?: string } | undefined;
+  const slotCall = mockExtensionSlot.mock.calls.find(([props]) => props?.name === 'start-visit-button-slot2');
+  const mappedPatient = slotCall?.[0].state.patient as { birthDate?: string } | undefined;
   return mappedPatient?.birthDate;
 }

@@ -96,7 +96,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
       {showSearchInput ? (
         <>
           {isDesktop(layout) ? (
-            /* CompactPatientSearchComponent provides the search context */
+            /* CompactPatientSearchComponent wires up what happens when a result is clicked */
             <CompactPatientSearchComponent
               isSearchPage={isSearchPage}
               initialSearchTerm={initialSearchTerm}

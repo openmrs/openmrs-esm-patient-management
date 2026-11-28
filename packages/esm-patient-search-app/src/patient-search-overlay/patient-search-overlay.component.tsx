@@ -1,12 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type PatientSearchContextProps } from '../patient-search-context';
 import PatientSearchWorkspace from '../patient-search-workspace/patient-search.workspace';
+import { type PatientSelectionCallback } from '../patient-search-context';
 import Overlay from '../ui-components/overlay.component';
 
-interface PatientSearchOverlayProps extends Pick<PatientSearchContextProps, 'patientClickSideEffect'> {
+interface PatientSearchOverlayProps {
   onClose: () => void;
   query?: string;
+  /** Called just before following a result's link to the patient chart. */
+  patientClickSideEffect?: PatientSelectionCallback;
 }
 
 /**
