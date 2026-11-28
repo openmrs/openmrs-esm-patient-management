@@ -2,10 +2,10 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { type TFunction } from 'i18next';
 import { launchWorkspace2, type Workspace2DefinitionProps, restBaseUrl } from '@openmrs/esm-framework';
 import { AppointmentStatus } from '../types';
-import { appointmentsFormWorkspace, omrsDateFormat } from '../constants';
+import { appointmentsFormWorkspace } from '../constants';
 
 export const buildAppointmentsUrl = (isoDate: string): string => {
-  const startOfDay = dayjs(isoDate).startOf('day').format(omrsDateFormat);
+  const startOfDay = dayjs(isoDate).startOf('day').toISOString();
   return `${restBaseUrl}/appointments?forDate=${encodeURIComponent(startOfDay)}`;
 };
 

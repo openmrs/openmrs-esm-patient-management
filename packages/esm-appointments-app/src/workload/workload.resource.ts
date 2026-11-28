@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import first from 'lodash-es/first';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentSummary } from '../types';
-import { omrsDateFormat } from '../constants';
 
 export const useMonthlyCalendarDistribution = (
   serviceUuid: string,
@@ -19,9 +18,9 @@ export const useMonthlyAppointmentSummary = (
   fromDate: Date,
   serviceUuid: string,
 ): Array<{ date: string; count: number }> => {
-  const startDate = dayjs(fromDate).startOf('month').format(omrsDateFormat);
-  const endDate = dayjs(fromDate).endOf('month').format(omrsDateFormat);
-  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+  const startDate = dayjs(fromDate).startOf('month').toISOString();
+  const endDate = dayjs(fromDate).endOf('month').toISOString();
+  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
   const { data } = useSWR<{ data: Array<AppointmentSummary> }>(url, openmrsFetch);
 
   const results = first(data?.data?.filter(({ appointmentService }) => appointmentService.uuid === serviceUuid));

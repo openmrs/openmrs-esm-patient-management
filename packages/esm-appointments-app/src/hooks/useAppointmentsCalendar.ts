@@ -1,7 +1,6 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { omrsDateFormat } from '../constants';
 import { type DailyAppointmentsCountByService } from '../types';
 
 interface AppointmentCountMapEntry {
@@ -18,7 +17,7 @@ interface AppointmentSummaryResponse {
 
 export const useAppointmentsCalendar = (forDate: string | null, period: string) => {
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
-  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
 
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentSummaryResponse> }>(
     startDate && endDate ? url : null,
@@ -53,13 +52,13 @@ function evaluateAppointmentCalendarDates(forDate: string | null, period: string
 
   if (period === 'daily') {
     return {
-      startDate: dayjs(forDate).startOf('day').format(omrsDateFormat),
-      endDate: dayjs(forDate).endOf('day').format(omrsDateFormat),
+      startDate: dayjs(forDate).startOf('day').toISOString(),
+      endDate: dayjs(forDate).endOf('day').toISOString(),
     };
   }
 
   return {
-    startDate: dayjs(forDate).startOf('month').format(omrsDateFormat),
-    endDate: dayjs(forDate).endOf('month').format(omrsDateFormat),
+    startDate: dayjs(forDate).startOf('month').toISOString(),
+    endDate: dayjs(forDate).endOf('month').toISOString(),
   };
 }

@@ -1,6 +1,7 @@
 import { AppointmentStatus } from '../types';
-import { vi, describe, it, expect } from 'vitest';
-import { canTransition } from './functions';
+import { vi, describe, it, expect, afterEach } from 'vitest';
+import { restBaseUrl } from '@openmrs/esm-framework';
+import { buildAppointmentsUrl, canTransition } from './functions';
 
 describe('canTransition', () => {
   // Forward transitions (should be allowed)
@@ -51,5 +52,23 @@ describe('canTransition', () => {
   // Same status (except Scheduled -> Scheduled which is allowed by the rule)
   it('allows Scheduled -> Scheduled', () => {
     expect(canTransition(AppointmentStatus.SCHEDULED, AppointmentStatus.SCHEDULED)).toBe(true);
+  });
+});
+
+describe('buildAppointmentsUrl', () => {
+  afterEach(() => {
+    process.env.TZ = 'UTC';
+  });
+
+  it.each([
+    ['Africa/Nairobi', '2026-12-14T21:00:00.000Z'],
+    ['America/New_York', '2026-12-15T05:00:00.000Z'],
+    ['UTC', '2026-12-15T00:00:00.000Z'],
+  ])('sends the start of the local day in %s as a UTC instant', (timeZone, expectedForDate) => {
+    process.env.TZ = timeZone;
+
+    expect(buildAppointmentsUrl('2026-12-15')).toBe(
+      `${restBaseUrl}/appointments?forDate=${encodeURIComponent(expectedForDate)}`,
+    );
   });
 });
