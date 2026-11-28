@@ -115,6 +115,36 @@ describe('ListDetails', () => {
     expect(screen.getByText(/there are no patients in this list/i)).toBeInTheDocument();
   });
 
+  it('shows an error instead of the table when the members fail to load', () => {
+    mockUsePatientListMembers.mockReturnValue({
+      listMembers: [],
+      isLoadingListMembers: false,
+      error: new Error('Members failed to load'),
+      mutateListMembers: vi.fn().mockResolvedValue({}),
+    });
+
+    render(<ListDetails />);
+
+    // The framework mock renders ErrorState as the text 'Error State'.
+    expect(screen.getByText('Error State')).toBeInTheDocument();
+    expect(screen.queryByTestId('data-table-skeleton')).not.toBeInTheDocument();
+    expect(screen.queryByText(/there are no patients in this list/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps showing the members when refreshing them fails', () => {
+    mockUsePatientListMembers.mockReturnValue({
+      listMembers: mockPatientListMembers,
+      isLoadingListMembers: false,
+      error: new Error('Refresh failed'),
+      mutateListMembers: vi.fn().mockResolvedValue([]),
+    });
+
+    render(<ListDetails />);
+
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.queryByText('Error State')).not.toBeInTheDocument();
+  });
+
   it('opens workspace to edit patient list', async () => {
     const user = userEvent.setup();
     render(<ListDetails />);

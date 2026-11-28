@@ -42,6 +42,7 @@
   "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
   "listCreated": "List created successfully",
   "listDescriptionPlaceholder": "e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study",
+  "listMembers": "List members",
   "listName": "List name",
   "listNamePlaceholder": "e.g. Potential research participants",
   "listType": "List type",

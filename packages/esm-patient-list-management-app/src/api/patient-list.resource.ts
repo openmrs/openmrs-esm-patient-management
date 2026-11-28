@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import {
   type LoggedInUser,
   openmrsFetch,
+  openmrsFetchAll,
   refetchCurrentUser,
   restBaseUrl,
   fhirBaseUrl,
@@ -86,6 +87,22 @@ async function deleteData(url: string, data = {}, ac = new AbortController()) {
   });
 
   return response.data;
+}
+
+/**
+ * Returns a fetcher for `openmrsFetchAll` that can be aborted, and that throws an error returned in the
+ * response body of any page.
+ */
+function cohortFetcher<T>(ac: AbortController) {
+  return async (url: string) => {
+    const response = await openmrsFetch<CohortResponse<T>>(url, { signal: ac.signal });
+
+    if (response.data?.error) {
+      throw response.data.error;
+    }
+
+    return response;
+  };
 }
 
 export async function getAllPatientLists(
@@ -184,6 +201,24 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
   });
 
   return validPatients;
+}
+
+/** Only what the patient list page shows; `v=full` is many times larger. */
+const listMemberRepresentation =
+  'custom:(uuid,startDate,patient:(uuid,identifiers:(identifier),person:(display,gender,attributes:(value,attributeType:(display)))))';
+
+/**
+ * The URL of a list's members. It leaves out `limit`, so each page has the server's default size: the
+ * REST API rejects a limit above the server's configured maximum instead of returning a smaller page.
+ */
+export function getAllPatientListMembersUrl(patientListUuid: string) {
+  return `${cohortUrl}/cohortmember?cohort=${patientListUuid}&v=${listMemberRepresentation}`;
+}
+
+export async function getAllPatientListMembers(url: string) {
+  const response = await openmrsFetchAll<OpenmrsCohortMember>(url, cohortFetcher(new AbortController()));
+
+  return response.data.results;
 }
 
 export async function getPatientListIdsForPatient(patientUuid: string, ac = new AbortController()) {
