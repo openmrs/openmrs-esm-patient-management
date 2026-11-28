@@ -1,10 +1,11 @@
 import camelCase from 'lodash-es/camelCase';
 import { parseDate } from '@openmrs/esm-framework';
 import {
-  type Encounter,
   type FormValues,
   type PatientIdentifierValue,
   type PatientUuidMapType,
+  type RegistrationEncounter,
+  type RegistrationEncounterResponse,
 } from './patient-registration.types';
 
 export function scrollIntoView(viewId: string) {
@@ -114,5 +115,24 @@ export const filterOutUndefinedPatientIdentifiers = (patientIdentifiers: Identif
     ),
   );
 
-export const latestFirstEncounter = (a: Encounter, b: Encounter) =>
-  new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime();
+export const latestFirstEncounter = (
+  a: { encounterDatetime: Date | string },
+  b: { encounterDatetime: Date | string },
+) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime();
+
+export const REGISTRATION_ENCOUNTER_REPRESENTATION = 'custom:(uuid,encounterDatetime,obs:(uuid,concept:ref,value:ref))';
+
+/** Reads a registration encounter into form obs values and the obs uuids needed to update it. */
+export function getRegistrationEncounterObs(encounter: RegistrationEncounterResponse): {
+  obsValues: Record<string, string>;
+  registrationEncounter: RegistrationEncounter;
+} {
+  const obsValues: Record<string, string> = {};
+  const registrationEncounter: RegistrationEncounter = { uuid: encounter.uuid, obs: {} };
+  encounter.obs?.forEach(({ uuid, concept, value }) => {
+    const formValue = typeof value === 'object' ? value?.uuid : value;
+    obsValues[concept.uuid] = formValue as string;
+    registrationEncounter.obs[concept.uuid] = { uuid, value: String(formValue) };
+  });
+  return { obsValues, registrationEncounter };
+}
