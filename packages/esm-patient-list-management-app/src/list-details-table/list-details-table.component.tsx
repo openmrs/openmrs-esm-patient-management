@@ -190,7 +190,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           .filter(debouncedSearchTerm, patients, {
             extract: (patient: any) => `${patient.name} ${patient.identifier} ${patient.sex}`,
           })
-          .sort((r1, r2) => r1.score - r2.score)
+          .sort((r1, r2) => r2.score - r1.score)
           .map((result) => result.original)
       : patients;
   }, [debouncedSearchTerm, patients]);
@@ -198,7 +198,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   const tableRows = useMemo(
     () =>
       filteredPatients?.map((patient) => ({
-        id: patient.identifier,
+        id: patient.membershipUuid || patient.uuid,
         identifier: patient.identifier,
         membershipUuid: patient.membershipUuid,
         name: columns.find((column) => column.key === 'name')?.link ? (
@@ -396,7 +396,9 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => {
-                      const currentPatient = patients.find((patient) => patient.identifier === row.id);
+                      const currentPatient = patients.find(
+                        (patient) => (patient.membershipUuid || patient.uuid) === row.id,
+                      );
 
                       return (
                         <TableRow
@@ -439,9 +441,9 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           )}
           {pagination.usePagination && (
             <Pagination
-              backwardText={t('nextPage', 'Next page')}
+              backwardText={t('previousPage', 'Previous page')}
               className={styles.paginationOverride}
-              forwardText={t('previousPage', 'Previous page')}
+              forwardText={t('nextPage', 'Next page')}
               isLastPage={pagination.lastPage}
               onChange={pagination.onChange}
               page={pagination.currentPage}

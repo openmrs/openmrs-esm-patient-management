@@ -141,4 +141,26 @@ describe('ListDetails', () => {
       expect.objectContaining({ listName: expect.any(String), onConfirm: expect.any(Function) }),
     );
   });
+
+  it('updates and persists page size when changed in pagination', async () => {
+    const user = userEvent.setup();
+    mockUsePatientListDetails.mockReturnValue({
+      listDetails: {
+        ...mockPatientListDetails,
+        size: 50,
+      },
+      error: null,
+      isLoading: false,
+      mutateListDetails: vi.fn().mockResolvedValue({}),
+    });
+
+    render(<ListDetails />);
+
+    const pageSizeSelect = screen.getByRole('combobox', { name: /items per page/i });
+    expect(pageSizeSelect).toHaveValue('10');
+
+    await user.selectOptions(pageSizeSelect, '20');
+
+    expect(pageSizeSelect).toHaveValue('20');
+  });
 });

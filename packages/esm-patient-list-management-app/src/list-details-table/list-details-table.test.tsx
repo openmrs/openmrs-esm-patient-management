@@ -2,7 +2,7 @@ import React from 'react';
 import { vi, describe, it, expect, test, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
-import { isDesktop, launchWorkspace2, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, launchWorkspace2, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { addPatientToList } from '../api/patient-list.resource';
 import ListDetailsTable from './list-details-table.component';
 
@@ -10,12 +10,14 @@ const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUseLayoutType = vi.mocked(useLayoutType);
 const mockIsDesktop = vi.mocked(isDesktop);
 const mockLaunchWorkspace2 = vi.mocked(launchWorkspace2);
+const mockShowModal = vi.mocked(showModal);
 
 beforeEach(() => {
   mockUseLayoutType.mockReturnValue('small-desktop');
   mockIsDesktop.mockReturnValue(true);
   mockShowSnackbar.mockImplementation(() => {});
   mockLaunchWorkspace2.mockImplementation(() => {});
+  mockShowModal.mockImplementation(() => vi.fn());
 });
 
 vi.mock('../api/patient-list.resource', () => ({
@@ -27,21 +29,25 @@ describe('ListDetailsTable', () => {
   const patients = [
     {
       identifier: '123abced',
+      name: 'John Doe',
       firstName: 'John',
       lastName: 'Doe',
       age: 30,
       sex: 'Male',
       startDate: '2023-08-10',
+      uuid: 'patient-uuid-1',
       membershipUuid: 'ce7d26fa-e1b4-4e78-a1f5-3a7a5de9c0db',
     },
     {
       identifier: '123abcedfg',
+      name: 'Jane Smith',
       firstName: 'Jane',
       lastName: 'Smith',
       age: 25,
       sex: 'Female',
       startDate: '2023-08-10',
-      membershipUuid: 'ce7d26fa-e1b4-4e78-a1f5-3a7a5de9c0db',
+      uuid: 'patient-uuid-2',
+      membershipUuid: 'ce7d26fa-e1b4-4e78-a1f5-3a7a5de9c0dc',
     },
   ];
 
@@ -210,5 +216,134 @@ describe('ListDetailsTable', () => {
     expect(mockMutateListDetails).toHaveBeenCalled();
 
     expect(mockCloseWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('renders correct pagination backward and forward button accessibility labels', () => {
+    render(
+      <ListDetailsTable
+        patients={patients}
+        columns={columns}
+        pagination={pagination}
+        isLoading={false}
+        autoFocus={false}
+        isFetching={false}
+        mutateListDetails={vi.fn()}
+        mutateListMembers={vi.fn()}
+        cohortUuid="test-cohort"
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: /previous page/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next page/i })).toBeInTheDocument();
+  });
+
+  it('ranks higher fuzzy search score matches first', async () => {
+    const user = userEvent.setup();
+    const testPatients = [
+      {
+        identifier: 'ID1',
+        name: 'Jack Harrison Nelson',
+        sex: 'Male',
+        membershipUuid: 'm1',
+      },
+      {
+        identifier: 'ID2',
+        name: 'John',
+        sex: 'Male',
+        membershipUuid: 'm2',
+      },
+    ];
+
+    const testColumns = [
+      {
+        key: 'name',
+        header: 'Name',
+      },
+      {
+        key: 'identifier',
+        header: 'Identifier',
+      },
+    ];
+
+    render(
+      <ListDetailsTable
+        patients={testPatients}
+        columns={testColumns}
+        pagination={pagination}
+        isLoading={false}
+        autoFocus={false}
+        isFetching={false}
+        mutateListDetails={vi.fn()}
+        mutateListMembers={vi.fn()}
+        cohortUuid="test-cohort"
+      />,
+    );
+
+    const searchInput = screen.getByRole('searchbox');
+    await user.type(searchInput, 'jhn');
+
+    await waitFor(() => {
+      expect(screen.getByText('Jack Harrison Nelson')).toBeInTheDocument();
+    });
+
+    const rows = screen.getAllByRole('row');
+    expect(rows[1]).toHaveTextContent('John');
+    expect(rows[1]).toHaveTextContent('ID2');
+    expect(rows[2]).toHaveTextContent('Jack Harrison Nelson');
+    expect(rows[2]).toHaveTextContent('ID1');
+  });
+
+  it('handles patients without identifiers using membershipUuid or uuid and opens remove modal correctly', async () => {
+    const user = userEvent.setup();
+    const patientsWithoutId = [
+      {
+        identifier: null,
+        name: 'Patient A',
+        sex: 'Male',
+        membershipUuid: 'mem-uuid-1',
+        uuid: 'patient-a-uuid',
+      },
+      {
+        identifier: null,
+        name: 'Patient B',
+        sex: 'Female',
+        membershipUuid: 'mem-uuid-2',
+        uuid: 'patient-b-uuid',
+      },
+    ];
+
+    const testColumns = [
+      {
+        key: 'name',
+        header: 'Name',
+      },
+    ];
+
+    render(
+      <ListDetailsTable
+        patients={patientsWithoutId}
+        columns={testColumns}
+        pagination={pagination}
+        isLoading={false}
+        autoFocus={false}
+        isFetching={false}
+        mutateListDetails={vi.fn()}
+        mutateListMembers={vi.fn()}
+        cohortUuid="test-cohort"
+      />,
+    );
+
+    const removeButtons = screen.getAllByRole('button', { name: /remove from list/i });
+    expect(removeButtons).toHaveLength(2);
+
+    await user.click(removeButtons[1]);
+
+    expect(mockShowModal).toHaveBeenCalledWith(
+      'remove-patient-from-list-modal',
+      expect.objectContaining({
+        patientName: 'Patient B',
+        membershipUuid: 'mem-uuid-2',
+      }),
+    );
   });
 });
