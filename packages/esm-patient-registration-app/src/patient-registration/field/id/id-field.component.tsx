@@ -62,7 +62,7 @@ export function deleteIdentifierType(identifiers: FormValues['identifiers'], ide
 export const Identifiers: React.FC = () => {
   const { identifierTypes } = useResourcesContext();
   const isLoading = !identifierTypes?.length;
-  const { values, setFieldValue, initialFormValues } = usePatientRegistrationContext();
+  const { values, setFieldValue, initialFormValues, recordInitialFieldValue } = usePatientRegistrationContext();
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
@@ -98,6 +98,9 @@ export const Identifiers: React.FC = () => {
         fall into an infinite run.
       */
       if (Object.keys(identifiers).length) {
+        Object.entries(identifiers).forEach(([fieldName, value]) => {
+          recordInitialFieldValue?.(`identifiers.${fieldName}`, value);
+        });
         setFieldValue('identifiers', {
           ...values.identifiers,
           ...identifiers,

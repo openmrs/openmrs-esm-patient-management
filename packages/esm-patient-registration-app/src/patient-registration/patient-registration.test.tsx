@@ -12,6 +12,8 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import {
   type FetchResponse,
   getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
+  showModal,
   showSnackbar,
   useConfig,
   usePatient,
@@ -28,6 +30,7 @@ import { ResourcesContextProvider } from '../resources-context';
 
 const mockSaveEncounter = vi.mocked(saveEncounter);
 const mockSavePatient = vi.mocked(savePatient);
+const mockShowModal = vi.mocked(showModal);
 const mockShowSnackbar = vi.mocked(showSnackbar);
 const mockUseConfig = vi.mocked(useConfig<RegistrationConfig>);
 const mockUsePatient = vi.mocked(usePatient);
@@ -653,6 +656,78 @@ describe('Registering a new patient', () => {
     expect(mockSaveEncounter).toHaveBeenCalledTimes(2);
 
     expect(mockShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' }));
+  });
+
+  describe('Unsaved-changes prompt', () => {
+    beforeEach(() => {
+      mockShowModal.mockClear();
+    });
+
+    const navigateAway = () => {
+      const cancelNavigation = vi.fn();
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent('single-spa:before-routing-event', {
+            detail: { navigationIsCanceled: false, cancelNavigation, newUrl: '/elsewhere' },
+          }),
+        );
+      });
+      return cancelNavigation;
+    };
+
+    it('does not open when focusing and leaving fields or date pickers without changing values', async () => {
+      const user = userEvent.setup();
+
+      renderWithContext(
+        <PatientRegistration savePatientForm={vi.fn()} />,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
+
+      const givenNameInput = await screen.findByLabelText(/first name/i);
+      await user.click(givenNameInput);
+      await user.tab();
+
+      const datePickerProps = vi.mocked(OpenmrsDatePicker).mock.lastCall?.[0];
+      expect(datePickerProps?.onBlur).toEqual(expect.any(Function));
+      act(() => {
+        datePickerProps.onBlur({} as React.FocusEvent<HTMLInputElement>);
+      });
+
+      const cancelNavigation = navigateAway();
+      expect(cancelNavigation).not.toHaveBeenCalled();
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
+
+    it('opens when a field value changes and disarms if the change is reverted', async () => {
+      const user = userEvent.setup();
+
+      renderWithContext(
+        <PatientRegistration savePatientForm={vi.fn()} />,
+        ResourcesContextProvider,
+        mockResourcesContextValue,
+      );
+
+      const givenNameInput = await screen.findByLabelText(/first name/i);
+      await user.type(givenNameInput, 'John');
+
+      const firstCancel = navigateAway();
+      expect(firstCancel).toHaveBeenCalledTimes(1);
+      expect(mockShowModal).toHaveBeenCalledWith('cancel-patient-edit-modal', expect.anything(), expect.anything());
+
+      // Run BeforeSavePrompt's onClose callback so its internal modal-open guard resets before the second navigation.
+      const onClose = mockShowModal.mock.calls[0][2];
+      act(() => {
+        onClose?.();
+      });
+
+      mockShowModal.mockClear();
+      await user.clear(givenNameInput);
+
+      const secondCancel = navigateAway();
+      expect(secondCancel).not.toHaveBeenCalled();
+      expect(mockShowModal).not.toHaveBeenCalled();
+    });
   });
 });
 

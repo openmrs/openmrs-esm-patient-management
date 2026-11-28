@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, useCallback } from 'react';
+import React, { type ChangeEvent, useCallback, useRef } from 'react';
 import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
@@ -76,7 +76,20 @@ export const DobField: React.FC = () => {
     [setFieldValue, dateOfBirth, yearsEstimateMeta.value],
   );
 
+  // The estimated age when one of its inputs gained focus. Leaving an input without editing it keeps the form unchanged.
+  const estimatedAgeOnFocus = useRef<{ years: unknown; months: unknown } | null>(null);
+  const recordEstimatedAgeOnFocus = useCallback(() => {
+    estimatedAgeOnFocus.current = { years: yearsEstimateMeta.value, months: monthsEstimateMeta.value };
+  }, [yearsEstimateMeta.value, monthsEstimateMeta.value]);
+
   const updateBirthdate = useCallback(() => {
+    const isUnchanged =
+      estimatedAgeOnFocus.current?.years === yearsEstimateMeta.value &&
+      estimatedAgeOnFocus.current?.months === monthsEstimateMeta.value;
+    if (isUnchanged && birthdate.value) {
+      return;
+    }
+
     const months = +monthsEstimateMeta.value % 12;
     const years = +yearsEstimateMeta.value + Math.floor(monthsEstimateMeta.value / 12);
     setFieldValue('yearsEstimated', years);
@@ -85,7 +98,7 @@ export const DobField: React.FC = () => {
     setFieldTouched('yearsEstimated', true, false);
     setFieldTouched('monthsEstimated', true, false);
     setFieldTouched('birthdate', true, false);
-  }, [setFieldValue, setFieldTouched, monthsEstimateMeta, yearsEstimateMeta, dateOfBirth]);
+  }, [setFieldValue, setFieldTouched, monthsEstimateMeta, yearsEstimateMeta, dateOfBirth, birthdate.value]);
 
   return (
     <div className={styles.halfWidthInDesktopView}>
@@ -132,6 +145,7 @@ export const DobField: React.FC = () => {
                 min={0}
                 required
                 {...yearsEstimated}
+                onFocus={recordEstimatedAgeOnFocus}
                 onBlur={(e) => {
                   yearsEstimated.onBlur(e);
                   setFieldTouched('yearsEstimated', true, false);
@@ -152,6 +166,7 @@ export const DobField: React.FC = () => {
                 min={0}
                 {...monthsEstimated}
                 required={!yearsEstimateMeta.value}
+                onFocus={recordEstimatedAgeOnFocus}
                 onBlur={(e) => {
                   monthsEstimated.onBlur(e);
                   setFieldTouched('monthsEstimated', true, false);

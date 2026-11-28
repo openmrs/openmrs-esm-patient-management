@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
+import { cloneDeep, isEqual, set } from 'lodash-es';
 import { Button, InlineLoading, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
@@ -54,6 +55,21 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
 
   const [target, setTarget] = useState<undefined | string>();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
+
+  // Tracks the form's baseline values (including mount-time defaults applied by child sections)
+  // so BeforeSavePrompt only arms when the user actually changes data, not on focus/blur alone.
+  const baselineValuesRef = useRef<FormValues | null>(null);
+  const previousInitialValuesRef = useRef<FormValues | null>(null);
+  if (baselineValuesRef.current === null || !isEqual(previousInitialValuesRef.current, initialFormValues)) {
+    previousInitialValuesRef.current = initialFormValues;
+    baselineValuesRef.current = cloneDeep(initialFormValues);
+  }
+
+  const recordInitialFieldValue = useCallback((field: string, value: unknown) => {
+    if (baselineValuesRef.current) {
+      set(baselineValuesRef.current, field, cloneDeep(value));
+    }
+  }, []);
 
   const location = currentSession?.sessionLocation?.uuid;
   const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
@@ -177,8 +193,9 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
       currentPhoto: photo?.imageSrc,
       initialFormValues: formikProps.initialValues,
       setInitialFormValues,
+      recordInitialFieldValue,
     }),
-    [identifierTypes, inEditMode, setCapturePhotoProps, photo?.imageSrc, setInitialFormValues],
+    [identifierTypes, inEditMode, setCapturePhotoProps, photo?.imageSrc, setInitialFormValues, recordInitialFieldValue],
   );
 
   return (
@@ -189,7 +206,10 @@ const PatientRegistrationForm: React.FC<PatientRegistrationProps> = ({ savePatie
       validate={(values) => validateRegistrationForm(validationSchema, values)}>
       {(props) => (
         <Form className={styles.form}>
-          <BeforeSavePrompt when={Object.keys(props.touched).length > 0} redirect={target} />
+          <BeforeSavePrompt
+            when={!isEqual(baselineValuesRef.current, props.values) || Boolean(capturePhotoProps)}
+            redirect={target}
+          />
           <div className={styles.formContainer}>
             {/* Navigation Sidebar */}
             <div className={styles.stickyColumn}>
