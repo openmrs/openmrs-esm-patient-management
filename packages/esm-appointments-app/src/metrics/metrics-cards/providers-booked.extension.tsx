@@ -2,13 +2,14 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import MetricsCard from './metrics-card.component';
+import MetricsErrorCard from './metrics-error-card.component';
 import { useAppointmentsAppContext } from '../../hooks/useAppointmentsAppContext';
 import { useSelectedDate } from '../../hooks/useSelectedDate';
 
 export default function ProvidersBookedExtension() {
   const { t } = useTranslation();
   const selectedDate = useSelectedDate();
-  const { appointmentForSelectedDateFilteredByServiceTypes } = useAppointmentsAppContext();
+  const { appointmentForSelectedDateFilteredByServiceTypes, error } = useAppointmentsAppContext();
 
   const totalProviders = useMemo(() => {
     return appointmentForSelectedDateFilteredByServiceTypes.reduce((providersSet, appointment) => {
@@ -18,6 +19,10 @@ export default function ProvidersBookedExtension() {
   }, [appointmentForSelectedDateFilteredByServiceTypes]);
 
   const formattedStartDate = formatDate(parseDate(selectedDate), { mode: 'standard', time: false });
+
+  if (error) {
+    return <MetricsErrorCard headerLabel={t('providersBookedCardTitle', 'Providers booked')} />;
+  }
 
   return (
     <MetricsCard
