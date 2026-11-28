@@ -23,7 +23,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
       visit
         ? visit?.encounters?.map((encounter) => ({
             id: encounter.uuid,
-            time: formatTime(parseDate(encounter.encounterDateTime)),
+            time: formatTime(parseDate(encounter.encounterDatetime)),
             encounterType: encounter.encounterType.display,
             provider: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
             obs: encounter.obs,

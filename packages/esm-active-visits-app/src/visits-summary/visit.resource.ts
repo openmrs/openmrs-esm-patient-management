@@ -9,7 +9,7 @@ export function useVisit(visitUuid: string) {
     'dose,route:(uuid,display),frequency:(uuid,display),' +
     'duration,durationUnits:(uuid,display),numRefills,' +
     'orderType:(uuid,display),orderer:(uuid,person:(uuid,display))),' +
-    'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
+    'obs:(uuid,obsDatetime,concept:(uuid,display,conceptClass:(uuid,display)),' +
     'display,groupMembers:(uuid,concept:(uuid,display),' +
     'value:(uuid,display)),value),encounterType:(uuid,display),' +
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
