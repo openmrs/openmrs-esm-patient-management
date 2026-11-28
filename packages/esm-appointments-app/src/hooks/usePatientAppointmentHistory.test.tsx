@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { SWRConfig } from 'swr';
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
@@ -34,6 +34,10 @@ describe('usePatientAppointmentHistory', () => {
     mockUseSelectedDate.mockReturnValue('2026-04-01');
   });
 
+  afterEach(() => {
+    process.env.TZ = 'UTC';
+  });
+
   it('fetches separately when both patientUuid and selectedDate change', async () => {
     mockOpenmrsFetch
       .mockResolvedValueOnce({ data: [] } as FetchResponse)
@@ -50,7 +54,7 @@ describe('usePatientAppointmentHistory', () => {
       `${restBaseUrl}/appointments/search`,
       expect.objectContaining({
         method: 'POST',
-        body: expect.objectContaining({ patientUuid: 'patient-1', startDate: '2026-04-01' }),
+        body: expect.objectContaining({ patientUuid: 'patient-1', startDate: '2026-04-01T00:00:00.000Z' }),
       }),
     );
     expect(result.current.appointmentsCount.missedAppointments).toBe(0);
@@ -64,7 +68,7 @@ describe('usePatientAppointmentHistory', () => {
       `${restBaseUrl}/appointments/search`,
       expect.objectContaining({
         method: 'POST',
-        body: expect.objectContaining({ patientUuid: 'patient-2', startDate: '2026-04-15' }),
+        body: expect.objectContaining({ patientUuid: 'patient-2', startDate: '2026-04-15T00:00:00.000Z' }),
       }),
     );
     // Data must reflect patient-2's response, not patient-1's cached empty data
@@ -95,7 +99,7 @@ describe('usePatientAppointmentHistory', () => {
       2,
       `${restBaseUrl}/appointments/search`,
       expect.objectContaining({
-        body: expect.objectContaining({ patientUuid: 'patient-2', startDate: '2026-04-01' }),
+        body: expect.objectContaining({ patientUuid: 'patient-2', startDate: '2026-04-01T00:00:00.000Z' }),
       }),
     );
     // Result must reflect patient-2's data, not patient-1's cached empty data
@@ -117,7 +121,7 @@ describe('usePatientAppointmentHistory', () => {
       1,
       `${restBaseUrl}/appointments/search`,
       expect.objectContaining({
-        body: expect.objectContaining({ patientUuid: 'patient-1', startDate: '2026-04-01' }),
+        body: expect.objectContaining({ patientUuid: 'patient-1', startDate: '2026-04-01T00:00:00.000Z' }),
       }),
     );
     expect(result.current.appointmentsCount.completedAppointments).toBe(0);
@@ -131,11 +135,34 @@ describe('usePatientAppointmentHistory', () => {
       2,
       `${restBaseUrl}/appointments/search`,
       expect.objectContaining({
-        body: expect.objectContaining({ patientUuid: 'patient-1', startDate: '2026-04-15' }),
+        body: expect.objectContaining({ patientUuid: 'patient-1', startDate: '2026-04-15T00:00:00.000Z' }),
       }),
     );
     // Data must reflect the new date's response, not the first date's cached empty data
     await waitFor(() => expect(result.current.appointmentsCount.completedAppointments).toBe(1));
+  });
+
+  it.each([
+    ['Asia/Ho_Chi_Minh', '2026-12-14T17:00:00.000Z'],
+    ['America/New_York', '2026-12-15T05:00:00.000Z'],
+    ['UTC', '2026-12-15T00:00:00.000Z'],
+  ])('sends the start of the local day in %s as a UTC instant', async (timeZone, expectedStartDate) => {
+    process.env.TZ = timeZone;
+    mockUseSelectedDate.mockReturnValue('2026-12-15');
+
+    renderHook(({ patientUuid }) => usePatientAppointmentHistory(patientUuid), {
+      wrapper,
+      initialProps: { patientUuid: 'patient-1' },
+    });
+
+    await waitFor(() => expect(mockOpenmrsFetch).toHaveBeenCalledTimes(1));
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      `${restBaseUrl}/appointments/search`,
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.objectContaining({ patientUuid: 'patient-1', startDate: expectedStartDate }),
+      }),
+    );
   });
 
   it('does not fetch again when patientUuid and selectedDate are unchanged (cache hit)', async () => {
