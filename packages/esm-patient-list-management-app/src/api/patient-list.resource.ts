@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import {
   type LoggedInUser,
   openmrsFetch,
+  openmrsFetchAll,
   refetchCurrentUser,
   restBaseUrl,
   fhirBaseUrl,
@@ -88,6 +89,22 @@ async function deleteData(url: string, data = {}, ac = new AbortController()) {
   return response.data;
 }
 
+/**
+ * Returns a fetcher for `openmrsFetchAll` that can be aborted, and that throws an error returned in the
+ * response body of any page.
+ */
+function cohortFetcher<T>(ac: AbortController) {
+  return async (url: string) => {
+    const response = await openmrsFetch<CohortResponse<T>>(url, { signal: ac.signal });
+
+    if (response.data?.error) {
+      throw response.data.error;
+    }
+
+    return response;
+  };
+}
+
 export async function getAllPatientLists(
   filter: PatientListFilter = {},
   systemListCohortTypeUUID,
@@ -111,14 +128,8 @@ export async function getAllPatientLists(
 
   const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
   const {
-    data: { results, error },
-  } = await openmrsFetch<CohortResponse<OpenmrsCohort>>(`${cohortUrl}/cohort?${params}`, {
-    signal: ac.signal,
-  });
-
-  if (error) {
-    throw error;
-  }
+    data: { results },
+  } = await openmrsFetchAll<OpenmrsCohort>(`${cohortUrl}/cohort?${params}`, cohortFetcher(ac));
 
   return results.map((cohort) => ({
     id: cohort.uuid,
@@ -188,17 +199,11 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
 
 export async function getPatientListIdsForPatient(patientUuid: string, ac = new AbortController()) {
   const {
-    data: { results, error },
-  } = await openmrsFetch<CohortResponse<OpenmrsCohortRef>>(
+    data: { results },
+  } = await openmrsFetchAll<OpenmrsCohortRef>(
     `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
-    {
-      signal: ac.signal,
-    },
+    cohortFetcher(ac),
   );
-
-  if (error) {
-    throw error;
-  }
 
   return results.map((ref) => ref.cohort.uuid);
 }
