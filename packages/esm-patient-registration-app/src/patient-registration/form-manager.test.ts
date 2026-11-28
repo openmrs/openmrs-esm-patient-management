@@ -803,4 +803,23 @@ describe('FormManager', () => {
       expect(mockSavePatient.mock.calls[1][0].identifiers).toEqual([expect.objectContaining({ identifier: '10002X' })]);
     });
   });
+
+  describe('getPatientToCreate addresses', () => {
+    it('includes preferredAddressUuid on the address when editing an existing patient', () => {
+      const patient = FormManager.getPatientToCreate(
+        { ...formValues, address: { cityVillage: 'Kisumu' } },
+        { preferredNameUuid: 'name-uuid', preferredAddressUuid: 'address-uuid' },
+        [],
+      );
+
+      expect(patient.person.addresses).toEqual([{ uuid: 'address-uuid', cityVillage: 'Kisumu' }]);
+    });
+
+    it('omits uuid from the address when there is no existing address uuid', () => {
+      const patient = FormManager.getPatientToCreate({ ...formValues, address: { cityVillage: 'Kisumu' } }, {}, []);
+
+      expect(patient.person.addresses).toEqual([{ cityVillage: 'Kisumu' }]);
+      expect('uuid' in patient.person.addresses[0]).toBe(false);
+    });
+  });
 });
